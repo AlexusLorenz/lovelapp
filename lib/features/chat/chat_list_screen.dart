@@ -4,10 +4,10 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/placeholder_photo.dart';
 import '../discover/discover_providers.dart';
 import '../discover/public_profile.dart';
 import '../matches/matches_repository.dart';
+import '../../core/widgets/profile_image.dart';
 
 /// Oben neue Matches (noch ohne Nachricht) als Profilbilder,
 /// darunter alle Unterhaltungen.
@@ -97,7 +97,7 @@ class ProfileAvatar extends StatelessWidget {
       return ClipOval(
         child: SizedBox.square(
           dimension: radius * 2,
-          child: PlaceholderPhoto(art: profile.photos.first),
+          child: ProfileImageView(image: profile.photos.first),
         ),
       );
     }

@@ -2,15 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../core/config/env.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/placeholder_photo.dart';
 import '../../data/demo_data.dart';
 import '../discover/discover_providers.dart';
 import '../matches/matches_repository.dart';
 import '../session/session_controller.dart';
+import '../profile/own_profile_providers.dart';
 import 'chat_background.dart';
+import '../../core/widgets/profile_image.dart';
 
 /// Chat mit einem Match – Nachrichten kommen live (Supabase Realtime).
 class ChatScreen extends ConsumerStatefulWidget {
@@ -106,7 +106,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     final me = _AvatarData(
       name: myName,
-      photo: Env.hasSupabase ? null : demoMyPhoto,
+      photo:
+          ref.watch(ownPhotosProvider).value?.firstOrNull?.image ??
+          myMainPhoto(ref),
     );
     final them = _AvatarData(
       name: partner?.name ?? '?',
@@ -197,7 +199,7 @@ class _AvatarData {
   const _AvatarData({required this.name, this.photo});
 
   final String name;
-  final PhotoArt? photo;
+  final ProfileImage? photo;
 }
 
 class _Avatar extends StatelessWidget {
@@ -213,7 +215,7 @@ class _Avatar extends StatelessWidget {
       return ClipOval(
         child: SizedBox.square(
           dimension: radius * 2,
-          child: PlaceholderPhoto(art: photo),
+          child: ProfileImageView(image: photo),
         ),
       );
     }

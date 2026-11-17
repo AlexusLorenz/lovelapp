@@ -1,4 +1,4 @@
-import '../../core/widgets/placeholder_photo.dart';
+import '../../core/widgets/profile_image.dart';
 import '../profile/profile_basics.dart';
 import '../profile/profile_prompts.dart';
 
@@ -22,6 +22,7 @@ class PublicProfile {
   factory PublicProfile.fromRow(
     Map<String, Object?> row, {
     List<PromptAnswer> prompts = const [],
+    List<ProfileImage> photos = const [],
   }) {
     return PublicProfile(
       id: row['id']! as String,
@@ -32,6 +33,7 @@ class PublicProfile {
       bio: (row['bio'] as String?) ?? '',
       level: (row['level'] as num?)?.toInt() ?? 1,
       prompts: prompts,
+      photos: photos,
       basics: ProfileBasics.fromJson(row),
     );
   }
@@ -46,10 +48,24 @@ class PublicProfile {
   final String bio;
   final int level;
 
-  /// Bis zum Foto-Upload gezeichnete Platzhalter; leer = Initiale zeigen.
-  final List<PhotoArt> photos;
+  /// Fotos in Anzeige-Reihenfolge; leer = Initiale zeigen.
+  final List<ProfileImage> photos;
   final List<PromptAnswer> prompts;
   final ProfileBasics basics;
+
+  PublicProfile copyWith({List<ProfileImage>? photos}) => PublicProfile(
+    id: id,
+    name: name,
+    age: age,
+    city: city,
+    distanceKm: distanceKm,
+    bio: bio,
+    level: level,
+    photos: photos ?? this.photos,
+    prompts: prompts,
+    basics: basics,
+    likesYouBack: likesYouBack,
+  );
 
   /// Nur Demo: Würde dieses Profil zurückliken?
   final bool likesYouBack;

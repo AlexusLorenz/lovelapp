@@ -124,7 +124,7 @@ Die Werte stehen in `lib/features/economy/like_quota.dart` **und** `public.like_
 - Melden/Blockieren im Chat an die Datenbank anschließen
 - Profil bearbeiten: Geburtsdatum, Geschlecht, Orientierung (mit Widerruf der Einwilligung)
 - Konto löschen (DSGVO)
-- Foto-Upload und Moderation (Freigabe-Workflow)
+- Foto-Moderation: neue Fotos sind vorerst sofort sichtbar (Default `approved`); vor dem Launch Prüfung einbauen
 - Edge Function für AdMob Server-Side Verification → `grant_rewarded_ad_bonus()`
 - Echte Mehrspieler-Runden über Realtime
 - iOS-Build in der CI (macOS-Runner)

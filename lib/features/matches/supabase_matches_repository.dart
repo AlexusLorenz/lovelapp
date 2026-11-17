@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../discover/public_profile.dart';
+import '../photos/photos_repository.dart';
 import 'matches_repository.dart';
 
 class SupabaseMatchesRepository implements MatchesRepository {
-  SupabaseMatchesRepository(this._client);
+  SupabaseMatchesRepository(this._client, this._photos);
 
   final SupabaseClient _client;
+  final PhotosRepository _photos;
 
   @override
   Future<List<MatchSummary>> fetchMatches() async {
@@ -40,11 +42,13 @@ class SupabaseMatchesRepository implements MatchesRepository {
           .select('profile_id, position, prompt_key, answer')
           .inFilter('profile_id', partnerIds);
       final prompts = groupPromptRows(promptRows);
+      final photos = await _photos.imagesFor(partnerIds);
       final profiles = {
         for (final r in profileRows.cast<Map<String, Object?>>())
           r['id']! as String: PublicProfile.fromRow(
             r,
             prompts: prompts[r['id']] ?? const [],
+            photos: photos[r['id']] ?? const [],
           ),
       };
 

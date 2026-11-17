@@ -3,13 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/placeholder_photo.dart';
 import '../profile/profile_basics.dart';
 import '../profile/profile_prompts.dart';
 import 'discover_providers.dart';
 import 'photo_gallery.dart';
 import 'public_profile.dart';
 import 'swipe_card.dart';
+import '../../core/widgets/profile_image.dart';
 
 /// Ganzes Profil: Bilder, Text, Fragen und Steckbrief.
 ///
@@ -20,14 +20,19 @@ class ProfileDetailScreen extends ConsumerWidget {
     super.key,
     required this.profileId,
     this.showActions = false,
+    this.preview,
   });
 
   final String profileId;
   final bool showActions;
 
+  /// Fertiges Profil statt Laden über die ID – z. B. die eigene Vorschau.
+  final AsyncValue<PublicProfile?>? preview;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(profileByIdProvider(profileId));
+    final AsyncValue<PublicProfile?> async =
+        preview ?? ref.watch(profileByIdProvider(profileId));
     if (async.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -55,7 +60,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   background: profile.photos.isEmpty
                       ? PhotoGallery(photos: const [], name: profile.name)
-                      : PlaceholderPhoto(art: profile.photos.first),
+                      : ProfileImageView(image: profile.photos.first),
                 ),
               ),
               SliverPadding(
@@ -197,7 +202,7 @@ class _PromptCard extends StatelessWidget {
 class _PhotoTile extends StatelessWidget {
   const _PhotoTile({required this.art});
 
-  final PhotoArt art;
+  final ProfileImage art;
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +210,7 @@ class _PhotoTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       child: AspectRatio(
         aspectRatio: 4 / 5,
-        child: PlaceholderPhoto(art: art),
+        child: ProfileImageView(image: art),
       ),
     );
   }

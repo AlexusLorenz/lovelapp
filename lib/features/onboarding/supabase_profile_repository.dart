@@ -85,8 +85,8 @@ class SupabaseProfileRepository implements ProfileRepository {
       final row = await _client
           .from('profiles')
           .select(
-            'display_name, bio, city, relationship_goal, children, smoking, '
-            'drinking, exercise, height_cm',
+            'display_name, birthdate, xp, bio, city, relationship_goal, '
+            'children, smoking, drinking, exercise, height_cm',
           )
           .eq('id', userId)
           .maybeSingle();

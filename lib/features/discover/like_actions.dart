@@ -2,11 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../core/config/env.dart';
 import '../../core/router/app_router.dart';
 import '../../data/demo_data.dart';
 import '../economy/like_quota_controller.dart';
 import '../session/session_controller.dart';
+import '../profile/own_profile_providers.dart';
 import 'discover_providers.dart';
 import 'discover_repository.dart';
 import 'match_overlay.dart';
@@ -61,7 +61,7 @@ Future<void> _celebrate(
   final result = await showMatchOverlay(
     context,
     myName: me?.displayName ?? demoMyName,
-    myPhoto: Env.hasSupabase ? null : demoMyPhoto,
+    myPhoto: myMainPhoto(ref),
     matchName: profile.name,
     matchPhoto: profile.photos.isEmpty ? null : profile.photos.first,
   );

@@ -66,6 +66,8 @@ class DemoProfileRepository implements ProfileRepository {
       // Vorbelegtes Demo-Profil
       return const OwnProfile(
         displayName: 'Du',
+        age: 28,
+        xp: 240,
         city: 'Leipzig',
         basics: ProfileBasics(smoking: Smoking.never),
       );

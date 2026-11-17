@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
-import 'placeholder_photo.dart';
+import 'profile_image.dart';
 
 /// Profilbild im Polaroid-Stil.
 ///
@@ -18,7 +18,7 @@ class ProfilePhoto extends StatelessWidget {
   });
 
   /// Gezeichnetes Platzhalter-Bild; ohne wird die Initiale gezeigt.
-  final PhotoArt? art;
+  final ProfileImage? art;
 
   final String name;
   final double width;
@@ -55,7 +55,7 @@ class ProfilePhoto extends StatelessWidget {
       child: art != null
           ? ClipRRect(
               borderRadius: BorderRadius.circular(6),
-              child: PlaceholderPhoto(art: art!),
+              child: ProfileImageView(image: art!),
             )
           : DecoratedBox(
               decoration: BoxDecoration(

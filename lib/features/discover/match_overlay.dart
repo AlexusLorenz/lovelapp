@@ -2,9 +2,9 @@ import 'package:flame/game.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/placeholder_photo.dart';
 import '../../core/widgets/profile_photo.dart';
 import '../games/flame/hearts_game.dart';
+import '../../core/widgets/profile_image.dart';
 
 /// Was der Nutzer im Match-Overlay gewählt hat.
 enum MatchOverlayResult { playGame, keepDiscovering }
@@ -18,8 +18,8 @@ Future<MatchOverlayResult?> showMatchOverlay(
   BuildContext context, {
   required String myName,
   required String matchName,
-  PhotoArt? myPhoto,
-  PhotoArt? matchPhoto,
+  ProfileImage? myPhoto,
+  ProfileImage? matchPhoto,
 }) {
   return showGeneralDialog<MatchOverlayResult>(
     context: context,
@@ -49,8 +49,8 @@ class MatchOverlay extends StatefulWidget {
 
   final String myName;
   final String matchName;
-  final PhotoArt? myPhoto;
-  final PhotoArt? matchPhoto;
+  final ProfileImage? myPhoto;
+  final ProfileImage? matchPhoto;
 
   /// Gesamtdauer der Choreografie.
   static const duration = Duration(milliseconds: 2200);

@@ -19,6 +19,10 @@ import 'package:lovelapp/features/auth/supabase_auth_repository.dart';
 import 'package:lovelapp/features/discover/supabase_discover_repository.dart';
 import 'package:lovelapp/features/matches/supabase_matches_repository.dart';
 import 'package:lovelapp/features/onboarding/supabase_profile_repository.dart';
+import 'package:lovelapp/core/widgets/profile_image.dart';
+import 'package:lovelapp/features/photos/image_processing.dart';
+import 'package:lovelapp/features/photos/supabase_photos_repository.dart';
+import 'package:image/image.dart' as img;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 const url = String.fromEnvironment('SUPABASE_URL');
@@ -60,6 +64,11 @@ void main() {
     final idA = a.auth.currentUser!.id;
     final idB = b.auth.currentUser!.id;
 
+    // Reste früherer Läufe wegräumen (Fotos von B)
+    for (final p in await SupabasePhotosRepository(b).fetchOwn(idB)) {
+      await SupabasePhotosRepository(b).delete(idB, p);
+    }
+
     // Falsches Passwort → verständlicher Fehler
     await expectLater(
       SupabaseAuthRepository(newClient())
@@ -80,7 +89,10 @@ void main() {
     expect(own!.hasLocation, isTrue);
 
     // Feed von A enthält B mit Fragen und gerundeter Entfernung
-    final discoverA = SupabaseDiscoverRepository(a);
+    final discoverA = SupabaseDiscoverRepository(
+      a,
+      SupabasePhotosRepository(a),
+    );
     final feed = await discoverA.fetchFeed();
     final ben = feed.singleWhere((p) => p.id == idB);
     expect(ben.prompts.length, 3);
@@ -92,7 +104,7 @@ void main() {
     expect(detail!.name, ben.name);
 
     // B hört live auf seinen Posteingang (Likes, Matches, Nachrichten)
-    final inboxB = SupabaseMatchesRepository(b);
+    final inboxB = SupabaseMatchesRepository(b, SupabasePhotosRepository(b));
     var pingsB = 0;
     final inboxSubB = inboxB.watchInbox().listen((_) => pingsB++);
     await Future<void>.delayed(const Duration(seconds: 4));
@@ -106,16 +118,22 @@ void main() {
 
     // B sieht den Like live und in „Likes“
     await _waitFor(() => pingsB > 0, 'Like kommt live bei B an');
-    final likesB = await SupabaseDiscoverRepository(b).fetchReceivedLikes();
+    final likesB = await SupabaseDiscoverRepository(
+      b,
+      SupabasePhotosRepository(b),
+    ).fetchReceivedLikes();
     expect(likesB.single.id, idA);
 
     // B liked zurück → Match
-    final second = await SupabaseDiscoverRepository(b).like(idA);
+    final second = await SupabaseDiscoverRepository(
+      b,
+      SupabasePhotosRepository(b),
+    ).like(idA);
     expect(second.matched, isTrue);
 
     // Matches und Chat
-    final matchesA = SupabaseMatchesRepository(a);
-    final matchesB = SupabaseMatchesRepository(b);
+    final matchesA = SupabaseMatchesRepository(a, SupabasePhotosRepository(a));
+    final matchesB = SupabaseMatchesRepository(b, SupabasePhotosRepository(b));
     final listA = await matchesA.fetchMatches();
     expect(listA.single.profile.id, idB);
     final matchId = listA.single.matchId;
@@ -145,11 +163,55 @@ void main() {
     await matchesA.markRead(matchId);
     expect((await matchesA.fetchMatches()).single.unreadCount, 0);
     await _waitFor(() => pingsB > before, 'Gelesen-Status kommt live bei B an');
-    expect((await SupabaseDiscoverRepository(b).fetchReceivedLikes()), isEmpty);
+    expect(
+      (await SupabaseDiscoverRepository(
+        b,
+        SupabasePhotosRepository(b),
+      ).fetchReceivedLikes()),
+      isEmpty,
+    );
 
     // A antwortet → Vorschau aktualisiert
     await matchesA.sendMessage(matchId, 'Hallo zurück!');
     expect((await matchesB.fetchMatches()).single.lastMessage, 'Hallo zurück!');
+
+    // Fotos: B lädt zwei hoch, sortiert um; A sieht sie in Bs Profil
+    final photosB = SupabasePhotosRepository(b);
+    final jpeg1 = prepareProfileJpeg(
+      img.encodePng(img.Image(width: 800, height: 1000)),
+    );
+    final jpeg2 = prepareProfileJpeg(
+      img.encodePng(
+        img.fill(
+          img.Image(width: 600, height: 600),
+          color: img.ColorRgb8(200, 90, 60),
+        ),
+      ),
+    );
+    final p1 = await photosB.upload(idB, jpeg1, position: 0);
+    final p2 = await photosB.upload(idB, jpeg2, position: 1);
+    await photosB.reorder(idB, [p2.id, p1.id]);
+    final ownPhotos = await photosB.fetchOwn(idB);
+    expect(ownPhotos.map((p) => p.id), [p2.id, p1.id]);
+
+    final seenByA = await SupabasePhotosRepository(a).imagesFor([idB]);
+    expect(seenByA[idB], hasLength(2));
+    final photoUrl = (seenByA[idB]!.first as NetworkProfileImage).url;
+    final response = await HttpClient()
+        .getUrl(Uri.parse(photoUrl))
+        .then((r) => r.close());
+    expect(response.statusCode, 200, reason: 'Signierte URL lädt das Bild');
+    await response.drain<void>();
+
+    // A darf Bs Fotos nicht löschen
+    await SupabasePhotosRepository(a).delete(idA, ownPhotos.first);
+    expect(await photosB.fetchOwn(idB), hasLength(2));
+
+    // Aufräumen: B löscht seine Fotos (Datei + Eintrag)
+    for (final p in ownPhotos) {
+      await photosB.delete(idB, p);
+    }
+    expect(await photosB.fetchOwn(idB), isEmpty);
 
     await inboxSubB.cancel();
     await a.dispose();

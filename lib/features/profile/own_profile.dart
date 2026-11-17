@@ -2,6 +2,7 @@
 library;
 
 import '../onboarding/profile_draft.dart';
+import '../progress/level.dart';
 import 'profile_basics.dart';
 import 'profile_prompts.dart';
 
@@ -12,6 +13,8 @@ import 'profile_prompts.dart';
 class OwnProfile {
   const OwnProfile({
     required this.displayName,
+    this.age,
+    this.xp = 0,
     this.bio = '',
     this.city = '',
     this.basics = const ProfileBasics(),
@@ -21,8 +24,14 @@ class OwnProfile {
   factory OwnProfile.fromRow(
     Map<String, Object?> row, {
     List<PromptAnswer> prompts = const [],
+    DateTime? today,
   }) => OwnProfile(
     displayName: row['display_name']! as String,
+    age: switch (row['birthdate']) {
+      final String b => ageOn(DateTime.parse(b), today ?? DateTime.now()),
+      _ => null,
+    },
+    xp: (row['xp'] as num?)?.toInt() ?? 0,
     bio: (row['bio'] as String?) ?? '',
     city: (row['city'] as String?) ?? '',
     basics: ProfileBasics.fromJson(row),
@@ -30,6 +39,12 @@ class OwnProfile {
   );
 
   final String displayName;
+
+  /// Nur zur Anzeige (Vorschau); geändert wird hier nichts davon.
+  final int? age;
+  final int xp;
+  int get level => LevelProgress.fromXp(xp).level;
+
   final String bio;
   final String city;
   final ProfileBasics basics;

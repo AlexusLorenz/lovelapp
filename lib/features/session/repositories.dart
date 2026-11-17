@@ -10,6 +10,8 @@ import '../location/location_service.dart';
 import '../matches/matches_repository.dart';
 import '../matches/supabase_matches_repository.dart';
 import '../onboarding/profile_repository.dart';
+import '../photos/photos_repository.dart';
+import '../photos/supabase_photos_repository.dart';
 import '../onboarding/supabase_profile_repository.dart';
 
 // Mit Supabase-Zugangsdaten echte Repositories, sonst Demo-Modus.
@@ -29,13 +31,19 @@ final profileRepositoryProvider = Provider<ProfileRepository>(
 
 final discoverRepositoryProvider = Provider<DiscoverRepository>(
   (ref) => Env.hasSupabase
-      ? SupabaseDiscoverRepository(Supabase.instance.client)
+      ? SupabaseDiscoverRepository(
+          Supabase.instance.client,
+          ref.read(photosRepositoryProvider),
+        )
       : DemoDiscoverRepository(),
 );
 
 final matchesRepositoryProvider = Provider<MatchesRepository>(
   (ref) => Env.hasSupabase
-      ? SupabaseMatchesRepository(Supabase.instance.client)
+      ? SupabaseMatchesRepository(
+          Supabase.instance.client,
+          ref.read(photosRepositoryProvider),
+        )
       : DemoMatchesRepository(
           myUserId: () =>
               ref.read(authRepositoryProvider).currentUser?.id ?? 'me',
@@ -46,4 +54,10 @@ final locationServiceProvider = Provider<LocationService>(
   (ref) => Env.hasSupabase
       ? const DeviceLocationService()
       : const FakeLocationService(),
+);
+
+final photosRepositoryProvider = Provider<PhotosRepository>(
+  (ref) => Env.hasSupabase
+      ? SupabasePhotosRepository(Supabase.instance.client)
+      : DemoPhotosRepository(),
 );

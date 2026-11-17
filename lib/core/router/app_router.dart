@@ -17,6 +17,7 @@ import '../../features/games/games_screen.dart';
 import '../../features/games/this_or_that/this_or_that_screen.dart';
 import '../../features/likes/likes_screen.dart';
 import '../../features/profile/edit_profile_screen.dart';
+import '../../features/profile/own_preview_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../widgets/app_shell.dart';
 
@@ -29,6 +30,7 @@ class Routes {
   static const profile = '/profile';
   static const games = '/games';
   static const editProfile = '/profile/edit';
+  static const ownPreview = '/me';
 
   static const splash = '/splash';
   static const welcome = '/welcome';
@@ -152,6 +154,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: Routes.ownPreview,
+        pageBuilder: (context, state) => const MaterialPage(
+          fullscreenDialog: true,
+          child: OwnPreviewScreen(),
+        ),
       ),
       GoRoute(
         path: '/people/:id',

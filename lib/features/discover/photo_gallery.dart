@@ -1,14 +1,14 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/placeholder_photo.dart';
+import '../../core/widgets/profile_image.dart';
 
 /// Bilder eines Profils; Tippen links/rechts blättert, Balken oben zeigen
 /// die Position.
 class PhotoGallery extends StatefulWidget {
   const PhotoGallery({super.key, required this.photos, this.name = ''});
 
-  final List<PhotoArt> photos;
+  final List<ProfileImage> photos;
 
   /// Für die Initiale, solange es keine Bilder gibt.
   final String name;
@@ -63,7 +63,7 @@ class _PhotoGalleryState extends State<PhotoGallery> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            PlaceholderPhoto(art: photos[_index]),
+            ProfileImageView(image: photos[_index]),
             if (photos.length > 1)
               Positioned(
                 top: 10,

@@ -7,14 +7,10 @@ import '../onboarding/profile_draft.dart';
 import '../onboarding/profile_repository.dart';
 import '../session/session_controller.dart';
 import 'own_profile.dart';
+import 'own_profile_providers.dart';
 import 'profile_basics.dart';
+import 'widgets/photo_editor.dart';
 import 'widgets/profile_editors.dart';
-
-final ownProfileProvider = FutureProvider.autoDispose<OwnProfile?>((ref) async {
-  final id = ref.watch(sessionProvider.select((s) => s.user?.id));
-  if (id == null) return null;
-  return ref.read(profileRepositoryProvider).fetchOwnProfile(id);
-});
 
 /// Eigenes Profil bearbeiten: Name, Über mich, Stadt, Steckbrief, Fragen.
 class EditProfileScreen extends ConsumerWidget {
@@ -133,6 +129,10 @@ class _EditFormState extends ConsumerState<_EditForm> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
+            Text('Fotos', style: theme.textTheme.headlineSmall),
+            const SizedBox(height: 12),
+            const PhotoEditor(),
+            const SizedBox(height: 24),
             TextFormField(
               controller: _name,
               maxLength: maxDisplayNameLength,

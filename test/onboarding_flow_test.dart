@@ -1,9 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'package:lovelapp/features/profile/widgets/completion_avatar.dart';
+
 import 'helpers.dart';
 
 Finder field(String label) => find.widgetWithText(TextFormField, label);
+
+/// Scrollt die (senkrechte) Hauptliste, bis [finder] sichtbar ist – etwas
+/// weiter, damit nichts am Rand unter der Navigationsleiste liegt.
+Future<void> scrollTo(WidgetTester tester, Finder finder) async {
+  final vertical = find.byWidgetPredicate(
+    (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+  );
+  // .first: die Liste selbst; mehrzeilige Textfelder sind auch Scrollables.
+  await tester.scrollUntilVisible(finder, 150, scrollable: vertical.first);
+  await tester.drag(vertical.first, const Offset(0, -120));
+  await tester.pumpAndSettle();
+}
 
 Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
@@ -116,11 +130,7 @@ void main() {
   testWidgets('Abmelden führt zur Startseite', (tester) async {
     await pumpLovelApp(tester);
     await tapAndSettle(tester, find.text('Profil'));
-    await tester.scrollUntilVisible(
-      find.text('Abmelden'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollTo(tester, find.text('Abmelden'));
     await tapAndSettle(tester, find.text('Abmelden'));
     expect(find.text('Erst spielen, dann daten.'), findsOneWidget);
   });
@@ -148,29 +158,20 @@ void main() {
   ) async {
     await pumpLovelApp(tester);
     await tapAndSettle(tester, find.text('Profil'));
-    await tester.scrollUntilVisible(
-      find.text('Profil bearbeiten'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollTo(tester, find.text('Profil bearbeiten'));
     await tapAndSettle(tester, find.text('Profil bearbeiten'));
 
     expect(find.text('Profil bearbeiten'), findsOneWidget);
+    await scrollTo(tester, field('Über mich'));
     await tester.enterText(field('Über mich'), 'Neu hier.');
+    await scrollTo(tester, find.text('Frage 1 auswählen'));
     await tapAndSettle(tester, find.text('Frage 1 auswählen'));
     await tapAndSettle(tester, find.text('Mein perfekter Sonntag …'));
     await tester.enterText(
       find.widgetWithText(TextField, 'Antwort 1'),
       'Lange schlafen',
     );
-    await tester.scrollUntilVisible(
-      find.text('Trinke gesellig'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    // Etwas weiter, damit der Chip nicht am Rand unter der Leiste liegt.
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
-    await tester.pumpAndSettle();
+    await scrollTo(tester, find.text('Trinke gesellig'));
     await tapAndSettle(tester, find.text('Trinke gesellig'));
     await tapAndSettle(tester, find.widgetWithText(TextButton, 'Speichern'));
 
@@ -179,12 +180,9 @@ void main() {
     // Erneut öffnen: Werte sind da
     await tapAndSettle(tester, find.text('Profil bearbeiten'));
     expect(find.text('Neu hier.'), findsOneWidget);
+    await scrollTo(tester, find.text('Lange schlafen'));
     expect(find.text('Lange schlafen'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('Trinke gesellig'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollTo(tester, find.text('Trinke gesellig'));
     final chip = tester.widget<ChoiceChip>(
       find.widgetWithText(ChoiceChip, 'Trinke gesellig'),
     );
@@ -210,5 +208,48 @@ void main() {
     await tapAndSettle(tester, find.byTooltip('Senden'));
     expect(find.text('Noch was'), findsOneWidget);
     expect(tester.widget<TextField>(input).focusNode!.hasFocus, isTrue);
+  });
+
+  testWidgets('Fotos hochladen, Vervollständigung steigt, Vorschau zeigt sie', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Profil'));
+    // Demo-Profil: Stadt + 1 Steckbrief-Angabe = 10 %
+    expect(find.text('10 %'), findsOneWidget);
+
+    await scrollTo(tester, find.text('Profil bearbeiten'));
+    await tapAndSettle(tester, find.text('Profil bearbeiten'));
+
+    // Zwei Fotos hinzufügen (Bildaufbereitung läuft wirklich)
+    for (var i = 0; i < 2; i++) {
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Foto hinzufügen'));
+        await Future<void>.delayed(const Duration(seconds: 2));
+      });
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('Hauptbild'), findsOneWidget);
+    expect(find.byTooltip('Foto 2 löschen'), findsOneWidget);
+
+    // Eines löschen
+    await tapAndSettle(tester, find.byTooltip('Foto 2 löschen'));
+    await tapAndSettle(tester, find.widgetWithText(FilledButton, 'Löschen'));
+    expect(find.byTooltip('Foto 2 löschen'), findsNothing);
+    expect(find.byTooltip('Foto 1 löschen'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    // Nach oben zurück zum Profilkopf
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 1000));
+    await tester.pumpAndSettle();
+    // 1 Foto (+20) → 30 %
+    expect(find.text('30 %'), findsOneWidget);
+
+    // Profilbild antippen → „So sehen dich andere“
+    await tapAndSettle(tester, find.byType(CompletionAvatar));
+    expect(find.text('Du, 28'), findsOneWidget);
+    await scrollTo(tester, find.text('Nichtraucher:in'));
+    expect(find.text('Nichtraucher:in'), findsOneWidget);
   });
 }

@@ -1,15 +1,17 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../economy/like_quota.dart';
+import '../photos/photos_repository.dart';
 import 'discover_repository.dart';
 import 'public_profile.dart';
 
 class SupabaseDiscoverRepository implements DiscoverRepository {
-  SupabaseDiscoverRepository(this._client);
+  SupabaseDiscoverRepository(this._client, this._photos);
 
   final SupabaseClient _client;
+  final PhotosRepository _photos;
 
-  /// Lädt die drei Fragen zu den Profilen nach.
+  /// Lädt Fragen und Fotos zu den Profilen nach.
   Future<List<PublicProfile>> _withPrompts(
     List<Map<String, Object?>> rows,
   ) async {
@@ -20,9 +22,14 @@ class SupabaseDiscoverRepository implements DiscoverRepository {
         .select('profile_id, position, prompt_key, answer')
         .inFilter('profile_id', ids);
     final prompts = groupPromptRows(promptRows);
+    final photos = await _photos.imagesFor(ids);
     return [
       for (final r in rows)
-        PublicProfile.fromRow(r, prompts: prompts[r['id']] ?? const []),
+        PublicProfile.fromRow(
+          r,
+          prompts: prompts[r['id']] ?? const [],
+          photos: photos[r['id']] ?? const [],
+        ),
     ];
   }
 

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
+import 'profile_image.dart';
 
 /// Motiv eines gezeichneten Platzhalter-Fotos.
 ///
@@ -12,7 +13,7 @@ enum PhotoMotif { portrait, mountains, sea, city, plants }
 
 enum HairStyle { short, long, bun, curly }
 
-class PhotoArt {
+class PhotoArt extends ProfileImage {
   const PhotoArt.portrait({
     required this.skin,
     required this.hair,
