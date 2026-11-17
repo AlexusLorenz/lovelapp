@@ -218,6 +218,16 @@ class _CheckYourMail extends StatelessWidget {
           'Danach kannst du dich anmelden.',
           textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 16),
+        // Supabase verrät aus Datenschutzgründen nicht, ob es die Adresse
+        // schon gibt – dann kommt auch keine Mail. Darauf hinweisen.
+        Text(
+          'Keine Mail bekommen? Schau im Spam-Ordner nach. Wenn du schon ein '
+          'Konto hast – auch über Google oder Apple –, melde dich einfach '
+          'darüber an.',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodySmall,
+        ),
         const SizedBox(height: 24),
         FilledButton(
           onPressed: () => context.go(Routes.signIn),
