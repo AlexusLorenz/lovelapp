@@ -173,8 +173,9 @@ class _PromptCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               answer.answer,
-              style: theme.textTheme.headlineSmall?.copyWith(
+              style: theme.textTheme.titleLarge?.copyWith(
                 color: LovelColors.ink,
+                height: 1.3,
               ),
             ),
           ],
