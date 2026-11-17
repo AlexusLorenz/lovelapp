@@ -2,7 +2,8 @@ name: Web-Vorschau
 
 # Baut die App für den Browser und veröffentlicht sie auf GitHub Pages:
 #   /lovelapp/      Demo-Modus mit Beispieldaten, ohne Backend
-#   /lovelapp/app/  echte Datenbank, Anmeldung nur mit Einladung
+#   /lovelapp/app/  echte Datenbank, offene Registrierung
+#   (für eine geschlossene Testphase: --dart-define=INVITE_ONLY=true)
 on:
   push:
     branches: [main]
@@ -31,12 +32,11 @@ jobs:
       - run: flutter pub get
       - name: Web-Build Demo (ohne Backend)
         run: flutter build web --release --no-web-resources-cdn --base-href /${{ github.event.repository.name }}/ --output ${{ github.workspace }}/build/demo
-      - name: Web-Build App (echte Datenbank, nur mit Einladung)
+      - name: Web-Build App (echte Datenbank)
         run: >
           flutter build web --release --no-web-resources-cdn
           --base-href /${{ github.event.repository.name }}/app/
           --dart-define-from-file=config/supabase.json
-          --dart-define=INVITE_ONLY=true
           --output ${{ github.workspace }}/build/app
       - name: Zusammenführen
         run: |
