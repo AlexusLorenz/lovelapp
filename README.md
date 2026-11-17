@@ -53,6 +53,7 @@ Die App nutzt Supabase OAuth. Rücksprung in die App per Deep Link
    (OAuth-Client „Webanwendung“, autorisierte Weiterleitungs-URI: `https://<projekt>.supabase.co/auth/v1/callback`).
 3. Supabase → Authentication → Sign In / Providers → **Apple**: braucht ein Apple-Developer-Konto
    (Services ID, Key, Team ID). Pflicht im App Store, sobald Google-Login angeboten wird.
+   Der Button erscheint erst, wenn mit `--dart-define=APPLE_LOGIN=true` gebaut wird.
 
 ### Integrationstest gegen Supabase
 
@@ -121,7 +122,7 @@ Die Werte stehen in `lib/features/economy/like_quota.dart` **und** `public.like_
 
 - Passwort vergessen / zurücksetzen (braucht Deep Links und die Site-URL in Supabase)
 - Melden/Blockieren im Chat an die Datenbank anschließen
-- Profil bearbeiten (Fragen, Steckbrief, Standort-Freigabe widerrufen)
+- Profil bearbeiten: Geburtsdatum, Geschlecht, Orientierung (mit Widerruf der Einwilligung)
 - Konto löschen (DSGVO)
 - Foto-Upload und Moderation (Freigabe-Workflow)
 - Edge Function für AdMob Server-Side Verification → `grant_rewarded_ad_bonus()`

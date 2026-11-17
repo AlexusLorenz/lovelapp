@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/config/env.dart';
+import '../../core/router/app_router.dart';
 import '../discover/discover_providers.dart';
 import '../location/location_prompt.dart';
 import '../progress/level.dart';
@@ -53,10 +56,22 @@ class ProfileScreen extends ConsumerWidget {
               trailing: Text('+${reason.amount} XP'),
             ),
           const Divider(),
-          const ListTile(
-            leading: Icon(Icons.edit),
-            title: Text('Profil bearbeiten'),
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Profil bearbeiten'),
+            subtitle: const Text('Fragen, Steckbrief, Über mich'),
+            onTap: () => context.push(Routes.editProfile),
           ),
+          // Im Demo-Modus gibt es kein eigenes öffentliches Profil.
+          if (Env.hasSupabase)
+            ListTile(
+              leading: const Icon(Icons.visibility_outlined),
+              title: const Text('So sehen dich andere'),
+              onTap: () {
+                final id = ref.read(sessionProvider).user?.id;
+                if (id != null) context.push(Routes.person(id));
+              },
+            ),
           const ListTile(leading: Icon(Icons.tune), title: Text('Suchfilter')),
           ListTile(
             leading: const Icon(Icons.near_me_outlined),

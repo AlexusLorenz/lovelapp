@@ -1,12 +1,11 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../session/session_controller.dart';
 import '../location/location_prompt.dart';
-import '../profile/profile_basics.dart';
 import '../profile/profile_prompts.dart';
+import '../profile/widgets/profile_editors.dart';
 import 'date_input_formatter.dart';
 import 'profile_draft.dart';
 import 'profile_repository.dart';
@@ -42,12 +41,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _height = TextEditingController();
   final _heightKey = GlobalKey<FormFieldState<String>>();
 
-  /// Gewählte Fragen je Platz (oder `null`) und die Antworten dazu.
-  final List<String?> _promptKeys = List.filled(promptsPerProfile, null);
-  final List<TextEditingController> _promptAnswers = List.generate(
-    promptsPerProfile,
-    (_) => TextEditingController(),
-  );
+  final _prompts = PromptEditorController();
   final _nameKey = GlobalKey<FormFieldState<String>>();
   final _birthdateKey = GlobalKey<FormFieldState<String>>();
 
@@ -56,15 +50,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    // „Weiter“ hängt an den Fragen → bei jeder Änderung neu bauen.
+    _prompts.addListener(_onPromptsChanged);
+  }
+
+  void _onPromptsChanged() => setState(() {});
+
+  @override
   void dispose() {
     _name.dispose();
     _birthdate.dispose();
     _city.dispose();
     _bio.dispose();
     _height.dispose();
-    for (final c in _promptAnswers) {
-      c.dispose();
-    }
+    _prompts.dispose();
     super.dispose();
   }
 
@@ -75,16 +76,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _Step.interests =>
       _draft.interestedIn.isNotEmpty && _draft.sensitiveConsentAt != null,
     _Step.basics => true,
-    _Step.prompts => validatePromptSelection(_currentPrompts) == null,
+    _Step.prompts => _prompts.error == null,
     _Step.location => true, // freiwillig, lässt sich später nachholen
     _Step.about => !_saving,
   };
-
-  List<PromptAnswer> get _currentPrompts => [
-    for (var i = 0; i < promptsPerProfile; i++)
-      if (_promptKeys[i] != null)
-        PromptAnswer(_promptKeys[i]!, _promptAnswers[i].text.trim()),
-  ];
 
   void _back() {
     if (_step.index == 0) return;
@@ -107,7 +102,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         final cm = int.tryParse(_height.text.trim());
         _draft.basics = _draft.basics.copyWith(heightCm: () => cm);
       case _Step.prompts:
-        _draft.prompts = _currentPrompts;
+        _draft.prompts = _prompts.value;
       case _Step.location:
         break;
       case _Step.about:
@@ -135,48 +130,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       setState(() => _error = e.message);
     } finally {
       if (mounted) setState(() => _saving = false);
-    }
-  }
-
-  Future<void> _choosePrompt(int slot) async {
-    final taken = {
-      for (var i = 0; i < promptsPerProfile; i++)
-        if (i != slot && _promptKeys[i] != null) _promptKeys[i]!,
-    };
-    final key = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: LovelColors.cream,
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.7,
-        maxChildSize: 0.95,
-        builder: (context, scroll) => ListView(
-          controller: scroll,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-              child: Text(
-                'Frage auswählen',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ),
-            for (final p in promptCatalog)
-              ListTile(
-                enabled: !taken.contains(p.key),
-                title: Text(p.question),
-                trailing: _promptKeys[slot] == p.key
-                    ? const Icon(Icons.check, color: LovelColors.terracotta)
-                    : null,
-                onTap: () => Navigator.of(context).pop(p.key),
-              ),
-          ],
-        ),
-      ),
-    );
-    if (key != null && mounted) {
-      setState(() => _promptKeys[slot] = key);
     }
   }
 
@@ -371,7 +324,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         return _StepLayout(
           title: 'Dein Steckbrief',
           hint: 'Alles freiwillig – lass weg, was du nicht teilen magst.',
-          child: _BasicsForm(
+          child: BasicsForm(
             basics: _draft.basics,
             heightController: _height,
             heightKey: _heightKey,
@@ -380,25 +333,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         );
       case _Step.prompts:
         return _StepLayout(
-          title: 'Drei Fragen über dich',
+          title: 'Fragen über dich',
           hint:
-              'Such dir $promptsPerProfile Fragen aus. Die Antworten '
-              'stehen auf deinem Profil – gute Eisbrecher!',
-          child: Column(
-            children: [
-              for (var i = 0; i < promptsPerProfile; i++)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _PromptSlot(
-                    index: i,
-                    promptKey: _promptKeys[i],
-                    controller: _promptAnswers[i],
-                    onChoose: () => _choosePrompt(i),
-                    onChanged: () => setState(() {}),
-                  ),
-                ),
-            ],
-          ),
+              'Freiwillig: Such dir bis zu $promptsPerProfile Fragen aus. '
+              'Die Antworten stehen auf deinem Profil – gute Eisbrecher! '
+              'Du kannst sie später jederzeit ändern.',
+          child: PromptEditor(controller: _prompts),
         );
       case _Step.location:
         return _StepLayout(
@@ -520,187 +460,6 @@ class _ChoiceTile extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _PromptSlot extends StatelessWidget {
-  const _PromptSlot({
-    required this.index,
-    required this.promptKey,
-    required this.controller,
-    required this.onChoose,
-    required this.onChanged,
-  });
-
-  final int index;
-  final String? promptKey;
-  final TextEditingController controller;
-  final VoidCallback onChoose;
-  final VoidCallback onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final prompt = promptKey == null ? null : promptByKey(promptKey!);
-    if (prompt == null) {
-      return OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(64),
-          foregroundColor: LovelColors.umber,
-          side: const BorderSide(color: LovelColors.slate, width: 1.5),
-        ),
-        icon: const Icon(Icons.add),
-        label: Text('Frage ${index + 1} auswählen'),
-        onPressed: onChoose,
-      );
-    }
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    prompt.question,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: LovelColors.umber,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Andere Frage wählen',
-                  icon: const Icon(Icons.swap_horiz),
-                  onPressed: onChoose,
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: TextField(
-                controller: controller,
-                maxLength: maxPromptAnswerLength,
-                minLines: 1,
-                maxLines: 3,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  hintText: 'Deine Antwort',
-                  labelText: 'Antwort ${index + 1}',
-                  border: const OutlineInputBorder(),
-                ),
-                onChanged: (_) => onChanged(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BasicsForm extends StatelessWidget {
-  const _BasicsForm({
-    required this.basics,
-    required this.heightController,
-    required this.heightKey,
-    required this.onChanged,
-  });
-
-  final ProfileBasics basics;
-  final TextEditingController heightController;
-  final GlobalKey<FormFieldState<String>> heightKey;
-  final ValueChanged<ProfileBasics> onChanged;
-
-  Widget _section<T extends BasicOption>(
-    BuildContext context,
-    String title,
-    List<T> options,
-    T? selected,
-    ValueChanged<T?> onSelect,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final o in options)
-                ChoiceChip(
-                  label: Text(o.label),
-                  selected: selected == o,
-                  // Nochmal tippen hebt die Auswahl auf.
-                  onSelected: (on) => onSelect(on ? o : null),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _section(
-          context,
-          'Ich suche …',
-          RelationshipGoal.values,
-          basics.relationshipGoal,
-          (v) => onChanged(basics.copyWith(relationshipGoal: () => v)),
-        ),
-        _section(
-          context,
-          'Kinder',
-          ChildrenPlan.values,
-          basics.children,
-          (v) => onChanged(basics.copyWith(children: () => v)),
-        ),
-        _section(
-          context,
-          'Rauchen',
-          Smoking.values,
-          basics.smoking,
-          (v) => onChanged(basics.copyWith(smoking: () => v)),
-        ),
-        _section(
-          context,
-          'Alkohol',
-          Drinking.values,
-          basics.drinking,
-          (v) => onChanged(basics.copyWith(drinking: () => v)),
-        ),
-        _section(
-          context,
-          'Sport',
-          Exercise.values,
-          basics.exercise,
-          (v) => onChanged(basics.copyWith(exercise: () => v)),
-        ),
-        TextFormField(
-          key: heightKey,
-          controller: heightController,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(3),
-          ],
-          decoration: const InputDecoration(
-            labelText: 'Größe (cm)',
-            border: OutlineInputBorder(),
-          ),
-          validator: validateHeight,
-        ),
-      ],
     );
   }
 }

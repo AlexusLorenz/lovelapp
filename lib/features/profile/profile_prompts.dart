@@ -1,5 +1,5 @@
-/// Profil-Fragen: Jede Person beantwortet drei Fragen aus einem Katalog
-/// (ohne Flutter-Abhängigkeit).
+/// Profil-Fragen: Jede Person kann bis zu drei Fragen aus einem Katalog
+/// beantworten – freiwillig (ohne Flutter-Abhängigkeit).
 ///
 /// Die Schlüssel landen in `profile_prompts.prompt_key` – nie umbenennen,
 /// nur neue hinzufügen.
@@ -59,10 +59,11 @@ String? validatePromptAnswer(String? value) {
   return null;
 }
 
-/// Prüft eine komplette Auswahl: genau drei verschiedene, beantwortete Fragen.
+/// Prüft eine Auswahl: höchstens drei verschiedene, beantwortete Fragen.
+/// Keine Frage ist auch in Ordnung.
 String? validatePromptSelection(List<PromptAnswer> answers) {
-  if (answers.length != promptsPerProfile) {
-    return 'Bitte wähle $promptsPerProfile Fragen aus.';
+  if (answers.length > promptsPerProfile) {
+    return 'Höchstens $promptsPerProfile Fragen.';
   }
   final keys = answers.map((a) => a.promptKey).toSet();
   if (keys.length != answers.length) return 'Jede Frage nur einmal, bitte.';

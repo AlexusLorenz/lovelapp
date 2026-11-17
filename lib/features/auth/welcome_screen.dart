@@ -119,22 +119,24 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                           const SizedBox(height: 24),
                           const DemoModeBanner(),
                           const SizedBox(height: 16),
-                          // Apple-Vorgaben: schwarzer Button mit Apple-Symbol.
-                          FilledButton.icon(
-                            style: FilledButton.styleFrom(
-                              padding: padding,
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
+                          if (Env.appleLoginEnabled) ...[
+                            // Apple-Vorgaben: schwarzer Button mit Apple-Symbol.
+                            FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                padding: padding,
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                              ),
+                              icon: _busy == SocialProvider.apple
+                                  ? const _Spinner(color: Colors.white)
+                                  : const Icon(Icons.apple),
+                              label: const Text('Mit Apple fortfahren'),
+                              onPressed: _busy == null
+                                  ? () => _social(SocialProvider.apple)
+                                  : null,
                             ),
-                            icon: _busy == SocialProvider.apple
-                                ? const _Spinner(color: Colors.white)
-                                : const Icon(Icons.apple),
-                            label: const Text('Mit Apple fortfahren'),
-                            onPressed: _busy == null
-                                ? () => _social(SocialProvider.apple)
-                                : null,
-                          ),
-                          const SizedBox(height: 8),
+                            const SizedBox(height: 8),
+                          ],
                           // TODO(branding): Offizielles Google-Logo laut
                           // Google-Branding-Richtlinien einsetzen.
                           OutlinedButton.icon(

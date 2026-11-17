@@ -86,7 +86,7 @@ class ProfileDraft {
   /// Steckbrief, alles freiwillig.
   ProfileBasics basics = const ProfileBasics();
 
-  /// Genau drei beantwortete Fragen, in Anzeige-Reihenfolge.
+  /// Bis zu drei beantwortete Fragen (freiwillig), in Anzeige-Reihenfolge.
   List<PromptAnswer> prompts = [];
 
   bool get isComplete =>

@@ -9,9 +9,19 @@ void main() {
     const b = PromptAnswer('green_flag', 'Ehrlichkeit');
     const c = PromptAnswer('superpower', 'Parkplätze finden');
 
-    test('genau drei verschiedene, beantwortete Fragen', () {
+    test('bis zu drei verschiedene, beantwortete Fragen – freiwillig', () {
       expect(validatePromptSelection([a, b, c]), isNull);
-      expect(validatePromptSelection([a, b]), isNotNull);
+      expect(validatePromptSelection([a, b]), isNull);
+      expect(validatePromptSelection([]), isNull);
+      expect(
+        validatePromptSelection([
+          a,
+          b,
+          c,
+          const PromptAnswer('guilty_pleasure', 'x'),
+        ]),
+        isNotNull,
+      );
       expect(validatePromptSelection([a, a, c]), contains('nur einmal'));
       expect(
         validatePromptSelection([a, b, const PromptAnswer('superpower', ' ')]),

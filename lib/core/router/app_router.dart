@@ -16,6 +16,7 @@ import '../../features/discover/profile_detail_screen.dart';
 import '../../features/games/games_screen.dart';
 import '../../features/games/this_or_that/this_or_that_screen.dart';
 import '../../features/matches/matches_screen.dart';
+import '../../features/profile/edit_profile_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../widgets/app_shell.dart';
 
@@ -27,6 +28,7 @@ class Routes {
   static const chats = '/chats';
   static const profile = '/profile';
   static const games = '/games';
+  static const editProfile = '/profile/edit';
 
   static const splash = '/splash';
   static const welcome = '/welcome';
@@ -140,6 +142,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.profile,
                 builder: (context, state) => const ProfileScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (context, state) => const EditProfileScreen(),
+                  ),
+                ],
               ),
             ],
           ),

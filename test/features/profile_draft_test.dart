@@ -86,9 +86,10 @@ void main() {
       expect(draft.toInsertJson, throwsStateError);
     });
 
-    test('ohne drei Fragen nicht vollständig', () {
+    test('Fragen sind freiwillig', () {
       final draft = complete()..prompts = const [];
-      expect(draft.isComplete, isFalse);
+      expect(draft.isComplete, isTrue);
+      expect(draft.promptRows(), isEmpty);
     });
 
     test('leere Stadt wird null', () {

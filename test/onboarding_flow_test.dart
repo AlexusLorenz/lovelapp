@@ -64,15 +64,11 @@ void main() {
     await tester.enterText(field('Größe (cm)'), '178');
     await tapAndSettle(tester, find.text('Weiter'));
 
-    // Drei Fragen
-    expect(find.text('Drei Fragen über dich'), findsOneWidget);
-    expect(tester.widget<FilledButton>(weiter).onPressed, isNull);
-    const picks = [
-      'Mein perfekter Sonntag …',
-      'Meine heimliche Superkraft:',
-      'Meine unpopuläre Meinung:',
-    ];
-    for (var i = 0; i < 3; i++) {
+    // Fragen (freiwillig)
+    expect(find.text('Fragen über dich'), findsOneWidget);
+    expect(tester.widget<FilledButton>(weiter).onPressed, isNotNull);
+    const picks = ['Mein perfekter Sonntag …', 'Meine heimliche Superkraft:'];
+    for (var i = 0; i < picks.length; i++) {
       await tapAndSettle(tester, find.text('Frage ${i + 1} auswählen'));
       await tester.scrollUntilVisible(
         find.text(picks[i]),
@@ -80,6 +76,8 @@ void main() {
         scrollable: find.byType(Scrollable).last,
       );
       await tapAndSettle(tester, find.text(picks[i]));
+      // Gewählt, aber unbeantwortet → noch nicht weiter
+      expect(tester.widget<FilledButton>(weiter).onPressed, isNull);
       await tester.enterText(
         find.widgetWithText(TextField, 'Antwort ${i + 1}'),
         'Antwort Nummer ${i + 1}',
@@ -143,5 +141,74 @@ void main() {
     // Social Login (Demo) → Onboarding
     await tapAndSettle(tester, find.text('Mit Google fortfahren'));
     expect(find.text('Wie heißt du?'), findsOneWidget);
+  });
+
+  testWidgets('Profil bearbeiten: Steckbrief und Fragen ändern', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Profil'));
+    await tester.scrollUntilVisible(
+      find.text('Profil bearbeiten'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tapAndSettle(tester, find.text('Profil bearbeiten'));
+
+    expect(find.text('Profil bearbeiten'), findsOneWidget);
+    await tester.enterText(field('Über mich'), 'Neu hier.');
+    await tapAndSettle(tester, find.text('Frage 1 auswählen'));
+    await tapAndSettle(tester, find.text('Mein perfekter Sonntag …'));
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Antwort 1'),
+      'Lange schlafen',
+    );
+    await tester.scrollUntilVisible(
+      find.text('Trinke gesellig'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // Etwas weiter, damit der Chip nicht am Rand unter der Leiste liegt.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.text('Trinke gesellig'));
+    await tapAndSettle(tester, find.widgetWithText(TextButton, 'Speichern'));
+
+    expect(find.text('Profil gespeichert.'), findsOneWidget);
+
+    // Erneut öffnen: Werte sind da
+    await tapAndSettle(tester, find.text('Profil bearbeiten'));
+    expect(find.text('Neu hier.'), findsOneWidget);
+    expect(find.text('Lange schlafen'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Trinke gesellig'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final chip = tester.widget<ChoiceChip>(
+      find.widgetWithText(ChoiceChip, 'Trinke gesellig'),
+    );
+    expect(chip.selected, isTrue);
+  });
+
+  testWidgets('Chat: Feld bleibt nach dem Senden fokussiert', (tester) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Chats'));
+    await tapAndSettle(tester, find.text('Mia'));
+
+    final input = find.widgetWithText(TextField, 'Nachricht schreiben');
+    await tester.enterText(input, 'Hallo Mia!');
+    await tester.testTextInput.receiveAction(TextInputAction.send);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Hallo Mia!'), findsOneWidget);
+    final field = tester.widget<TextField>(input);
+    expect(field.focusNode!.hasFocus, isTrue);
+    expect(field.controller!.text, isEmpty);
+
+    await tester.enterText(input, 'Noch was');
+    await tapAndSettle(tester, find.byTooltip('Senden'));
+    expect(find.text('Noch was'), findsOneWidget);
+    expect(tester.widget<TextField>(input).focusNode!.hasFocus, isTrue);
   });
 }

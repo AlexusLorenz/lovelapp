@@ -17,6 +17,11 @@ class Env {
   static bool get hasSupabase =>
       supabaseUrl.isNotEmpty && supabasePublishableKey.isNotEmpty;
 
+  /// „Mit Apple fortfahren“ anzeigen? Erst einschalten, wenn Apple in
+  /// Supabase eingerichtet ist (Apple-Developer-Konto). Im Demo-Modus immer.
+  static bool get appleLoginEnabled =>
+      !hasSupabase || const bool.fromEnvironment('APPLE_LOGIN');
+
   /// Geschlossene Testphase: keine offene Registrierung, Anmeldung nur für
   /// eingeladene Personen (in Supabase „Allow new users to sign up“ aus).
   static const inviteOnly = bool.fromEnvironment('INVITE_ONLY');
