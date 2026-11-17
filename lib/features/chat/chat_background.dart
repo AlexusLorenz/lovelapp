@@ -33,7 +33,8 @@ class _DoodlePainter extends CustomPainter {
 
   final Color color;
 
-  static const _cell = 76.0;
+  /// Abstand der Rasterzellen – eng, damit das Muster die Fläche füllt.
+  static const _cell = 44.0;
   static const _size = 26.0; // Symbole zeichnen in einem 26×26-Raster
 
   @override
@@ -41,7 +42,7 @@ class _DoodlePainter extends CustomPainter {
     final stroke = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
+      ..strokeWidth = 1.8
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     final fill = Paint()..color = color;
@@ -68,11 +69,16 @@ class _DoodlePainter extends CustomPainter {
         // Fester Zufall je Zelle → Muster bleibt beim Scrollen gleich.
         final rnd = math.Random(r * 7919 + c * 104729);
         final dx =
-            c * _cell + (r.isOdd ? _cell / 2 : 0) + rnd.nextDouble() * 14;
-        final dy = r * _cell + rnd.nextDouble() * 14;
+            c * _cell +
+            (r.isOdd ? _cell / 2 : 0) +
+            (rnd.nextDouble() - 0.5) * 14;
+        final dy = r * _cell + (rnd.nextDouble() - 0.5) * 16;
+        // Unterschiedlich groß: 60 % bis 130 % – kleine füllen die Lücken.
+        final scale = 0.6 + rnd.nextDouble() * 0.7;
         canvas.save();
         canvas.translate(dx, dy);
-        canvas.rotate((rnd.nextDouble() - 0.5) * 0.7);
+        canvas.rotate((rnd.nextDouble() - 0.5) * 0.9);
+        canvas.scale(scale);
         canvas.translate(-_size / 2, -_size / 2);
         doodles[(r * 5 + c * 3 + rnd.nextInt(3)) % doodles.length](
           canvas,
