@@ -1,0 +1,33 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:lovelapp/app.dart';
+import 'package:lovelapp/features/auth/auth_repository.dart';
+import 'package:lovelapp/features/onboarding/profile_repository.dart';
+import 'package:lovelapp/features/session/session_controller.dart';
+
+const testUser = AppUser(id: 'demo-test@lovel.app', email: 'test@lovel.app');
+
+/// Startet die App im Demo-Modus.
+///
+/// [signedIn]: schon angemeldet; [hasProfile]: Onboarding schon erledigt.
+Future<void> pumpLovelApp(
+  WidgetTester tester, {
+  bool signedIn = true,
+  bool hasProfile = true,
+}) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(
+          DemoAuthRepository(signedInAs: signedIn ? testUser : null),
+        ),
+        profileRepositoryProvider.overrideWithValue(
+          DemoProfileRepository(existingUserIds: [if (hasProfile) testUser.id]),
+        ),
+      ],
+      child: const LovelApp(),
+    ),
+  );
+  await tester.pumpAndSettle();
+}

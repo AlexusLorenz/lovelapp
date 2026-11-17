@@ -53,7 +53,11 @@ lib/
   core/            Konfiguration, Router, Theme, App-Shell
   data/            Beispieldaten für den Demo-Modus
   features/
-    discover/      Entdecken-Feed (Like / Weiter, Match-Dialog)
+    auth/          Willkommen, Registrieren, Anmelden
+    onboarding/    Profil anlegen (Name, 18+, Geschlecht, Einwilligung, Stadt, Bio)
+    session/       Sitzungsstand → Weiterleitung im Router
+    legal/         Platzhalter für AGB und Datenschutz
+    discover/      Entdecken-Feed (Like / Weiter, Match-Overlay)
     matches/       Match-Liste
     chat/          Chat-Liste und Chat
     profile/       Profil, Level & XP
@@ -91,7 +95,8 @@ Die Werte stehen in `lib/features/economy/like_quota.dart` **und** `public.like_
 
 ## Offene nächste Schritte
 
-- Anmeldung (Supabase Auth) und Onboarding mit 18+-Prüfung und Einwilligungen
+- Passwort vergessen / zurücksetzen (braucht Deep Links und die Site-URL in Supabase)
+- Standort fürs Matching (Berechtigung, auf ~1 km gerundet)
 - Demo-Daten durch Supabase-Repositories ersetzen
 - Foto-Upload und Moderation (Freigabe-Workflow)
 - Edge Function für AdMob Server-Side Verification → `grant_rewarded_ad_bonus()`

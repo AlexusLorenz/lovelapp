@@ -226,41 +226,26 @@ class _MatchLettering extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const style = TextStyle(
-      fontFamily: AppTheme.displayFont,
-      fontSize: 84,
-      height: 1,
-      letterSpacing: 2,
-    );
+    // Komplett in Terrakotta; nur ein weicher Schatten hebt ihn von den
+    // Bildern ab.
     return Semantics(
       label: 'Match!',
-      child: Stack(
-        children: [
-          // Kontur in Umbra für Lesbarkeit auf den Bildern
-          Text(
-            'MATCH!',
-            style: style.copyWith(
-              foreground: Paint()
-                ..style = PaintingStyle.stroke
-                ..strokeWidth = 8
-                ..strokeJoin = StrokeJoin.round
-                ..color = LovelColors.umber,
+      child: const Text(
+        'MATCH!',
+        style: TextStyle(
+          fontFamily: AppTheme.displayFont,
+          fontSize: 104,
+          height: 1,
+          letterSpacing: 3,
+          color: LovelColors.terracotta,
+          shadows: [
+            Shadow(
+              color: Color(0x80000000),
+              blurRadius: 18,
+              offset: Offset(0, 6),
             ),
-          ),
-          Text(
-            'MATCH!',
-            style: style.copyWith(
-              color: LovelColors.cream,
-              shadows: const [
-                Shadow(
-                  color: Color(0x66000000),
-                  blurRadius: 16,
-                  offset: Offset(0, 6),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

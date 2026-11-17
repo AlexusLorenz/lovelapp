@@ -12,10 +12,8 @@ Future<void> main() async {
 
   // Lizenz der mitgelieferten Schrift auf der Lizenzseite anzeigen.
   LicenseRegistry.addLicense(() async* {
-    final ofl = await rootBundle.loadString(
-      'assets/fonts/OFL-DMSerifDisplay.txt',
-    );
-    yield LicenseEntryWithLineBreaks(['DM Serif Display'], ofl);
+    final ofl = await rootBundle.loadString('assets/fonts/OFL-Staatliches.txt');
+    yield LicenseEntryWithLineBreaks(['Staatliches'], ofl);
   });
 
   if (Env.hasSupabase) {

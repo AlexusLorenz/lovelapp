@@ -1,13 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'package:lovelapp/app.dart';
+import 'helpers.dart';
 
 void main() {
   testWidgets('App startet mit Navigation und Entdecken-Feed', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
-    await tester.pumpAndSettle();
+    await pumpLovelApp(tester);
 
     expect(find.text('Entdecken'), findsWidgets);
     expect(find.text('Matches'), findsOneWidget);
@@ -17,8 +15,7 @@ void main() {
   });
 
   testWidgets('Pass zeigt das nächste Profil', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
-    await tester.pumpAndSettle();
+    await pumpLovelApp(tester);
 
     await tester.tap(find.byTooltip('Weiter'));
     await tester.pumpAndSettle();
@@ -26,8 +23,7 @@ void main() {
   });
 
   testWidgets('This or That ist spielbar', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
-    await tester.pumpAndSettle();
+    await pumpLovelApp(tester);
 
     await tester.tap(find.text('Matches').last);
     await tester.pumpAndSettle();
@@ -46,8 +42,7 @@ void main() {
   testWidgets('Like auf Gegenseitigkeit zeigt das Match-Overlay', (
     tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
-    await tester.pumpAndSettle();
+    await pumpLovelApp(tester);
 
     await tester.tap(find.byTooltip('Like'));
     // Kein pumpAndSettle: die Flame-Game-Loop läuft dauerhaft.
@@ -69,8 +64,7 @@ void main() {
   testWidgets('Match-Overlay: Spiel starten führt zu den Spielen', (
     tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
-    await tester.pumpAndSettle();
+    await pumpLovelApp(tester);
 
     await tester.tap(find.byTooltip('Like'));
     for (var i = 0; i < 60; i++) {
@@ -90,8 +84,7 @@ void main() {
         const FakeAccessibilityFeatures(disableAnimations: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
 
-    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
-    await tester.pumpAndSettle();
+    await pumpLovelApp(tester);
     await tester.tap(find.byTooltip('Like'));
     await tester.pumpAndSettle(); // ohne Herzen läuft keine Game-Loop
 

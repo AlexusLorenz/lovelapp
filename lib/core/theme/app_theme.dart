@@ -30,7 +30,7 @@ class AppTheme {
   const AppTheme._();
 
   /// Schrift für Überschriften und große Momente („MATCH!“).
-  static const displayFont = 'DMSerifDisplay';
+  static const displayFont = 'Staatliches';
 
   /// Helles Theme. Ein dunkles Theme folgt später.
   static ThemeData light() {

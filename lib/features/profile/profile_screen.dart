@@ -1,15 +1,17 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../progress/level.dart';
+import '../session/session_controller.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   /// Demo-Wert, später aus `profiles.xp`.
   static const _demoXp = 240;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final progress = LevelProgress.fromXp(_demoXp);
 
@@ -57,6 +59,12 @@ class ProfileScreen extends StatelessWidget {
           const ListTile(
             leading: Icon(Icons.privacy_tip_outlined),
             title: Text('Privatsphäre & Einwilligungen'),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Abmelden'),
+            onTap: () => ref.read(authRepositoryProvider).signOut(),
           ),
         ],
       ),

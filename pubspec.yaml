@@ -63,12 +63,12 @@ flutter:
   uses-material-design: true
 
   fonts:
-    - family: DMSerifDisplay
+    - family: Staatliches
       fonts:
-        - asset: assets/fonts/DMSerifDisplay-Regular.ttf
+        - asset: assets/fonts/Staatliches-Regular.ttf
 
   assets:
-    - assets/fonts/OFL-DMSerifDisplay.txt
+    - assets/fonts/OFL-Staatliches.txt
 
   # To add assets to your application, add an assets section, like this:
   # assets:
