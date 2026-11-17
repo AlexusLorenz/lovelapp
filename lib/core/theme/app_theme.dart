@@ -79,8 +79,9 @@ class AppTheme {
         backgroundColor: LovelColors.mist,
         surfaceTintColor: Colors.transparent,
         foregroundColor: LovelColors.umber,
-        titleTextStyle: text.headlineSmall?.copyWith(
+        titleTextStyle: const TextStyle(
           fontFamily: displayFont,
+          fontSize: 28,
           color: LovelColors.umber,
         ),
       ),

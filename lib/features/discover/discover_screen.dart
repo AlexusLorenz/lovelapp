@@ -37,9 +37,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       return;
     }
     if (profile.likesYouBack) {
-      _showMatch(profile);
+      // Erst nach dem Match-Moment zum nächsten Profil wechseln.
+      _showMatch(profile).then((_) {
+        if (mounted) _next();
+      });
+    } else {
+      _next();
     }
-    _next();
   }
 
   Future<void> _showMatch(DemoProfile profile) async {
