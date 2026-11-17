@@ -55,6 +55,22 @@ Die App nutzt Supabase OAuth. Rücksprung in die App per Deep Link
    (Services ID, Key, Team ID). Pflicht im App Store, sobald Google-Login angeboten wird.
    Der Button erscheint erst, wenn mit `--dart-define=APPLE_LOGIN=true` gebaut wird.
 
+### Spiele (RAWG) und Musik (Spotify) einrichten
+
+Die Suche läuft über die Edge Function `supabase/functions/catalog-search`, damit keine Schlüssel im Client landen.
+Secrets unter Supabase → Edge Functions → Secrets:
+
+- `RAWG_API_KEY` – kostenlos unter https://rawg.io/apidocs (Quellenangabe „RAWG“ mit Link ist Pflicht und eingebaut).
+- `SPOTIFY_CLIENT_ID` und `SPOTIFY_CLIENT_SECRET` – aus einer App im Spotify-Developer-Dashboard (Künstlersuche).
+
+Ohne Secrets antwortet die Funktion mit 503 und die App zeigt „Die Suche ist noch nicht eingerichtet.“
+
+„Mit Spotify verbinden“ (Top-Künstler:innen per PKCE, nur Web-App) erscheint, wenn mit
+`SPOTIFY_CLIENT_ID` gebaut wird (öffentlich, darf in `config/supabase.json`). Redirect URI im
+Spotify-Dashboard: `https://alexuslorenz.github.io/lovelapp/app/spotify-callback.html`.
+Im Development Mode von Spotify gilt: App-Inhaber:in braucht Premium, höchstens 5 freigeschaltete Konten.
+Die Künstlersuche funktioniert dagegen für alle.
+
 ### Integrationstest gegen Supabase
 
 `test_supabase/` prüft Anmeldung, Feed, Like, Match und Live-Chat gegen ein echtes Projekt.

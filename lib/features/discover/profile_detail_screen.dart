@@ -10,6 +10,7 @@ import 'photo_gallery.dart';
 import 'public_profile.dart';
 import 'swipe_card.dart';
 import '../../core/widgets/pinch_zoom.dart';
+import '../interests/extras_view.dart';
 import '../../core/widgets/profile_image.dart';
 
 /// Ganzes Profil: Bilder, Text, Fragen und Steckbrief.
@@ -161,6 +162,7 @@ class ProfileDetailScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         BasicsChips(basics: profile.basics),
       ],
+      ProfileExtrasSection(profileId: profile.id),
       const SizedBox(height: 16),
       for (final w in mixed) ...[w, const SizedBox(height: 16)],
     ];

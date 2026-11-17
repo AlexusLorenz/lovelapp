@@ -16,6 +16,9 @@ import '../../features/discover/profile_detail_screen.dart';
 import '../../features/games/games_screen.dart';
 import '../../features/games/this_or_that/this_or_that_screen.dart';
 import '../../features/likes/likes_screen.dart';
+import '../../features/interests/game_picker_screen.dart';
+import '../../features/interests/interest_picker_screen.dart';
+import '../../features/music/music_picker_screen.dart';
 import '../../features/profile/edit_profile_screen.dart';
 import '../../features/profile/own_preview_screen.dart';
 import '../../features/profile/profile_screen.dart';
@@ -30,6 +33,11 @@ class Routes {
   static const profile = '/profile';
   static const games = '/games';
   static const editProfile = '/profile/edit';
+  static const editInterests = '/profile/interests';
+  static const editGames = '/profile/games';
+
+  /// Fest in web/spotify-callback.html eingetragen.
+  static const editMusic = '/profile/music';
   static const ownPreview = '/me';
 
   static const splash = '/splash';
@@ -148,6 +156,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'edit',
                     builder: (context, state) => const EditProfileScreen(),
+                  ),
+                  GoRoute(
+                    path: 'interests',
+                    builder: (context, state) => const InterestPickerScreen(),
+                  ),
+                  GoRoute(
+                    path: 'games',
+                    builder: (context, state) => const GamePickerScreen(),
+                  ),
+                  GoRoute(
+                    path: 'music',
+                    builder: (context, state) => const MusicPickerScreen(),
                   ),
                 ],
               ),

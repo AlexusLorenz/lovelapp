@@ -6,6 +6,8 @@ import 'package:material_ui/material_ui.dart';
 import '../core/theme/app_theme.dart';
 import '../core/widgets/placeholder_photo.dart';
 import '../features/discover/public_profile.dart';
+import '../features/interests/extras_repository.dart';
+import '../features/interests/profile_extras.dart';
 import '../features/profile/profile_basics.dart';
 import '../features/profile/profile_prompts.dart';
 
@@ -193,3 +195,43 @@ PublicProfile? demoProfileById(String id) {
   }
   return null;
 }
+
+/// Interessen, Spiele und Musik der Demo-Profile.
+final demoExtras = <String, ProfileExtras>{
+  'p1': ProfileExtras(
+    interests: const [
+      'music.indie',
+      'music.jazz',
+      'sports.bouldern',
+      'food.specialty_coffee',
+      'travel.interrail',
+      'hobbies.brettspiele',
+    ],
+    games: [DemoCatalogSearch.games[13], DemoCatalogSearch.games[12]],
+    artists: [DemoCatalogSearch.artists[0], DemoCatalogSearch.artists[20]],
+  ),
+  'p2': ProfileExtras(
+    interests: const [
+      'music.techno',
+      'sports.radfahren',
+      'tech.programmieren',
+      'gaming.pc_gaming',
+      'gaming.soulslike',
+    ],
+    games: [DemoCatalogSearch.games[8], DemoCatalogSearch.games[3]],
+    artists: [DemoCatalogSearch.artists[21]],
+  ),
+  'p3': const ProfileExtras(
+    interests: [
+      'books.fantasy',
+      'books.krimi',
+      'creative.fotografie',
+      'animals.katzen',
+      'film.anime',
+    ],
+  ),
+  'p4': ProfileExtras(
+    interests: const ['sports.surfen', 'nature.meer', 'food.bbq'],
+    artists: [DemoCatalogSearch.artists[23], DemoCatalogSearch.artists[17]],
+  ),
+};

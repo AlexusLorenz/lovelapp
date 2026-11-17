@@ -2,9 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/config/env.dart';
+import '../../data/demo_data.dart';
 import '../auth/auth_repository.dart';
 import '../auth/supabase_auth_repository.dart';
 import '../discover/discover_repository.dart';
+import '../interests/extras_repository.dart';
+import '../interests/supabase_extras_repository.dart';
 import '../discover/supabase_discover_repository.dart';
 import '../location/location_service.dart';
 import '../matches/matches_repository.dart';
@@ -60,4 +63,16 @@ final photosRepositoryProvider = Provider<PhotosRepository>(
   (ref) => Env.hasSupabase
       ? SupabasePhotosRepository(Supabase.instance.client)
       : DemoPhotosRepository(),
+);
+
+final extrasRepositoryProvider = Provider<ExtrasRepository>(
+  (ref) => Env.hasSupabase
+      ? SupabaseExtrasRepository(Supabase.instance.client)
+      : DemoExtrasRepository(initial: demoExtras),
+);
+
+final catalogSearchProvider = Provider<CatalogSearch>(
+  (ref) => Env.hasSupabase
+      ? EdgeCatalogSearch(Supabase.instance.client)
+      : const DemoCatalogSearch(),
 );

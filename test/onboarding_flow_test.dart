@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -19,12 +21,38 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) async {
   );
   // .first: die Liste selbst; mehrzeilige Textfelder sind auch Scrollables.
   await tester.scrollUntilVisible(finder, 150, scrollable: vertical.first);
-  await tester.drag(vertical.first, const Offset(0, -120));
+  // Nicht über den oberen Rand hinausschieben.
+  final top = tester.getTopLeft(finder.first).dy;
+  final shift = min(120.0, top - 100);
+  if (shift > 0) {
+    await tester.drag(vertical.first, Offset(0, -shift));
+  }
   await tester.pumpAndSettle();
 }
 
 Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+/// Scrollt im Bearbeiten-Bildschirm zu [finder] und tippt ihn mittig an.
+Future<void> tapInEditor(WidgetTester tester, Finder finder) async {
+  final list = find
+      .descendant(
+        of: find.byType(EditProfileScreen),
+        matching: find.byWidgetPredicate(
+          (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+        ),
+      )
+      .first;
+  await tester.scrollUntilVisible(finder, 150, scrollable: list);
+  await tester.pumpAndSettle();
+  final y = tester.getCenter(finder).dy;
+  if (y < 150 || y > 450) {
+    await tester.drag(list, Offset(0, 300 - y));
+    await tester.pumpAndSettle();
+  }
   await tester.tap(finder);
   await tester.pumpAndSettle();
 }
@@ -368,6 +396,105 @@ void main() {
         .map((e) => e.widget as Transform)
         .where((t) => t.transform.getMaxScaleOnAxis() > 1.01);
     expect(still, isEmpty);
+  });
+
+  testWidgets('Interessen: max. 3 pro Kategorie, erscheinen im Profil', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Profil'));
+    await scrollTo(tester, find.text('Profil bearbeiten'));
+    await tapAndSettle(tester, find.text('Profil bearbeiten'));
+    await tapInEditor(tester, find.text('Interessen'));
+
+    for (final name in ['🎸 Rock', '🎷 Jazz', '🎧 Indie', '🎤 Pop']) {
+      await tester.tap(find.widgetWithText(FilterChip, name));
+      await tester.pumpAndSettle();
+    }
+    expect(find.textContaining('Höchstens 3'), findsOneWidget);
+    expect(find.text('3/3'), findsOneWidget);
+
+    // Suche quer durch alle Kategorien
+    await tester.enterText(find.byType(TextField), 'boulder');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, '🧗 Bouldern'));
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.widgetWithText(TextButton, 'Speichern'));
+    expect(find.text('Interessen gespeichert.'), findsOneWidget);
+
+    // Zusammenfassung im Bearbeiten-Bildschirm
+    expect(find.text('🎧 Indie, 🎷 Jazz, 🎸 Rock +1'), findsOneWidget);
+
+    // In der Vorschau sichtbar
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 1000));
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.byType(CompletionAvatar));
+    await scrollTo(tester, find.text('🎷 Jazz'));
+    expect(find.text('🎷 Jazz'), findsOneWidget);
+    expect(find.text('🎤 Pop'), findsNothing);
+  });
+
+  testWidgets('Lieblingsspiele suchen, auswählen und speichern', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Profil'));
+    await scrollTo(tester, find.text('Profil bearbeiten'));
+    await tapAndSettle(tester, find.text('Profil bearbeiten'));
+    await tapInEditor(tester, find.text('Lieblingsspiele'));
+
+    await tester.enterText(find.byType(TextField), 'zelda');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    await tapAndSettle(
+      tester,
+      find
+          .widgetWithText(ListTile, 'The Legend of Zelda: Breath of the Wild')
+          .first,
+    );
+    expect(find.text('Deine Auswahl (1/6)'), findsOneWidget);
+    expect(find.text('Spieldaten und Bilder von RAWG'), findsOneWidget);
+    await tapAndSettle(tester, find.widgetWithText(TextButton, 'Speichern'));
+    expect(
+      find.textContaining('The Legend of Zelda: Breath of the Wild'),
+      findsOneWidget,
+      reason: 'Zusammenfassung im Bearbeiten-Bildschirm',
+    );
+  });
+
+  testWidgets('Lieblingsmusik suchen (ohne Spotify-Verbindung)', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Profil'));
+    await scrollTo(tester, find.text('Profil bearbeiten'));
+    await tapAndSettle(tester, find.text('Profil bearbeiten'));
+    await tapInEditor(tester, find.text('Lieblingsmusik'));
+
+    // Spotify-Login nur in der Web-App mit Client-ID
+    expect(find.text('Spotify verbinden'), findsNothing);
+    await tester.enterText(find.byType(TextField), 'radio');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    await tapAndSettle(
+      tester,
+      find.widgetWithText(ListTile, 'Radiohead').first,
+    );
+    await tapAndSettle(tester, find.widgetWithText(TextButton, 'Speichern'));
+    expect(find.textContaining('Radiohead'), findsOneWidget);
+  });
+
+  testWidgets('Fremdes Profil zeigt Interessen, Spiele und Musik', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.byTooltip('Profil öffnen'));
+    await scrollTo(tester, find.text('Lieblingsmusik'));
+    expect(find.text('🎷 Jazz'), findsOneWidget);
+    expect(find.text('Hollow Knight'), findsWidgets);
+    expect(find.text('Radiohead'), findsWidgets);
   });
 }
 

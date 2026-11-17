@@ -7,6 +7,7 @@ import '../discover/discover_providers.dart';
 import '../onboarding/profile_draft.dart';
 import '../onboarding/profile_repository.dart';
 import '../session/session_controller.dart';
+import '../interests/extras_view.dart';
 import 'own_profile.dart';
 import 'own_profile_providers.dart';
 import 'profile_basics.dart';
@@ -191,7 +192,16 @@ class _EditFormState extends ConsumerState<_EditForm> {
             const Text('Freiwillig, bis zu drei.'),
             const SizedBox(height: 12),
             PromptEditor(controller: _prompts),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
+            Text(
+              'Interessen & Favoriten',
+              style: theme.textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 4),
+            const Text('Wird sofort gespeichert.'),
+            const SizedBox(height: 12),
+            const ExtrasEditTiles(),
+            const SizedBox(height: 16),
             Text('Steckbrief', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 4),
             const Text(
