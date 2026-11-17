@@ -8,7 +8,7 @@ void main() {
     await pumpLovelApp(tester);
 
     expect(find.text('Entdecken'), findsWidgets);
-    expect(find.text('Matches'), findsOneWidget);
+    expect(find.text('Likes'), findsOneWidget);
     expect(find.text('Chats'), findsOneWidget);
     expect(find.text('Profil'), findsOneWidget);
     expect(find.text('Mia, 27'), findsOneWidget);
@@ -25,7 +25,9 @@ void main() {
   testWidgets('This or That ist spielbar', (tester) async {
     await pumpLovelApp(tester);
 
-    await tester.tap(find.text('Matches').last);
+    await tester.tap(find.text('Chats').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mia'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Eisbrecher-Spiel').first);
     await tester.pumpAndSettle();
@@ -148,5 +150,47 @@ void main() {
     await tester.pumpAndSettle();
     // Kein Absturz und Karte bleibt – Bildwechsel ist rein visuell.
     expect(find.text('Mia, 27'), findsOneWidget);
+  });
+
+  testWidgets('Likes-Tab: zurückliken ergibt ein Match', (tester) async {
+    await pumpLovelApp(tester);
+    await tester.tap(find.text('Likes').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 Person mag dich'), findsOneWidget);
+    await tester.tap(find.text('Lukas, 29'));
+    await tester.pumpAndSettle();
+    expect(find.text('Steckbrief'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Like').last);
+    for (var i = 0; i < 60; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(find.text('MATCH!'), findsOneWidget);
+    await tester.tap(find.text('Weiter entdecken'));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(find.text('1 Person mag dich'), findsNothing);
+    expect(find.textContaining('Noch keine neuen Likes'), findsOneWidget);
+  });
+
+  testWidgets('Chats: neue Matches oben, Unterhaltungen darunter', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tester.tap(find.text('Chats').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Neue Matches'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Neues Match: Jonas')), findsOneWidget);
+    // Jonas steht nur als Bild oben, nicht in der Nachrichtenliste
+    expect(find.text('Jonas'), findsNothing);
+    expect(find.text('Mia'), findsOneWidget);
+    expect(find.text('Sara'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel(RegExp('Neues Match: Jonas')));
+    await tester.pumpAndSettle();
+    expect(find.text('Schreib die erste Nachricht!'), findsOneWidget);
   });
 }

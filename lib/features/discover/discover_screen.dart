@@ -2,17 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../core/config/env.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
-import '../../data/demo_data.dart';
 import '../economy/like_quota.dart';
 import '../economy/like_quota_controller.dart';
 import '../location/location_prompt.dart';
-import '../session/session_controller.dart';
 import 'discover_providers.dart';
 import 'discover_repository.dart';
-import 'match_overlay.dart';
+import 'like_actions.dart';
 import 'photo_gallery.dart';
 import 'public_profile.dart';
 import 'swipe_card.dart';
@@ -40,45 +37,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     // Karte sofort weg – der Server-Aufruf läuft im Hintergrund.
     ref.read(discoverFeedProvider.notifier).dismiss(profile.id);
     if (direction == SwipeDirection.right) {
-      _like(profile);
+      likeProfile(context, ref, profile);
     } else {
-      ref.read(discoverRepositoryProvider).pass(profile.id).catchError((_) {});
-    }
-  }
-
-  Future<void> _like(PublicProfile profile) async {
-    final quota = ref.read(likeQuotaProvider.notifier);
-    try {
-      final result = await ref
-          .read(discoverRepositoryProvider)
-          .like(profile.id);
-      if (result.remaining != null) {
-        quota.applyServerRemaining(result.remaining!);
-      } else {
-        quota.tryUseLike();
-      }
-      if (result.matched && mounted) {
-        ref.invalidate(matchesProvider);
-        await _showMatch(profile);
-      }
-    } on DiscoverFailure catch (e) {
-      if (e.quotaExhausted) quota.markExhausted();
-      if (mounted) _showSnack(e.message);
-    }
-  }
-
-  Future<void> _showMatch(PublicProfile profile) async {
-    final me = ref.read(ownSummaryProvider).value;
-    final result = await showMatchOverlay(
-      context,
-      myName: me?.displayName ?? demoMyName,
-      myPhoto: Env.hasSupabase ? null : demoMyPhoto,
-      matchName: profile.name,
-      matchPhoto: profile.photos.isEmpty ? null : profile.photos.first,
-    );
-    if (!mounted) return;
-    if (result == MatchOverlayResult.playGame) {
-      context.push(Routes.games);
+      passProfile(ref, profile);
     }
   }
 

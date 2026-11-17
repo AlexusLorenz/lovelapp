@@ -24,7 +24,7 @@ class AppShell extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.favorite_border),
             selectedIcon: Icon(Icons.favorite),
-            label: 'Matches',
+            label: 'Likes',
           ),
           NavigationDestination(
             icon: Icon(Icons.chat_bubble_outline),

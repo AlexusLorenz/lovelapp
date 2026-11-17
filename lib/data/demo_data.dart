@@ -13,13 +13,15 @@ class DemoMatch {
   const DemoMatch({
     required this.id,
     required this.profile,
-    required this.lastMessage,
+    this.lastMessage,
     this.gamePending = false,
   });
 
   final String id;
   final PublicProfile profile;
-  final String lastMessage;
+
+  /// `null` = neues Match, noch keine Nachricht.
+  final String? lastMessage;
   final bool gamePending;
 }
 
@@ -144,6 +146,7 @@ const demoProfiles = [
     distanceKm: 32,
     bio: 'Läuft Halbmarathons, isst danach doppelt so viel.',
     level: 3,
+    likesYouBack: true,
     photos: [
       PhotoArt.portrait(
         skin: Color(0xFFE8C4A0),
@@ -180,6 +183,8 @@ final demoMatches = [
     profile: demoProfiles[2],
     lastMessage: 'Haha, Meer natürlich!',
   ),
+  // Neues Match ohne Nachrichten → erscheint oben in den Chats.
+  DemoMatch(id: 'm3', profile: demoProfiles[1]),
 ];
 
 PublicProfile? demoProfileById(String id) {

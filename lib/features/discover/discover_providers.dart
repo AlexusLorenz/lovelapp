@@ -53,10 +53,17 @@ final profileByIdProvider = FutureProvider.family<PublicProfile?, String>((
 ) async {
   // Schon im Feed? Dann ohne Netz.
   final feed = ref.read(discoverFeedProvider).value ?? const [];
-  for (final p in feed) {
+  final likes = ref.read(receivedLikesProvider).value ?? const [];
+  for (final p in [...feed, ...likes]) {
     if (p.id == id) return p;
   }
   return ref.read(discoverRepositoryProvider).fetchProfile(id);
+});
+
+/// Wer mich geliked hat und noch auf meine Antwort wartet.
+final receivedLikesProvider = FutureProvider<List<PublicProfile>>((ref) async {
+  if (_userId(ref) == null) return const [];
+  return ref.read(discoverRepositoryProvider).fetchReceivedLikes();
 });
 
 final matchesProvider = FutureProvider<List<MatchSummary>>((ref) async {

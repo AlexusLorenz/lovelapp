@@ -15,7 +15,7 @@ import '../../features/discover/discover_screen.dart';
 import '../../features/discover/profile_detail_screen.dart';
 import '../../features/games/games_screen.dart';
 import '../../features/games/this_or_that/this_or_that_screen.dart';
-import '../../features/matches/matches_screen.dart';
+import '../../features/likes/likes_screen.dart';
 import '../../features/profile/edit_profile_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../widgets/app_shell.dart';
@@ -24,7 +24,7 @@ class Routes {
   const Routes._();
 
   static const discover = '/discover';
-  static const matches = '/matches';
+  static const likes = '/likes';
   static const chats = '/chats';
   static const profile = '/profile';
   static const games = '/games';
@@ -117,8 +117,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: Routes.matches,
-                builder: (context, state) => const MatchesScreen(),
+                path: Routes.likes,
+                builder: (context, state) => const LikesScreen(),
               ),
             ],
           ),

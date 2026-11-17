@@ -29,7 +29,7 @@ void main() {
       redirectFor(SessionStatus.ready, Routes.onboarding),
       Routes.discover,
     );
-    expect(redirectFor(SessionStatus.ready, Routes.matches), isNull);
+    expect(redirectFor(SessionStatus.ready, Routes.likes), isNull);
   });
 
   test('beim Laden → Splash; Rechtstexte immer erreichbar', () {

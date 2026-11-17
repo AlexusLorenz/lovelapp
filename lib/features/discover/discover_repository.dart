@@ -34,6 +34,9 @@ abstract interface class DiscoverRepository {
   Future<void> pass(String profileId);
 
   Future<LikeQuota> fetchQuota();
+
+  /// Wer hat mich geliked und wartet noch auf meine Antwort?
+  Future<List<PublicProfile>> fetchReceivedLikes();
 }
 
 /// Demo-Modus: Beispielprofile aus `demo_data.dart`.
@@ -62,4 +65,14 @@ class DemoDiscoverRepository implements DiscoverRepository {
 
   @override
   Future<LikeQuota> fetchQuota() async => const LikeQuota();
+
+  @override
+  Future<List<PublicProfile>> fetchReceivedLikes() async {
+    final matched = {for (final m in demoMatches) m.profile.id};
+    return [
+      for (final p in demoProfiles)
+        if (p.likesYouBack && !matched.contains(p.id) && !_seen.contains(p.id))
+          p,
+    ];
+  }
 }

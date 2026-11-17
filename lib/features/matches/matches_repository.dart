@@ -67,12 +67,12 @@ class DemoMatchesRepository implements MatchesRepository {
 
   List<ChatMessage> _seed(String matchId) => _messages.putIfAbsent(matchId, () {
     for (final m in demoMatches) {
-      if (m.id == matchId) {
+      if (m.id == matchId && m.lastMessage != null) {
         return [
           ChatMessage(
             id: '$matchId-0',
             senderId: m.profile.id,
-            body: m.lastMessage,
+            body: m.lastMessage!,
             createdAt: DateTime(2026, 11, 17, 12),
           ),
         ];

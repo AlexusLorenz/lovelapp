@@ -66,6 +66,12 @@ class SupabaseDiscoverRepository implements DiscoverRepository {
   );
 
   @override
+  Future<List<PublicProfile>> fetchReceivedLikes() => _guard(() async {
+    final rows = await _client.rpc<List<dynamic>>('get_received_likes');
+    return _withPrompts(rows.cast<Map<String, Object?>>());
+  });
+
+  @override
   Future<LikeQuota> fetchQuota() => _guard(() async {
     final rows = await _client.rpc<List<dynamic>>('like_quota_status');
     if (rows.isEmpty) return const LikeQuota();
