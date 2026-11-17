@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Build-Zeit-Konfiguration.
 ///
 /// Werte werden per `--dart-define` übergeben, für das echte Projekt am
@@ -14,6 +16,23 @@ class Env {
 
   static bool get hasSupabase =>
       supabaseUrl.isNotEmpty && supabasePublishableKey.isNotEmpty;
+
+  /// Geschlossene Testphase: keine offene Registrierung, Anmeldung nur für
+  /// eingeladene Personen (in Supabase „Allow new users to sign up“ aus).
+  static const inviteOnly = bool.fromEnvironment('INVITE_ONLY');
+
+  /// Wohin Supabase nach Login-Link, Google/Apple usw. zurückleitet:
+  /// im Browser auf die aktuelle Seite, in der App per Deep Link.
+  static String get authCallbackUrl {
+    if (!kIsWeb) return authRedirectUrl;
+    final base = Uri.base;
+    return Uri(
+      scheme: base.scheme,
+      host: base.host,
+      port: base.hasPort ? base.port : null,
+      path: base.path,
+    ).toString();
+  }
 
   /// Rücksprung nach Google-/Apple-Login in die App (Deep Link).
   /// Muss in Supabase unter Authentication → URL Configuration →

@@ -164,12 +164,22 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          FilledButton(
-                            style: FilledButton.styleFrom(padding: padding),
-                            onPressed: () => context.push(Routes.signUp),
-                            child: const Text('Mit E-Mail registrieren'),
-                          ),
-                          const SizedBox(height: 8),
+                          if (Env.inviteOnly)
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                'Geschlossene Testphase: Anmeldung nur mit Einladung.',
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                          else ...[
+                            FilledButton(
+                              style: FilledButton.styleFrom(padding: padding),
+                              onPressed: () => context.push(Routes.signUp),
+                              child: const Text('Mit E-Mail registrieren'),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               padding: padding,

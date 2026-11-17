@@ -52,6 +52,9 @@ abstract interface class AuthRepository {
   /// [authStateChanges] (Rücksprung per Deep Link).
   Future<void> signInWithProvider(SocialProvider provider);
 
+  /// Schickt einen Login-Link per E-Mail (nur für bestehende Konten).
+  Future<void> sendLoginLink(String email);
+
   Future<void> signOut();
 }
 
@@ -96,6 +99,9 @@ class DemoAuthRepository implements AuthRepository {
     final email = 'demo-${provider.name}@lovel.app';
     _set(AppUser(id: 'demo-$email', email: email));
   }
+
+  @override
+  Future<void> sendLoginLink(String email) async {}
 
   @override
   Future<void> signOut() async => _set(null);

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/config/env.dart';
@@ -28,7 +27,11 @@ class SupabaseAuthRepository implements AuthRepository {
     required String password,
   }) async {
     final response = await _guard(
-      () => _auth.signUp(email: email.trim(), password: password),
+      () => _auth.signUp(
+        email: email.trim(),
+        password: password,
+        emailRedirectTo: Env.authCallbackUrl,
+      ),
     );
     // Ohne Sitzung muss erst die E-Mail bestätigt werden. Das gilt auch, wenn
     // es die Adresse schon gibt – Supabase verrät das absichtlich nicht.
@@ -52,7 +55,7 @@ class SupabaseAuthRepository implements AuthRepository {
           SocialProvider.google => OAuthProvider.google,
         },
         // Im Browser zurück auf dieselbe Seite, in der App per Deep Link.
-        redirectTo: kIsWeb ? null : Env.authRedirectUrl,
+        redirectTo: Env.authCallbackUrl,
       ),
     );
     if (!opened) {
@@ -61,6 +64,15 @@ class SupabaseAuthRepository implements AuthRepository {
       );
     }
   }
+
+  @override
+  Future<void> sendLoginLink(String email) => _guard(
+    () => _auth.signInWithOtp(
+      email: email.trim(),
+      emailRedirectTo: Env.authCallbackUrl,
+      shouldCreateUser: false, // nur bestehende/eingeladene Konten
+    ),
+  );
 
   @override
   Future<void> signOut() => _guard(_auth.signOut);
@@ -97,7 +109,9 @@ String messageForAuthError(String? code, String? statusCode) {
     case 'over_request_rate_limit':
       return 'Zu viele Versuche. Bitte warte kurz und probier es dann noch mal.';
     case 'signup_disabled':
-      return 'Registrierungen sind gerade geschlossen.';
+    case 'otp_disabled':
+      return 'Lovel ist gerade in einer geschlossenen Testphase – '
+          'Anmeldung nur mit Einladung.';
   }
   return 'Das hat nicht geklappt. Bitte versuch es noch einmal.';
 }

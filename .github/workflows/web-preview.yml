@@ -1,7 +1,8 @@
 name: Web-Vorschau
 
-# Baut die App für den Browser (Demo-Modus, ohne Backend-Zugang)
-# und veröffentlicht sie auf GitHub Pages.
+# Baut die App für den Browser und veröffentlicht sie auf GitHub Pages:
+#   /lovelapp/      Demo-Modus mit Beispieldaten, ohne Backend
+#   /lovelapp/app/  echte Datenbank, Anmeldung nur mit Einladung
 on:
   push:
     branches: [main]
@@ -28,11 +29,23 @@ jobs:
           flutter-version: 3.50.0
           cache: true
       - run: flutter pub get
-      - name: Web-Build
-        run: flutter build web --release --no-web-resources-cdn --base-href /${{ github.event.repository.name }}/
+      - name: Web-Build Demo (ohne Backend)
+        run: flutter build web --release --no-web-resources-cdn --base-href /${{ github.event.repository.name }}/ --output ${{ github.workspace }}/build/demo
+      - name: Web-Build App (echte Datenbank, nur mit Einladung)
+        run: >
+          flutter build web --release --no-web-resources-cdn
+          --base-href /${{ github.event.repository.name }}/app/
+          --dart-define-from-file=config/supabase.json
+          --dart-define=INVITE_ONLY=true
+          --output ${{ github.workspace }}/build/app
+      - name: Zusammenführen
+        run: |
+          mkdir -p build/site
+          cp -r build/demo/. build/site/
+          cp -r build/app build/site/app
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: build/web
+          path: build/site
 
   deploy:
     needs: build

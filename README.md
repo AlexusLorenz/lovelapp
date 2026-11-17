@@ -32,8 +32,15 @@ Den **Secret Key** (`service_role`) und das Datenbank-Passwort niemals ins Repo 
 
 ### Web-Vorschau
 
-Jeder Push auf `main` baut die App für den Browser (Demo-Modus) und veröffentlicht sie unter
-https://alexuslorenz.github.io/lovelapp/ – Workflow `.github/workflows/web-preview.yml`.
+Jeder Push auf `main` baut zwei Browser-Versionen (Workflow `.github/workflows/web-preview.yml`):
+
+- https://alexuslorenz.github.io/lovelapp/ – Demo-Modus mit Beispieldaten, nichts wird gespeichert
+- https://alexuslorenz.github.io/lovelapp/app/ – echte Datenbank, geschlossene Testphase (`INVITE_ONLY`):
+  keine offene Registrierung; Tester werden in Supabase eingeladen und melden sich per Login-Link,
+  Google oder Apple an. Auf dem iPhone in Safari öffnen → Teilen → „Zum Home-Bildschirm“.
+
+Supabase-Einstellungen dafür: Site URL `https://alexuslorenz.github.io/lovelapp/app/`, dieselbe Adresse
+(mit `**`) unter Redirect URLs, und „Allow new users to sign up“ ausschalten.
 
 ### Login mit Google und Apple einrichten
 

@@ -20,6 +20,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   bool _busy = false;
   bool _obscure = true;
   String? _error;
+  String? _info;
 
   @override
   void dispose() {
@@ -39,6 +40,32 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           .read(authRepositoryProvider)
           .signIn(email: _email.text, password: _password.text);
       // Weiterleitung übernimmt der Router, sobald die Sitzung steht.
+    } on AuthFailure catch (e) {
+      setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _sendLink() async {
+    final error = validateEmail(_email.text);
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await ref.read(authRepositoryProvider).sendLoginLink(_email.text);
+      if (mounted) {
+        setState(
+          () => _info =
+              'Falls es zu ${_email.text.trim()} ein Konto gibt, ist ein '
+              'Login-Link unterwegs. Öffne ihn auf diesem Gerät.',
+        );
+      }
     } on AuthFailure catch (e) {
       setState(() => _error = e.message);
     } finally {
@@ -101,6 +128,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             ? 'Bitte gib dein Passwort ein.'
                             : null,
                       ),
+                      if (_info != null) ...[
+                        const SizedBox(height: 16),
+                        Text(_info!),
+                      ],
                       if (_error != null) ...[
                         const SizedBox(height: 16),
                         Text(
@@ -124,6 +155,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                 ),
                               )
                             : const Text('Anmelden'),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: _busy ? null : _sendLink,
+                        child: const Text(
+                          'Ohne Passwort: Login-Link per E-Mail',
+                        ),
                       ),
                     ],
                   ),
