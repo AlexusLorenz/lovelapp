@@ -40,6 +40,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     super.dispose();
   }
 
+  bool _marking = false;
+
+  Future<void> _markRead() async {
+    if (_marking) return;
+    _marking = true;
+    try {
+      await ref.read(matchesRepositoryProvider).markRead(widget.matchId);
+    } finally {
+      _marking = false;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Beim Öffnen sofort als gelesen markieren.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _markRead();
+    });
+  }
+
   Future<void> _send() async {
     final text = _controller.text.trim();
     // Fokus sofort zurück ins Eingabefeld, damit man weiterschreiben kann.
@@ -69,6 +90,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ownSummaryProvider.select((s) => s.value?.displayName ?? demoMyName),
     );
     final messages = ref.watch(messagesProvider(widget.matchId));
+    // Sobald Nachrichten des Gegenübers sichtbar sind: als gelesen markieren.
+    ref.listen(messagesProvider(widget.matchId), (_, next) {
+      final list = next.value;
+      if (list != null && list.any((m) => m.senderId != myId)) {
+        _markRead();
+      }
+    });
     MatchSummary? match;
     for (final m
         in ref.watch(matchesProvider).value ?? const <MatchSummary>[]) {

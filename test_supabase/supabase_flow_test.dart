@@ -17,7 +17,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lovelapp/features/auth/auth_repository.dart';
 import 'package:lovelapp/features/auth/supabase_auth_repository.dart';
 import 'package:lovelapp/features/discover/supabase_discover_repository.dart';
-import 'package:lovelapp/features/location/approx_location.dart';
 import 'package:lovelapp/features/matches/supabase_matches_repository.dart';
 import 'package:lovelapp/features/onboarding/supabase_profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -79,7 +78,6 @@ void main() {
     expect(await profilesA.hasOwnProfile(idA), isTrue);
     final own = await profilesA.fetchOwnSummary(idA);
     expect(own!.hasLocation, isTrue);
-    await profilesA.updateLocation(idA, ApproxLocation.rounded(51.341, 12.372));
 
     // Feed von A enthält B mit Fragen und gerundeter Entfernung
     final discoverA = SupabaseDiscoverRepository(a);
@@ -93,12 +91,23 @@ void main() {
     final detail = await discoverA.fetchProfile(idB);
     expect(detail!.name, ben.name);
 
+    // B hört live auf seinen Posteingang (Likes, Matches, Nachrichten)
+    final inboxB = SupabaseMatchesRepository(b);
+    var pingsB = 0;
+    final inboxSubB = inboxB.watchInbox().listen((_) => pingsB++);
+    await Future<void>.delayed(const Duration(seconds: 4));
+
     // Kontingent und Like
     expect((await discoverA.fetchQuota()).remaining, 20);
     final first = await discoverA.like(idB);
     expect(first.matched, isFalse);
     expect(first.remaining, 19);
     expect((await discoverA.fetchFeed()).any((p) => p.id == idB), isFalse);
+
+    // B sieht den Like live und in „Likes“
+    await _waitFor(() => pingsB > 0, 'Like kommt live bei B an');
+    final likesB = await SupabaseDiscoverRepository(b).fetchReceivedLikes();
+    expect(likesB.single.id, idA);
 
     // B liked zurück → Match
     final second = await SupabaseDiscoverRepository(b).like(idA);
@@ -130,11 +139,28 @@ void main() {
     );
     await sub.cancel();
 
+    // Ungelesen bei A, nach dem Lesen nicht mehr; B erfährt es live
+    expect((await matchesA.fetchMatches()).single.unreadCount, 1);
+    final before = pingsB;
+    await matchesA.markRead(matchId);
+    expect((await matchesA.fetchMatches()).single.unreadCount, 0);
+    await _waitFor(() => pingsB > before, 'Gelesen-Status kommt live bei B an');
+    expect((await SupabaseDiscoverRepository(b).fetchReceivedLikes()), isEmpty);
+
     // A antwortet → Vorschau aktualisiert
     await matchesA.sendMessage(matchId, 'Hallo zurück!');
     expect((await matchesB.fetchMatches()).single.lastMessage, 'Hallo zurück!');
 
+    await inboxSubB.cancel();
     await a.dispose();
     await b.dispose();
   }, timeout: const Timeout(Duration(minutes: 2)));
+}
+
+Future<void> _waitFor(bool Function() condition, String what) async {
+  for (var i = 0; i < 40; i++) {
+    if (condition()) return;
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+  }
+  fail('Zeitüberschreitung: $what');
 }

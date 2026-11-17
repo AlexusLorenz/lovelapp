@@ -31,10 +31,10 @@ class ChatListScreen extends ConsumerWidget {
               for (final m in list)
                 if (m.lastMessage == null) m,
             ];
-            final chats = [
+            final chats = sortChats([
               for (final m in list)
                 if (m.lastMessage != null) m,
-            ];
+            ]);
             if (list.isEmpty) {
               return const _Hint(
                 text:
@@ -71,14 +71,8 @@ class ChatListScreen extends ConsumerWidget {
                     ),
                   ),
                 for (final match in chats)
-                  ListTile(
-                    leading: ProfileAvatar(profile: match.profile, radius: 24),
-                    title: Text(match.profile.name),
-                    subtitle: Text(
-                      match.lastMessage!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  _ChatRow(
+                    match: match,
                     onTap: () => context.go(Routes.chat(match.matchId)),
                   ),
               ],
@@ -154,6 +148,54 @@ class _NewMatchAvatar extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ChatRow extends StatelessWidget {
+  const _ChatRow({required this.match, required this.onTap});
+
+  final MatchSummary match;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final unread = match.unreadCount;
+    return ListTile(
+      leading: ProfileAvatar(profile: match.profile, radius: 24),
+      title: Text(
+        match.profile.name,
+        style: unread > 0 ? const TextStyle(fontWeight: FontWeight.bold) : null,
+      ),
+      subtitle: Text(
+        match.lastMessage!,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: unread > 0
+            ? TextStyle(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              )
+            : null,
+      ),
+      trailing: unread > 0
+          ? Semantics(
+              label: '$unread ungelesen',
+              child: Badge(
+                largeSize: 22,
+                padding: const EdgeInsets.symmetric(horizontal: 7),
+                backgroundColor: LovelColors.unread,
+                textColor: Colors.white,
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+                label: Text(unread > 99 ? '99+' : '$unread'),
+              ),
+            )
+          : null,
+      onTap: onTap,
     );
   }
 }

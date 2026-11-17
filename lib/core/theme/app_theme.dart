@@ -22,6 +22,10 @@ class LovelColors {
   /// Abgeleitet für gut lesbaren Fließtext (nicht Teil der Palette).
   static const ink = Color(0xFF2E211C);
 
+  /// Signalrot für Ungelesenes (Badges, Punkte) – bewusst kräftiger als
+  /// Terrakotta, damit es auffällt.
+  static const unread = Color(0xFFD93025);
+
   /// Abgeleitet: zarter Terrakotta-Ton für Container.
   static const blush = Color(0xFFF3DED6);
 }

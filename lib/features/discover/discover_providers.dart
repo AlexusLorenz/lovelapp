@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../matches/matches_repository.dart';
@@ -74,3 +76,34 @@ final matchesProvider = FutureProvider<List<MatchSummary>>((ref) async {
 final messagesProvider = StreamProvider.family<List<ChatMessage>, String>(
   (ref, matchId) => ref.read(matchesRepositoryProvider).watchMessages(matchId),
 );
+
+/// Summe ungelesener Nachrichten – für das Badge am Chats-Tab.
+final unreadMessagesCountProvider = Provider<int>((ref) {
+  final matches = ref.watch(matchesProvider).value ?? const <MatchSummary>[];
+  return matches.fold(0, (sum, m) => sum + m.unreadCount);
+});
+
+/// Offene Likes – für das Badge am Likes-Tab.
+final openLikesCountProvider = Provider<int>(
+  (ref) => ref.watch(receivedLikesProvider).value?.length ?? 0,
+);
+
+/// Hört live auf neue Nachrichten, Likes und Matches und lädt dann die
+/// betroffenen Listen neu. Läuft, solange die App-Shell sichtbar ist.
+final inboxListenerProvider = Provider<void>((ref) {
+  if (_userId(ref) == null) return;
+  Timer? debounce;
+  final sub = ref.read(matchesRepositoryProvider).watchInbox().listen((_) {
+    // Mehrere Ereignisse kurz hintereinander nur einmal verarbeiten.
+    debounce?.cancel();
+    debounce = Timer(const Duration(milliseconds: 300), () {
+      ref
+        ..invalidate(matchesProvider)
+        ..invalidate(receivedLikesProvider);
+    });
+  });
+  ref.onDispose(() {
+    debounce?.cancel();
+    sub.cancel();
+  });
+});

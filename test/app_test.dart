@@ -193,4 +193,35 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Schreib die erste Nachricht!'), findsOneWidget);
   });
+
+  testWidgets('Badges zählen Neues, Öffnen eines Chats liest ihn', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    // Demo: Mia und Sara haben je eine ungelesene Nachricht, Lukas liked dich.
+    Finder badge(String n) =>
+        find.descendant(of: find.byType(Badge), matching: find.text(n));
+    // Badge am Chats-Tab (2) und am Likes-Tab (1); je ausgewählt/nicht
+    // ausgewählt gibt es eine Variante.
+    expect(badge('2'), findsWidgets);
+    expect(badge('1'), findsWidgets);
+
+    await tester.tap(find.text('Chats').last);
+    await tester.pumpAndSettle();
+    Finder rowDots() => find.descendant(
+      of: find.byType(ListTile),
+      matching: find.byType(Badge),
+    );
+    expect(rowDots(), findsNWidgets(2));
+
+    await tester.tap(find.text('Mia'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 400)); // Entprellung
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(rowDots(), findsOneWidget); // nur noch Sara
+    expect(badge('2'), findsNothing);
+  });
 }

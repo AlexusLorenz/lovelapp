@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../discover/public_profile.dart';
@@ -46,19 +48,32 @@ class SupabaseMatchesRepository implements MatchesRepository {
           ),
       };
 
+      final matchIds = partnerByMatch.keys.toList();
+
       // Letzte Nachricht je Match (für die Vorschau in der Liste).
       final recent = await _client
           .from('messages')
           .select('match_id, body, created_at')
-          .inFilter('match_id', partnerByMatch.keys.toList())
+          .inFilter('match_id', matchIds)
           .order('created_at', ascending: false)
           .limit(200);
-      final lastByMatch = <String, String>{};
+      final lastByMatch = <String, Map<String, dynamic>>{};
       for (final row in recent) {
-        lastByMatch.putIfAbsent(
-          row['match_id'] as String,
-          () => row['body'] as String,
-        );
+        lastByMatch.putIfAbsent(row['match_id'] as String, () => row);
+      }
+
+      // Ungelesene Nachrichten vom Gegenüber zählen.
+      final unreadRows = await _client
+          .from('messages')
+          .select('match_id')
+          .inFilter('match_id', matchIds)
+          .neq('sender_id', me)
+          .isFilter('read_at', null)
+          .limit(1000);
+      final unread = <String, int>{};
+      for (final row in unreadRows) {
+        final id = row['match_id'] as String;
+        unread[id] = (unread[id] ?? 0) + 1;
       }
 
       return [
@@ -67,7 +82,13 @@ class SupabaseMatchesRepository implements MatchesRepository {
             MatchSummary(
               matchId: entry.key,
               profile: profiles[entry.value]!,
-              lastMessage: lastByMatch[entry.key],
+              lastMessage: lastByMatch[entry.key]?['body'] as String?,
+              lastMessageAt: lastByMatch[entry.key] == null
+                  ? null
+                  : DateTime.parse(
+                      lastByMatch[entry.key]!['created_at'] as String,
+                    ),
+              unreadCount: unread[entry.key] ?? 0,
             ),
       ];
     } on PostgrestException {
@@ -101,5 +122,69 @@ class SupabaseMatchesRepository implements MatchesRepository {
     } on Exception {
       throw const ChatFailure('Keine Verbindung zum Server.');
     }
+  }
+
+  @override
+  Future<void> markRead(String matchId) async {
+    final me = _client.auth.currentUser?.id;
+    if (me == null) return;
+    try {
+      await _client
+          .from('messages')
+          .update({'read_at': DateTime.now().toUtc().toIso8601String()})
+          .eq('match_id', matchId)
+          .neq('sender_id', me)
+          .isFilter('read_at', null);
+    } on Exception {
+      // Nicht schlimm – beim nächsten Öffnen wird es erneut versucht.
+    }
+  }
+
+  @override
+  Stream<void> watchInbox() {
+    final me = _client.auth.currentUser?.id;
+    if (me == null) return const Stream.empty();
+    late final RealtimeChannel channel;
+    late final StreamController<void> controller;
+    void ping(PostgresChangePayload _) => controller.add(null);
+    controller = StreamController<void>.broadcast(
+      onListen: () {
+        // RLS sorgt dafür, dass nur eigene Matches/Nachrichten/Likes ankommen.
+        channel = _client
+            .channel('inbox-$me')
+            .onPostgresChanges(
+              event: PostgresChangeEvent.insert,
+              schema: 'public',
+              table: 'messages',
+              callback: ping,
+            )
+            .onPostgresChanges(
+              event: PostgresChangeEvent.update,
+              schema: 'public',
+              table: 'messages',
+              callback: ping,
+            )
+            .onPostgresChanges(
+              event: PostgresChangeEvent.all,
+              schema: 'public',
+              table: 'matches',
+              callback: ping,
+            )
+            .onPostgresChanges(
+              event: PostgresChangeEvent.insert,
+              schema: 'public',
+              table: 'likes',
+              filter: PostgresChangeFilter(
+                type: PostgresChangeFilterType.eq,
+                column: 'likee_id',
+                value: me,
+              ),
+              callback: ping,
+            )
+            .subscribe();
+      },
+      onCancel: () => _client.removeChannel(channel),
+    );
+    return controller.stream;
   }
 }

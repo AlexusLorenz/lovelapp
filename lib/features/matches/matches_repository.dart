@@ -8,14 +8,30 @@ class MatchSummary {
     required this.matchId,
     required this.profile,
     this.lastMessage,
+    this.lastMessageAt,
+    this.unreadCount = 0,
     this.gamePending = false,
   });
 
   final String matchId;
   final PublicProfile profile;
+
+  /// `null` = noch keine Nachricht (neues Match).
   final String? lastMessage;
+  final DateTime? lastMessageAt;
+
+  /// Nachrichten vom Gegenüber, die ich noch nicht gelesen habe.
+  final int unreadCount;
   final bool gamePending;
 }
+
+/// Unterhaltungen: neueste Nachricht zuerst.
+List<MatchSummary> sortChats(Iterable<MatchSummary> matches) =>
+    matches.toList()..sort(
+      (a, b) => (b.lastMessageAt ?? DateTime(0)).compareTo(
+        a.lastMessageAt ?? DateTime(0),
+      ),
+    );
 
 class ChatMessage {
   const ChatMessage({
@@ -54,6 +70,13 @@ abstract interface class MatchesRepository {
   Stream<List<ChatMessage>> watchMessages(String matchId);
 
   Future<void> sendMessage(String matchId, String body);
+
+  /// Markiert alle Nachrichten des Gegenübers in diesem Match als gelesen.
+  Future<void> markRead(String matchId);
+
+  /// Meldet, wenn sich etwas für mich ändert: neue Nachricht, gelesen,
+  /// neuer Like, neues Match. Die App lädt dann die Listen neu.
+  Stream<void> watchInbox();
 }
 
 /// Demo-Modus: Matches und Nachrichten nur im Speicher.
@@ -64,6 +87,10 @@ class DemoMatchesRepository implements MatchesRepository {
   final String Function() myUserId;
   final _messages = <String, List<ChatMessage>>{};
   final _controllers = <String, StreamController<List<ChatMessage>>>{};
+  final _inbox = StreamController<void>.broadcast();
+
+  /// Index der ersten ungelesenen Nachricht je Match (alles davor gelesen).
+  final _readUpTo = <String, int>{};
 
   List<ChatMessage> _seed(String matchId) => _messages.putIfAbsent(matchId, () {
     for (final m in demoMatches) {
@@ -81,6 +108,15 @@ class DemoMatchesRepository implements MatchesRepository {
     return [];
   });
 
+  int _unread(String matchId) {
+    final list = _seed(matchId);
+    final me = myUserId();
+    return [
+      for (var i = _readUpTo[matchId] ?? 0; i < list.length; i++)
+        if (list[i].senderId != me) i,
+    ].length;
+  }
+
   @override
   Future<List<MatchSummary>> fetchMatches() async => [
     for (final m in demoMatches)
@@ -88,9 +124,21 @@ class DemoMatchesRepository implements MatchesRepository {
         matchId: m.id,
         profile: m.profile,
         lastMessage: _seed(m.id).isEmpty ? null : _seed(m.id).last.body,
+        lastMessageAt: _seed(m.id).isEmpty ? null : _seed(m.id).last.createdAt,
+        unreadCount: _unread(m.id),
         gamePending: m.gamePending,
       ),
   ];
+
+  @override
+  Future<void> markRead(String matchId) async {
+    if (_unread(matchId) == 0) return;
+    _readUpTo[matchId] = _seed(matchId).length;
+    _inbox.add(null);
+  }
+
+  @override
+  Stream<void> watchInbox() => _inbox.stream;
 
   @override
   Stream<List<ChatMessage>> watchMessages(String matchId) {
@@ -117,5 +165,6 @@ class DemoMatchesRepository implements MatchesRepository {
         ),
       );
     _controllers[matchId]?.add(List.unmodifiable(list));
+    _inbox.add(null);
   }
 }
