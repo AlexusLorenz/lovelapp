@@ -30,6 +30,11 @@ flutter run --dart-define-from-file=config/supabase.json
 `config/supabase.json` enthält nur URL und *Publishable Key* – beide sind öffentlich und landen ohnehin in der App.
 Den **Secret Key** (`service_role`) und das Datenbank-Passwort niemals ins Repo oder in die App.
 
+### Web-Vorschau
+
+Jeder Push auf `main` baut die App für den Browser (Demo-Modus) und veröffentlicht sie unter
+https://alexuslorenz.github.io/lovelapp/ – Workflow `.github/workflows/web-preview.yml`.
+
 ### Datenbank lokal
 
 Voraussetzung: [Supabase CLI](https://supabase.com/docs/guides/cli) und Docker.
