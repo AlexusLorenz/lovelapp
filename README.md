@@ -21,13 +21,14 @@ flutter pub get
 flutter run          # Demo-Modus mit Beispieldaten, ohne Backend
 ```
 
-Mit Supabase:
+Mit dem Supabase-Projekt **Lovel** (Frankfurt, `eu-central-1`):
 
 ```bash
-flutter run \
-  --dart-define=SUPABASE_URL=https://<projekt>.supabase.co \
-  --dart-define=SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+flutter run --dart-define-from-file=config/supabase.json
 ```
+
+`config/supabase.json` enthält nur URL und *Publishable Key* – beide sind öffentlich und landen ohnehin in der App.
+Den **Secret Key** (`service_role`) und das Datenbank-Passwort niemals ins Repo oder in die App.
 
 ### Datenbank lokal
 
@@ -62,7 +63,7 @@ test/              Unit- und Widget-Tests
 
 ## Datenmodell (Kurzfassung)
 
-- `profiles` – eigenes Profil; andere sind nur über `public_profiles` (ohne Geburtsdatum/Standort) und `discover_profiles()` sichtbar
+- `profiles` – eigenes Profil; andere sind nur über `get_public_profiles()` (ohne Geburtsdatum/Standort) und `discover_profiles()` sichtbar
 - `profile_photos` – Fotos im privaten Bucket `profile-photos`, erst nach Freigabe für andere sichtbar
 - `likes`, `passes`, `matches` – Likes nur über `like_profile()`, das Kontingent prüft und bei Gegenseitigkeit ein Match anlegt
 - `messages` – Chat, nur in aktiven Matches
@@ -70,6 +71,7 @@ test/              Unit- und Widget-Tests
 - `blocks`, `reports` – Blockieren (beendet Match automatisch) und Melden (DSA)
 - `daily_like_usage`, `ad_rewards` – Like-Kontingent; Video-Bonus nur serverseitig nach AdMob-Verifizierung
 - `xp_rewards`, `xp_events` – XP für gutes Verhalten (z. B. Antworten), mit Tageslimits
+- Schema `private` – Hilfsfunktionen für die Zugriffsregeln, nicht über die API erreichbar
 
 ## Like-Ökonomie (Startwerte)
 

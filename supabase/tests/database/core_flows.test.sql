@@ -55,9 +55,15 @@ set local request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000a';
 
 select is((select count(*)::int from public.profiles), 1,
   'profiles: nur das eigene Profil lesbar');
-select is((select display_name from public.public_profiles
-           where id = '00000000-0000-0000-0000-00000000000b'), 'Ben',
-  'public_profiles: andere sichtbar');
+select is((select display_name from public.get_public_profiles(
+             array['00000000-0000-0000-0000-00000000000b'::uuid])), 'Ben',
+  'get_public_profiles: andere sichtbar');
+select is((select count(*)::int from public.get_public_profiles(
+             array['00000000-0000-0000-0000-00000000000b'::uuid])), 1,
+  'get_public_profiles: liefert genau ein Profil');
+select hasnt_function('public', 'is_blocked_between', array['uuid', 'uuid'],
+  'Hilfsfunktionen liegen nicht im API-Schema public');
+select hasnt_view('public', 'public_profiles', 'Keine Security-Definer-View');
 select throws_ok(
   $$ update public.profiles set xp = 9999 where id = auth.uid() $$,
   '42501', null, 'XP nicht selbst änderbar');
@@ -177,8 +183,8 @@ select isnt((select unmatched_at from public.matches limit 1), null,
 select throws_ok(
   $$ insert into public.messages (match_id, body) select id, 'Hallo?' from t_match $$,
   '42501', null, 'Nach Blockieren keine Nachrichten mehr');
-select is((select count(*)::int from public.public_profiles
-           where id = '00000000-0000-0000-0000-00000000000b'), 0,
+select is((select count(*)::int from public.get_public_profiles(
+             array['00000000-0000-0000-0000-00000000000b'::uuid])), 0,
   'Blockierer ist unsichtbar');
 select throws_ok(
   $$ select public.like_profile('00000000-0000-0000-0000-00000000000b') $$,
