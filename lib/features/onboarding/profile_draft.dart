@@ -1,6 +1,9 @@
 /// Profil-Entwurf aus dem Onboarding und seine Regeln (ohne Flutter-Abhängigkeit).
 library;
 
+import '../profile/profile_basics.dart';
+import '../profile/profile_prompts.dart';
+
 /// Muss zum CHECK auf `profiles.gender` / `profiles.interested_in` passen.
 enum Gender {
   woman('woman', 'Frau', 'Frauen'),
@@ -76,12 +79,19 @@ class ProfileDraft {
   String city = '';
   String bio = '';
 
+  /// Steckbrief, alles freiwillig.
+  ProfileBasics basics = const ProfileBasics();
+
+  /// Genau drei beantwortete Fragen, in Anzeige-Reihenfolge.
+  List<PromptAnswer> prompts = [];
+
   bool get isComplete =>
       validateDisplayName(displayName) == null &&
       birthdate != null &&
       gender != null &&
       interestedIn.isNotEmpty &&
-      sensitiveConsentAt != null;
+      sensitiveConsentAt != null &&
+      validatePromptSelection(prompts) == null;
 
   /// Spalten für `insert into profiles` (ohne `id`).
   Map<String, Object?> toInsertJson() {
@@ -101,6 +111,17 @@ class ProfileDraft {
       'sensitive_consent_at': sensitiveConsentAt!.toUtc().toIso8601String(),
       'city': city.trim().isEmpty ? null : city.trim(),
       'bio': bio.trim(),
+      ...basics.toJson(),
     };
   }
+
+  /// Zeilen für `insert into profile_prompts` (ohne `profile_id`).
+  List<Map<String, Object?>> promptRows() => [
+    for (var i = 0; i < prompts.length; i++)
+      {
+        'position': i,
+        'prompt_key': prompts[i].promptKey,
+        'answer': prompts[i].answer.trim(),
+      },
+  ];
 }

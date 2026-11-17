@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lovelapp/features/onboarding/profile_draft.dart';
+import 'package:lovelapp/features/profile/profile_basics.dart';
+import 'package:lovelapp/features/profile/profile_prompts.dart';
 
 void main() {
   final today = DateTime(2026, 11, 17);
@@ -47,7 +49,13 @@ void main() {
       ..interestedIn.addAll({Gender.nonbinary, Gender.man})
       ..sensitiveConsentAt = DateTime.utc(2026, 11, 17, 12)
       ..city = ' Leipzig '
-      ..bio = 'Hallo';
+      ..bio = 'Hallo'
+      ..basics = const ProfileBasics(smoking: Smoking.never, heightCm: 170)
+      ..prompts = const [
+        PromptAnswer('perfect_sunday', ' Brunch '),
+        PromptAnswer('green_flag', 'Ehrlich'),
+        PromptAnswer('superpower', 'Kaffee'),
+      ];
 
     test('liefert die DB-Spalten', () {
       expect(complete().toInsertJson(), {
@@ -58,6 +66,17 @@ void main() {
         'sensitive_consent_at': '2026-11-17T12:00:00.000Z',
         'city': 'Leipzig',
         'bio': 'Hallo',
+        'relationship_goal': null,
+        'children': null,
+        'smoking': 'never',
+        'drinking': null,
+        'exercise': null,
+        'height_cm': 170,
+      });
+      expect(complete().promptRows().first, {
+        'position': 0,
+        'prompt_key': 'perfect_sunday',
+        'answer': 'Brunch',
       });
     });
 
@@ -65,6 +84,11 @@ void main() {
       final draft = complete()..sensitiveConsentAt = null;
       expect(draft.isComplete, isFalse);
       expect(draft.toInsertJson, throwsStateError);
+    });
+
+    test('ohne drei Fragen nicht vollständig', () {
+      final draft = complete()..prompts = const [];
+      expect(draft.isComplete, isFalse);
     });
 
     test('leere Stadt wird null', () {

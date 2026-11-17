@@ -25,6 +25,11 @@ class SupabaseProfileRepository implements ProfileRepository {
         'id': userId,
         ...draft.toInsertJson(),
       });
+      // Zweiter Schritt. Schlägt er fehl, existiert das Profil schon ohne
+      // Fragen. TODO(profile-edit): dort nachtragen lassen.
+      await _client.from('profile_prompts').insert([
+        for (final row in draft.promptRows()) {'profile_id': userId, ...row},
+      ]);
     } on PostgrestException catch (e) {
       // 23514 = CHECK verletzt (z. B. unter 18), 23505 = Profil existiert schon
       throw ProfileFailure(switch (e.code) {

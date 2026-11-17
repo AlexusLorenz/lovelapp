@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
+import 'placeholder_photo.dart';
 
 /// Profilbild im Polaroid-Stil.
 ///
@@ -13,7 +14,11 @@ class ProfilePhoto extends StatelessWidget {
     this.width = 150,
     this.height = 200,
     this.variant = 0,
+    this.art,
   });
+
+  /// Gezeichnetes Platzhalter-Bild; ohne wird die Initiale gezeigt.
+  final PhotoArt? art;
 
   final String name;
   final double width;
@@ -47,26 +52,31 @@ class ProfilePhoto extends StatelessWidget {
           ),
         ],
       ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: colors,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            initial,
-            style: TextStyle(
-              fontFamily: AppTheme.displayFont,
-              fontSize: height * 0.35,
-              color: LovelColors.cream,
+      child: art != null
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: PlaceholderPhoto(art: art!),
+            )
+          : DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: colors,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  initial,
+                  style: TextStyle(
+                    fontFamily: AppTheme.displayFont,
+                    fontSize: height * 0.35,
+                    color: LovelColors.cream,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

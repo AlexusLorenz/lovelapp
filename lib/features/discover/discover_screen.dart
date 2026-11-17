@@ -8,6 +8,9 @@ import '../../data/demo_data.dart';
 import '../economy/like_quota.dart';
 import '../economy/like_quota_controller.dart';
 import 'match_overlay.dart';
+import 'photo_gallery.dart';
+import 'public_profile.dart';
+import 'swipe_card.dart';
 
 class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
@@ -19,38 +22,40 @@ class DiscoverScreen extends ConsumerStatefulWidget {
 class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   int _index = 0;
 
-  DemoProfile? get _current =>
-      _index < demoProfiles.length ? demoProfiles[_index] : null;
+  /// Neu pro Karte, damit jede Karte frisch (ungedreht) startet.
+  GlobalKey<SwipeCardState> _cardKey = GlobalKey();
 
-  void _next() => setState(() => _index++);
+  PublicProfile? _at(int i) => i < demoProfiles.length ? demoProfiles[i] : null;
 
-  void _like() {
-    final profile = _current;
-    if (profile == null) return;
-    final ok = ref.read(likeQuotaProvider.notifier).tryUseLike();
-    if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Für heute sind deine Likes aufgebraucht.'),
-        ),
-      );
-      return;
-    }
-    if (profile.likesYouBack) {
-      // Erst nach dem Match-Moment zum nächsten Profil wechseln.
-      _showMatch(profile).then((_) {
-        if (mounted) _next();
-      });
-    } else {
-      _next();
-    }
+  bool _canSwipe(SwipeDirection direction) =>
+      direction == SwipeDirection.left || ref.read(likeQuotaProvider).canLike;
+
+  void _onBlocked(SwipeDirection _) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Für heute sind deine Likes aufgebraucht.')),
+    );
   }
 
-  Future<void> _showMatch(DemoProfile profile) async {
+  void _onSwiped(PublicProfile profile, SwipeDirection direction) {
+    if (direction == SwipeDirection.right) {
+      ref.read(likeQuotaProvider.notifier).tryUseLike();
+      // TODO(backend): like_profile(profile.id) aufrufen.
+      if (profile.likesYouBack) _showMatch(profile);
+    }
+    // TODO(backend): bei links pass_profile(profile.id) aufrufen.
+    setState(() {
+      _index++;
+      _cardKey = GlobalKey();
+    });
+  }
+
+  Future<void> _showMatch(PublicProfile profile) async {
     final result = await showMatchOverlay(
       context,
       myName: demoMyName,
+      myPhoto: demoMyPhoto,
       matchName: profile.name,
+      matchPhoto: profile.photos.isEmpty ? null : profile.photos.first,
     );
     if (!mounted) return;
     if (result == MatchOverlayResult.playGame) {
@@ -58,10 +63,20 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     }
   }
 
+  Future<void> _openProfile(PublicProfile profile) async {
+    final choice = await context.push<SwipeDirection>(
+      Routes.person(profile.id, withActions: true),
+    );
+    if (choice != null && mounted) {
+      await _cardKey.currentState?.swipe(choice);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final quota = ref.watch(likeQuotaProvider);
-    final profile = _current;
+    final current = _at(_index);
+    final next = _at(_index + 1);
 
     return Scaffold(
       appBar: AppBar(
@@ -71,13 +86,45 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           const SizedBox(width: 12),
         ],
       ),
-      body: profile == null
+      body: current == null
           ? const _EmptyState()
           : Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
               child: Column(
                 children: [
-                  Expanded(child: _ProfileCard(profile: profile)),
+                  Expanded(
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // Nächste Karte liegt leicht verkleinert dahinter.
+                        if (next != null)
+                          Positioned.fill(
+                            child: Transform.scale(
+                              scale: 0.95,
+                              child: IgnorePointer(
+                                child: _ProfileCard(
+                                  key: ValueKey('next-${next.id}'),
+                                  profile: next,
+                                ),
+                              ),
+                            ),
+                          ),
+                        Positioned.fill(
+                          child: SwipeCard(
+                            key: _cardKey,
+                            canSwipe: _canSwipe,
+                            onBlocked: _onBlocked,
+                            onSwiped: (d) => _onSwiped(current, d),
+                            child: _ProfileCard(
+                              key: ValueKey(current.id),
+                              profile: current,
+                              onOpenProfile: () => _openProfile(current),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -88,7 +135,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                         backgroundColor: LovelColors.cream,
                         foregroundColor: LovelColors.umber,
                         elevation: 1,
-                        onPressed: _next,
+                        onPressed: () =>
+                            _cardKey.currentState?.swipe(SwipeDirection.left),
                         child: const Icon(Icons.close),
                       ),
                       FloatingActionButton.large(
@@ -99,7 +147,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                             : LovelColors.slate,
                         foregroundColor: LovelColors.cream,
                         elevation: 1,
-                        onPressed: quota.canLike ? _like : null,
+                        onPressed: quota.canLike
+                            ? () => _cardKey.currentState?.swipe(
+                                SwipeDirection.right,
+                              )
+                            : null,
                         child: const Icon(Icons.favorite),
                       ),
                     ],
@@ -140,60 +192,93 @@ class _QuotaChip extends StatelessWidget {
   }
 }
 
+/// Karte im Feed: Bilder formatfüllend, Name unten, Profil-Button unten rechts.
 class _ProfileCard extends StatelessWidget {
-  const _ProfileCard({required this.profile});
+  const _ProfileCard({super.key, required this.profile, this.onOpenProfile});
 
-  final DemoProfile profile;
+  final PublicProfile profile;
+  final VoidCallback? onOpenProfile;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      elevation: 2,
+      shadowColor: const Color(0x33000000),
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Expanded(
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [LovelColors.slate, LovelColors.mist],
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  profile.name.characters.first,
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    color: LovelColors.cream,
-                    fontSize: 120,
+          PhotoGallery(photos: profile.photos),
+          // Verlauf, damit der Text auf jedem Bild lesbar ist
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 200,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x00000000), Color(0xB3000000)],
                   ),
                 ),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${profile.name}, ${profile.age}',
-                        style: theme.textTheme.headlineSmall,
+          Positioned(
+            left: 20,
+            right: 84,
+            bottom: 20,
+            child: IgnorePointer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${profile.name}, ${profile.age}',
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      color: LovelColors.cream,
+                    ),
+                  ),
+                  Text(
+                    '${profile.city} · ${profile.distanceKm} km · '
+                    'Level ${profile.level}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: LovelColors.cream,
+                    ),
+                  ),
+                  if (profile.bio.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      profile.bio,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: LovelColors.cream,
                       ),
                     ),
-                    Chip(label: Text('Level ${profile.level}')),
                   ],
-                ),
-                Text('${profile.city} · ${profile.distanceKm} km entfernt'),
-                const SizedBox(height: 8),
-                Text(profile.bio),
-              ],
+                ],
+              ),
             ),
           ),
+          if (onOpenProfile != null)
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: IconButton.filled(
+                tooltip: 'Profil öffnen',
+                style: IconButton.styleFrom(
+                  backgroundColor: LovelColors.cream,
+                  foregroundColor: LovelColors.umber,
+                  fixedSize: const Size.square(52),
+                ),
+                icon: const Icon(Icons.keyboard_arrow_up, size: 30),
+                onPressed: onOpenProfile,
+              ),
+            ),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/placeholder_photo.dart';
 import '../../core/widgets/profile_photo.dart';
 import '../games/flame/hearts_game.dart';
 
@@ -17,6 +18,8 @@ Future<MatchOverlayResult?> showMatchOverlay(
   BuildContext context, {
   required String myName,
   required String matchName,
+  PhotoArt? myPhoto,
+  PhotoArt? matchPhoto,
 }) {
   return showGeneralDialog<MatchOverlayResult>(
     context: context,
@@ -26,8 +29,12 @@ Future<MatchOverlayResult?> showMatchOverlay(
     transitionDuration: const Duration(milliseconds: 250),
     transitionBuilder: (context, animation, _, child) =>
         FadeTransition(opacity: animation, child: child),
-    pageBuilder: (context, _, _) =>
-        MatchOverlay(myName: myName, matchName: matchName),
+    pageBuilder: (context, _, _) => MatchOverlay(
+      myName: myName,
+      matchName: matchName,
+      myPhoto: myPhoto,
+      matchPhoto: matchPhoto,
+    ),
   );
 }
 
@@ -36,10 +43,14 @@ class MatchOverlay extends StatefulWidget {
     super.key,
     required this.myName,
     required this.matchName,
+    this.myPhoto,
+    this.matchPhoto,
   });
 
   final String myName;
   final String matchName;
+  final PhotoArt? myPhoto;
+  final PhotoArt? matchPhoto;
 
   /// Gesamtdauer der Choreografie.
   static const duration = Duration(milliseconds: 2200);
@@ -130,7 +141,10 @@ class _MatchOverlayState extends State<MatchOverlay>
                             fromY: -screenHeight,
                             offset: const Offset(-55, 10),
                             angle: -0.14,
-                            child: ProfilePhoto(name: widget.myName),
+                            child: ProfilePhoto(
+                              name: widget.myName,
+                              art: widget.myPhoto,
+                            ),
                           ),
                           _Falling(
                             animation: _theirPhoto,
@@ -140,6 +154,7 @@ class _MatchOverlayState extends State<MatchOverlay>
                             child: ProfilePhoto(
                               name: widget.matchName,
                               variant: 1,
+                              art: widget.matchPhoto,
                             ),
                           ),
                           _Falling(

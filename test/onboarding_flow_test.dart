@@ -39,14 +39,11 @@ void main() {
     await tester.enterText(field('Vorname'), 'Alex');
     await tapAndSettle(tester, find.text('Weiter'));
 
-    await tester.enterText(field('Geburtsdatum'), '17.11.2008');
+    // Nur Ziffern tippen – die Punkte setzt die App.
+    await tester.enterText(field('Geburtsdatum'), '24051998');
+    await tester.pump();
+    expect(find.text('24.05.1998'), findsOneWidget);
     await tapAndSettle(tester, find.text('Weiter'));
-    // ab 18 – je nach heutigem Datum ist der 17.11.2008 noch zu jung
-    final tooYoung = find.textContaining('erst ab 18').evaluate().isNotEmpty;
-    if (tooYoung) {
-      await tester.enterText(field('Geburtsdatum'), '24.05.1998');
-      await tapAndSettle(tester, find.text('Weiter'));
-    }
 
     expect(find.text('Ich bin …'), findsOneWidget);
     await tapAndSettle(tester, find.text('Nicht-binär'));
@@ -58,6 +55,37 @@ void main() {
     final weiter = find.widgetWithText(FilledButton, 'Weiter');
     expect(tester.widget<FilledButton>(weiter).onPressed, isNull);
     await tapAndSettle(tester, find.byType(Checkbox));
+    expect(tester.widget<FilledButton>(weiter).onPressed, isNotNull);
+    await tapAndSettle(tester, weiter);
+
+    // Steckbrief (freiwillig)
+    expect(find.text('Dein Steckbrief'), findsOneWidget);
+    await tapAndSettle(tester, find.text('Nichtraucher:in'));
+    await tester.enterText(field('Größe (cm)'), '178');
+    await tapAndSettle(tester, find.text('Weiter'));
+
+    // Drei Fragen
+    expect(find.text('Drei Fragen über dich'), findsOneWidget);
+    expect(tester.widget<FilledButton>(weiter).onPressed, isNull);
+    const picks = [
+      'Mein perfekter Sonntag …',
+      'Meine heimliche Superkraft:',
+      'Meine unpopuläre Meinung:',
+    ];
+    for (var i = 0; i < 3; i++) {
+      await tapAndSettle(tester, find.text('Frage ${i + 1} auswählen'));
+      await tester.scrollUntilVisible(
+        find.text(picks[i]),
+        100,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tapAndSettle(tester, find.text(picks[i]));
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Antwort ${i + 1}'),
+        'Antwort Nummer ${i + 1}',
+      );
+      await tester.pump();
+    }
     expect(tester.widget<FilledButton>(weiter).onPressed, isNotNull);
     await tapAndSettle(tester, weiter);
 
