@@ -1,0 +1,92 @@
+# Lovel
+
+Gamifizierte, kostenlose Dating-App mit Minispielen als Eisbrecher.
+Finanziert über freiwillige Werbung (Rewarded Videos); Premium entfernt Werbung.
+**Kein Pay-to-win** bei Kernfunktionen: Matchen, Chatten und sehen, wer dich geliked hat, sind für alle gratis.
+
+## Stack
+
+| Bereich | Technik |
+|---|---|
+| App | Flutter 3.50 (Dart 3.14), iOS + Android |
+| Minispiele | Flame (Game-Loop), einfache Spiele als normale Widgets |
+| State & Navigation | Riverpod 3, go_router |
+| Backend | Supabase (EU/Frankfurt): Postgres + PostGIS, Auth, Storage, Realtime |
+| Werbung / Abos | AdMob Rewarded Ads, RevenueCat *(noch nicht eingebunden)* |
+
+## Loslegen
+
+```bash
+flutter pub get
+flutter run          # Demo-Modus mit Beispieldaten, ohne Backend
+```
+
+Mit Supabase:
+
+```bash
+flutter run \
+  --dart-define=SUPABASE_URL=https://<projekt>.supabase.co \
+  --dart-define=SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+```
+
+### Datenbank lokal
+
+Voraussetzung: [Supabase CLI](https://supabase.com/docs/guides/cli) und Docker.
+
+```bash
+supabase start        # startet Postgres, Auth, Storage … und spielt die Migrationen ein
+supabase test db      # pgTAP-Tests in supabase/tests/
+supabase db reset     # alles neu aufsetzen
+```
+
+## Projektstruktur
+
+```
+lib/
+  app.dart, main.dart
+  core/            Konfiguration, Router, Theme, App-Shell
+  data/            Beispieldaten für den Demo-Modus
+  features/
+    discover/      Entdecken-Feed (Like / Weiter, Match-Dialog)
+    matches/       Match-Liste
+    chat/          Chat-Liste und Chat
+    profile/       Profil, Level & XP
+    games/         Spielekatalog, This or That, Flame-Szenen
+    economy/       Like-Kontingent und Rewarded-Bonus
+    progress/      Level-/XP-Berechnung
+supabase/
+  migrations/      Datenbankschema inkl. RLS und RPC-Funktionen
+  tests/database/  pgTAP-Tests
+test/              Unit- und Widget-Tests
+```
+
+## Datenmodell (Kurzfassung)
+
+- `profiles` – eigenes Profil; andere sind nur über `public_profiles` (ohne Geburtsdatum/Standort) und `discover_profiles()` sichtbar
+- `profile_photos` – Fotos im privaten Bucket `profile-photos`, erst nach Freigabe für andere sichtbar
+- `likes`, `passes`, `matches` – Likes nur über `like_profile()`, das Kontingent prüft und bei Gegenseitigkeit ein Match anlegt
+- `messages` – Chat, nur in aktiven Matches
+- `game_sessions`, `game_moves` – Minispiel-Runden (Realtime)
+- `blocks`, `reports` – Blockieren (beendet Match automatisch) und Melden (DSA)
+- `daily_like_usage`, `ad_rewards` – Like-Kontingent; Video-Bonus nur serverseitig nach AdMob-Verifizierung
+- `xp_rewards`, `xp_events` – XP für gutes Verhalten (z. B. Antworten), mit Tageslimits
+
+## Like-Ökonomie (Startwerte)
+
+| | Likes pro Tag |
+|---|---|
+| Gratis | 20 |
+| + Rewarded Video | +5 je Video, max. 3 Videos |
+| Premium | 35 ohne Videos, keine Werbung |
+
+Premium bekommt also genau das, was Gratis-Nutzer mit Videos auch erreichen.
+Die Werte stehen in `lib/features/economy/like_quota.dart` **und** `public.like_quota_rules()` und müssen übereinstimmen.
+
+## Offene nächste Schritte
+
+- Anmeldung (Supabase Auth) und Onboarding mit 18+-Prüfung und Einwilligungen
+- Demo-Daten durch Supabase-Repositories ersetzen
+- Foto-Upload und Moderation (Freigabe-Workflow)
+- Edge Function für AdMob Server-Side Verification → `grant_rewarded_ad_bonus()`
+- Echte Mehrspieler-Runden über Realtime
+- iOS-Build in der CI (macOS-Runner)
