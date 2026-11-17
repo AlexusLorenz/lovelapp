@@ -3,6 +3,10 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:lovelapp/features/profile/widgets/completion_avatar.dart';
 
+import 'package:lovelapp/core/widgets/pinch_zoom.dart';
+import 'package:lovelapp/features/discover/profile_detail_screen.dart';
+import 'package:lovelapp/features/profile/edit_profile_screen.dart';
+
 import 'helpers.dart';
 
 Finder field(String label) => find.widgetWithText(TextFormField, label);
@@ -213,7 +217,14 @@ void main() {
   testWidgets('Fotos hochladen, Vervollständigung steigt, Vorschau zeigt sie', (
     tester,
   ) async {
-    await pumpLovelApp(tester);
+    final requestedLimits = <int>[];
+    await pumpLovelApp(
+      tester,
+      pickImages: (limit) async {
+        requestedLimits.add(limit);
+        return [testJpeg(), testJpeg()];
+      },
+    );
     await tapAndSettle(tester, find.text('Profil'));
     // Demo-Profil: Stadt + 1 Steckbrief-Angabe = 10 %
     expect(find.text('10 %'), findsOneWidget);
@@ -221,14 +232,13 @@ void main() {
     await scrollTo(tester, find.text('Profil bearbeiten'));
     await tapAndSettle(tester, find.text('Profil bearbeiten'));
 
-    // Zwei Fotos hinzufügen (Bildaufbereitung läuft wirklich)
-    for (var i = 0; i < 2; i++) {
-      await tester.runAsync(() async {
-        await tester.tap(find.text('Foto hinzufügen'));
-        await Future<void>.delayed(const Duration(seconds: 2));
-      });
-      await tester.pumpAndSettle();
-    }
+    // Zwei Fotos auf einmal auswählen (Bildaufbereitung läuft wirklich)
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Foto hinzufügen'));
+      await Future<void>.delayed(const Duration(seconds: 3));
+    });
+    await tester.pumpAndSettle();
+    expect(requestedLimits, [6], reason: 'Auswahl auf freie Plätze begrenzt');
     expect(find.text('Hauptbild'), findsOneWidget);
     expect(find.byTooltip('Foto 2 löschen'), findsOneWidget);
 
@@ -252,4 +262,115 @@ void main() {
     await scrollTo(tester, find.text('Nichtraucher:in'));
     expect(find.text('Nichtraucher:in'), findsOneWidget);
   });
+
+  testWidgets('Speichern oben rechts: Fehler sichtbar, danach zurück', (
+    tester,
+  ) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Profil'));
+    await scrollTo(tester, find.text('Profil bearbeiten'));
+    await tapAndSettle(tester, find.text('Profil bearbeiten'));
+
+    // Frage ohne Antwort → Hinweis als Snackbar, Bearbeitung bleibt offen
+    await tester.scrollUntilVisible(
+      find.text('Frage 1 auswählen'),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Frage 1 auswählen'));
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.text('Eine Green Flag bei dir wäre …'));
+    await tapAndSettle(tester, find.widgetWithText(TextButton, 'Speichern'));
+    expect(find.byType(EditProfileScreen), findsOneWidget);
+    expect(find.byType(SnackBar), findsOneWidget);
+
+    await tester.enterText(
+      find
+              .widgetWithText(TextField, 'Antwort 1')
+              .hitTestable()
+              .evaluate()
+              .isEmpty
+          ? find
+                .byWidgetPredicate(
+                  (w) =>
+                      w is TextField &&
+                      (w.controller?.text.isEmpty ?? false) &&
+                      (w.decoration?.labelText?.startsWith('Antwort') ?? false),
+                )
+                .first
+          : find.widgetWithText(TextField, 'Antwort 1'),
+      'Ehrlich sein',
+    );
+    await tapAndSettle(tester, find.widgetWithText(TextButton, 'Speichern'));
+    expect(find.byType(EditProfileScreen), findsNothing);
+    expect(find.text('Profil gespeichert.'), findsOneWidget);
+  });
+
+  testWidgets('Chat: Profilbilder öffnen die Profile', (tester) async {
+    await pumpLovelApp(tester);
+    await tapAndSettle(tester, find.text('Chats'));
+    await tapAndSettle(tester, find.text('Mia'));
+
+    // Oben neben dem Namen
+    await tapAndSettle(tester, _semantics('Profil von Mia ansehen').first);
+    expect(find.byType(ProfileDetailScreen), findsOneWidget);
+    await tapAndSettle(tester, find.byTooltip('Schließen'));
+
+    // Eigenes Bild neben der eigenen Nachricht
+    final input = find.widgetWithText(TextField, 'Nachricht schreiben');
+    await tester.enterText(input, 'Hallo!');
+    await tapAndSettle(tester, find.byTooltip('Senden'));
+    await tapAndSettle(tester, _semantics('Dein Profil ansehen').last);
+    expect(find.text('Du, 28'), findsOneWidget);
+  });
+
+  testWidgets('Profilfoto: Zwei-Finger-Zoom vergrößert und springt zurück', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: PinchZoom(
+              child: SizedBox(
+                width: 200,
+                height: 200,
+                child: ColoredBox(color: Colors.red),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    final center = tester.getCenter(find.byType(PinchZoom));
+    final a = await tester.startGesture(center - const Offset(20, 0));
+    final b = await tester.startGesture(
+      center + const Offset(20, 0),
+      pointer: 7,
+    );
+    await a.moveBy(const Offset(-60, 0));
+    await b.moveBy(const Offset(60, 0));
+    await tester.pump();
+
+    final zoomed = find
+        .byType(Transform)
+        .evaluate()
+        .map((e) => e.widget as Transform)
+        .where((t) => t.transform.getMaxScaleOnAxis() > 2.5);
+    expect(zoomed, isNotEmpty, reason: 'Abstand 40 → 160 px = Faktor 4');
+
+    await a.up();
+    await b.up();
+    await tester.pumpAndSettle();
+    final still = find
+        .byType(Transform)
+        .evaluate()
+        .map((e) => e.widget as Transform)
+        .where((t) => t.transform.getMaxScaleOnAxis() > 1.01);
+    expect(still, isEmpty);
+  });
 }
+
+Finder _semantics(String label) => find.byWidgetPredicate(
+  (w) => w is Semantics && w.properties.label == label,
+);

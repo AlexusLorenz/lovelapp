@@ -9,6 +9,7 @@ import 'discover_providers.dart';
 import 'photo_gallery.dart';
 import 'public_profile.dart';
 import 'swipe_card.dart';
+import '../../core/widgets/pinch_zoom.dart';
 import '../../core/widgets/profile_image.dart';
 
 /// Ganzes Profil: Bilder, Text, Fragen und Steckbrief.
@@ -60,7 +61,9 @@ class ProfileDetailScreen extends ConsumerWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   background: profile.photos.isEmpty
                       ? PhotoGallery(photos: const [], name: profile.name)
-                      : ProfileImageView(image: profile.photos.first),
+                      : PinchZoom(
+                          child: ProfileImageView(image: profile.photos.first),
+                        ),
                 ),
               ),
               SliverPadding(
@@ -206,11 +209,13 @@ class _PhotoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: AspectRatio(
-        aspectRatio: 4 / 5,
-        child: ProfileImageView(image: art),
+    return PinchZoom(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: AspectRatio(
+          aspectRatio: 4 / 5,
+          child: ProfileImageView(image: art),
+        ),
       ),
     );
   }

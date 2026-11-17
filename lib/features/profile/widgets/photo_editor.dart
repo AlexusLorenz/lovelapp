@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_ui/material_ui.dart';
@@ -8,21 +9,39 @@ import '../../../core/widgets/profile_image.dart';
 import '../../photos/photos_repository.dart';
 import '../own_profile_providers.dart';
 
-/// Wählt ein Bild aus der Galerie. In Tests überschreibbar.
-typedef PickImage = Future<Uint8List?> Function();
+/// Wählt bis zu [limit] Bilder aus der Fotomediathek (Mehrfachauswahl).
+/// In Tests überschreibbar.
+typedef PickImages = Future<List<Uint8List>> Function(int limit);
 
-final pickImageProvider = Provider<PickImage>(
-  (ref) => () async {
-    final file = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
+final pickImagesProvider = Provider<PickImages>(
+  (ref) => (limit) async {
+    final files = await ImagePicker().pickMultiImage(
       // Vorab grob verkleinern; Feinschliff + Metadaten entfernen danach.
       maxWidth: 2048,
       maxHeight: 2048,
       imageQuality: 92,
+      limit: limit,
+      requestFullMetadata: false,
     );
-    return file?.readAsBytes();
+    return [for (final f in files.take(limit)) await f.readAsBytes()];
   },
 );
+
+/// Startet das Ziehen schon nach einem Drittel der üblichen Wartezeit.
+class _QuickDragStartListener extends ReorderableDragStartListener {
+  const _QuickDragStartListener({
+    required super.key,
+    required super.child,
+    required super.index,
+  });
+
+  @override
+  MultiDragGestureRecognizer createRecognizer() =>
+      DelayedMultiDragGestureRecognizer(
+        delay: const Duration(milliseconds: 170), // statt 500 ms
+        debugOwner: this,
+      );
+}
 
 /// Eigene Fotos: hinzufügen, löschen, per Ziehen sortieren.
 /// Das erste Foto ist das Hauptbild.
@@ -41,11 +60,17 @@ class _PhotoEditorState extends ConsumerState<PhotoEditor> {
     ..showSnackBar(SnackBar(content: Text(text)));
 
   Future<void> _add() async {
-    final bytes = await ref.read(pickImageProvider)();
-    if (bytes == null || !mounted) return;
+    final current = ref.read(ownPhotosProvider).value?.length ?? 0;
+    final free = maxPhotos - current;
+    if (free <= 0) return;
+    final picked = await ref.read(pickImagesProvider)(free);
+    if (picked.isEmpty || !mounted) return;
     setState(() => _uploading = true);
     try {
-      await ref.read(ownPhotosProvider.notifier).add(bytes);
+      // Nacheinander, damit die Reihenfolge der Auswahl erhalten bleibt.
+      for (final bytes in picked) {
+        await ref.read(ownPhotosProvider.notifier).add(bytes);
+      }
     } on PhotoFailure catch (e) {
       _snack(e.message);
     } finally {
@@ -110,16 +135,15 @@ class _PhotoEditorState extends ConsumerState<PhotoEditor> {
                     elevation: 6,
                     child: child,
                   ),
-                  itemBuilder: (context, i) =>
-                      ReorderableDelayedDragStartListener(
-                        key: ValueKey(list[i].id),
-                        index: i,
-                        child: _PhotoTile(
-                          photo: list[i],
-                          index: i,
-                          onRemove: () => _remove(list[i]),
-                        ),
-                      ),
+                  itemBuilder: (context, i) => _QuickDragStartListener(
+                    key: ValueKey(list[i].id),
+                    index: i,
+                    child: _PhotoTile(
+                      photo: list[i],
+                      index: i,
+                      onRemove: () => _remove(list[i]),
+                    ),
+                  ),
                   footer: canAdd || _uploading
                       ? _AddTile(
                           uploading: _uploading,

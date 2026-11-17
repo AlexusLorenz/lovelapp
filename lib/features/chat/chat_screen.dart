@@ -106,12 +106,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     final me = _AvatarData(
       name: myName,
+      semanticLabel: 'Dein Profil ansehen',
+      onTap: () => context.push(Routes.ownPreview),
       photo:
           ref.watch(ownPhotosProvider).value?.firstOrNull?.image ??
           myMainPhoto(ref),
     );
     final them = _AvatarData(
       name: partner?.name ?? '?',
+      semanticLabel: 'Profil von ${partner?.name ?? 'Match'} ansehen',
+      onTap: partner == null
+          ? null
+          : () => context.push(Routes.person(partner.id)),
       photo: (partner?.photos.isEmpty ?? true) ? null : partner!.photos.first,
     );
 
@@ -122,7 +128,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           children: [
             _Avatar(data: them, radius: 18),
             const SizedBox(width: 10),
-            Expanded(child: Text(partner?.name ?? 'Chat')),
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: them.onTap,
+                child: Text(partner?.name ?? 'Chat'),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -196,10 +208,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 }
 
 class _AvatarData {
-  const _AvatarData({required this.name, this.photo});
+  const _AvatarData({
+    required this.name,
+    required this.semanticLabel,
+    this.photo,
+    this.onTap,
+  });
 
   final String name;
+  final String semanticLabel;
   final ProfileImage? photo;
+
+  /// Öffnet das zugehörige Profil.
+  final VoidCallback? onTap;
 }
 
 class _Avatar extends StatelessWidget {
@@ -210,6 +231,22 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onTap = data.onTap;
+    final avatar = _circle();
+    if (onTap == null) return avatar;
+    return Semantics(
+      button: true,
+      label: data.semanticLabel,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: MouseRegion(cursor: SystemMouseCursors.click, child: avatar),
+      ),
+    );
+  }
+
+  Widget _circle() {
     final photo = data.photo;
     if (photo != null) {
       return ClipOval(

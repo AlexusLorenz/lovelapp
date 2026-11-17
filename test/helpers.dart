@@ -26,7 +26,7 @@ Future<void> pumpLovelApp(
   WidgetTester tester, {
   bool signedIn = true,
   bool hasProfile = true,
-  PickImage? pickImage,
+  PickImages? pickImages,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -34,8 +34,8 @@ Future<void> pumpLovelApp(
         authRepositoryProvider.overrideWithValue(
           DemoAuthRepository(signedInAs: signedIn ? testUser : null),
         ),
-        pickImageProvider.overrideWithValue(
-          pickImage ?? () async => testJpeg(),
+        pickImagesProvider.overrideWithValue(
+          pickImages ?? (limit) async => [testJpeg()],
         ),
         profileRepositoryProvider.overrideWithValue(
           DemoProfileRepository(existingUserIds: [if (hasProfile) testUser.id]),

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/router/app_router.dart';
 import '../discover/discover_providers.dart';
 import '../onboarding/profile_draft.dart';
 import '../onboarding/profile_repository.dart';
@@ -70,8 +71,22 @@ class _EditFormState extends ConsumerState<_EditForm> {
     super.dispose();
   }
 
+  /// Fehler sichtbar machen – auch wenn das Feld gerade nicht im Bild ist
+  /// (z. B. nach „Speichern“ oben rechts).
+  void _showProblem(String text) {
+    setState(() => _error = text);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
+  }
+
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus(); // Tastatur zu, Eingaben übernehmen
+    if (_saving) return;
+    if (!_formKey.currentState!.validate()) {
+      _showProblem('Bitte prüfe die markierten Felder.');
+      return;
+    }
     final updated = OwnProfile(
       displayName: _name.text,
       bio: _bio.text,
@@ -83,7 +98,7 @@ class _EditFormState extends ConsumerState<_EditForm> {
     );
     final problem = updated.validate();
     if (problem != null) {
-      setState(() => _error = problem);
+      _showProblem(problem);
       return;
     }
     final userId = ref.read(sessionProvider).user?.id;
@@ -101,11 +116,17 @@ class _EditFormState extends ConsumerState<_EditForm> {
         ..invalidate(ownSummaryProvider);
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Profil gespeichert.')));
-        context.pop();
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(content: Text('Profil gespeichert.')));
+        // Nach Neuladen im Browser gibt es evtl. nichts zum Zurückgehen.
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(Routes.profile);
+        }
       }
     } on ProfileFailure catch (e) {
-      setState(() => _error = e.message);
+      if (mounted) _showProblem(e.message);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
