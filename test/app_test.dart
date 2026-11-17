@@ -43,7 +43,7 @@ void main() {
     expect(find.text('Übereinstimmung'), findsOneWidget);
   });
 
-  testWidgets('Like auf Gegenseitigkeit zeigt Match mit Flame-Herzen', (
+  testWidgets('Like auf Gegenseitigkeit zeigt das Match-Overlay', (
     tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: LovelApp()));
@@ -51,17 +51,50 @@ void main() {
 
     await tester.tap(find.byTooltip('Like'));
     // Kein pumpAndSettle: die Flame-Game-Loop läuft dauerhaft.
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 60; i++) {
       await tester.pump(const Duration(milliseconds: 50));
     }
-    expect(find.text('Es ist ein Match!'), findsOneWidget);
+    expect(find.text('MATCH!'), findsWidgets);
+    expect(find.text('Du und Mia mögt euch.'), findsOneWidget);
     expect(find.text('19'), findsOneWidget); // ein Like verbraucht
 
     await tester.tap(find.text('Weiter entdecken'));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
     }
-    expect(find.text('Es ist ein Match!'), findsNothing);
+    expect(find.text('MATCH!'), findsNothing);
     expect(find.text('Jonas, 30'), findsOneWidget);
+  });
+
+  testWidgets('Match-Overlay: Spiel starten führt zu den Spielen', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Like'));
+    for (var i = 0; i < 60; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    await tester.tap(find.text('Eisbrecher-Spiel starten'));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(find.text('Eisbrecher-Spiele'), findsOneWidget);
+  });
+
+  testWidgets('Match-Overlay respektiert „Bewegung reduzieren“', (
+    tester,
+  ) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
+    await tester.pumpWidget(const ProviderScope(child: LovelApp()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Like'));
+    await tester.pumpAndSettle(); // ohne Herzen läuft keine Game-Loop
+
+    expect(find.text('Du und Mia mögt euch.'), findsOneWidget);
   });
 }

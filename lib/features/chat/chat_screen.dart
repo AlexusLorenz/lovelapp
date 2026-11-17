@@ -96,12 +96,15 @@ class _ChatScreenState extends State<ChatScreen> {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: msg.mine
-                          ? scheme.primaryContainer
-                          : scheme.surfaceContainerHighest,
+                      color: msg.mine ? scheme.primary : scheme.surface,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(msg.text),
+                    child: Text(
+                      msg.text,
+                      style: TextStyle(
+                        color: msg.mine ? scheme.onPrimary : scheme.onSurface,
+                      ),
+                    ),
                   ),
                 );
               },

@@ -15,7 +15,7 @@ class LovelApp extends ConsumerWidget {
       title: 'Lovel',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.light, // Dark Mode folgt später
       routerConfig: router,
     );
   }

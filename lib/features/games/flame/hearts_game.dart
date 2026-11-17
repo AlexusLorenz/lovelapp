@@ -4,37 +4,65 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 
-/// Kleine Flame-Szene: aufsteigende Herzen, z. B. für den „Match!“-Moment.
+/// Flame-Szene: Herzen fliegen über den ganzen Bildschirm, z. B. beim Match.
 ///
 /// Dient gleichzeitig als Vorlage für Minispiele, die eine Game-Loop brauchen.
 class HeartsGame extends FlameGame {
-  HeartsGame({this.color = const Color(0xFFE8457A), int? seed})
-    : _random = math.Random(seed);
+  HeartsGame({
+    this.colors = const [Color(0xFFBB5B3E)],
+    this.initialBurst = 24,
+    int? seed,
+  }) : _random = math.Random(seed);
 
-  final Color color;
+  final List<Color> colors;
+
+  /// Herzen, die beim Start sofort überall auf dem Bildschirm erscheinen.
+  final int initialBurst;
+
   final math.Random _random;
+  bool _burstDone = false;
 
   @override
   Color backgroundColor() => const Color(0x00000000);
 
   @override
   Future<void> onLoad() async {
-    add(TimerComponent(period: 0.12, repeat: true, onTick: _spawnHeart));
+    add(TimerComponent(period: 0.08, repeat: true, onTick: _spawnFromBottom));
   }
 
-  void _spawnHeart() {
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    if (!_burstDone && size.x > 0 && size.y > 0) {
+      _burstDone = true;
+      for (var i = 0; i < initialBurst; i++) {
+        _spawn(
+          Vector2(
+            _random.nextDouble() * size.x,
+            size.y * (0.2 + _random.nextDouble() * 0.9),
+          ),
+        );
+      }
+    }
+  }
+
+  void _spawnFromBottom() {
     if (size.x <= 0 || size.y <= 0) return;
-    final heartSize = 14 + _random.nextDouble() * 22;
+    _spawn(Vector2(_random.nextDouble() * size.x, size.y + 30));
+  }
+
+  void _spawn(Vector2 position) {
+    final heartSize = 16 + _random.nextDouble() * 30;
+    // Ein Herz braucht etwa 3–5 s für die ganze Bildschirmhöhe.
+    final speed = size.y / (3 + _random.nextDouble() * 2);
     add(
       HeartComponent(
-        color: color,
-        position: Vector2(_random.nextDouble() * size.x, size.y + heartSize),
-        velocity: Vector2(
-          (_random.nextDouble() - 0.5) * 40,
-          -(80 + _random.nextDouble() * 120),
-        ),
-        lifetime: 2 + _random.nextDouble() * 1.5,
+        color: colors[_random.nextInt(colors.length)],
+        position: position,
+        velocity: Vector2((_random.nextDouble() - 0.5) * 60, -speed),
+        lifetime: 5,
         size: Vector2.all(heartSize),
+        wobbleOffset: _random.nextDouble() * math.pi * 2,
       ),
     );
   }
@@ -45,6 +73,7 @@ class HeartComponent extends PositionComponent {
     required this.color,
     required this.velocity,
     required this.lifetime,
+    this.wobbleOffset = 0,
     super.position,
     super.size,
   }) : super(anchor: Anchor.center);
@@ -52,6 +81,7 @@ class HeartComponent extends PositionComponent {
   final Color color;
   final Vector2 velocity;
   final double lifetime;
+  final double wobbleOffset;
   double _age = 0;
 
   @override
@@ -59,14 +89,18 @@ class HeartComponent extends PositionComponent {
     super.update(dt);
     _age += dt;
     position += velocity * dt;
-    angle = math.sin(_age * 4) * 0.25;
-    if (_age >= lifetime) removeFromParent();
+    position.x += math.sin(_age * 2 + wobbleOffset) * 0.6;
+    angle = math.sin(_age * 3 + wobbleOffset) * 0.25;
+    if (_age >= lifetime || position.y < -size.y) removeFromParent();
   }
 
   @override
   void render(Canvas canvas) {
-    final opacity = (1 - _age / lifetime).clamp(0.0, 1.0);
-    final paint = Paint()..color = color.withValues(alpha: opacity);
+    // Kurz einblenden, gegen Ende ausblenden.
+    final fadeIn = (_age / 0.3).clamp(0.0, 1.0);
+    final fadeOut = (lifetime - _age).clamp(0.0, 1.0);
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.9 * fadeIn * fadeOut);
     canvas.drawPath(heartPath(size.x, size.y), paint);
   }
 

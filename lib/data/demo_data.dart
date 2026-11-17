@@ -39,6 +39,9 @@ class DemoMatch {
   final bool gamePending;
 }
 
+/// Name des eigenen (Demo-)Profils, z. B. im Match-Overlay.
+const demoMyName = 'Du';
+
 const demoProfiles = [
   DemoProfile(
     id: 'p1',

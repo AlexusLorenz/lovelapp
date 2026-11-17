@@ -1,13 +1,13 @@
-import 'package:flame/game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/router/app_router.dart';
+import '../../core/theme/app_theme.dart';
 import '../../data/demo_data.dart';
 import '../economy/like_quota.dart';
 import '../economy/like_quota_controller.dart';
-import '../games/flame/hearts_game.dart';
+import 'match_overlay.dart';
 
 class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
@@ -42,11 +42,16 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     _next();
   }
 
-  void _showMatch(DemoProfile profile) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => _MatchDialog(profile: profile),
+  Future<void> _showMatch(DemoProfile profile) async {
+    final result = await showMatchOverlay(
+      context,
+      myName: demoMyName,
+      matchName: profile.name,
     );
+    if (!mounted) return;
+    if (result == MatchOverlayResult.playGame) {
+      context.push(Routes.games);
+    }
   }
 
   @override
@@ -76,12 +81,20 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       FloatingActionButton.large(
                         heroTag: 'pass',
                         tooltip: 'Weiter',
+                        backgroundColor: LovelColors.cream,
+                        foregroundColor: LovelColors.umber,
+                        elevation: 1,
                         onPressed: _next,
                         child: const Icon(Icons.close),
                       ),
                       FloatingActionButton.large(
                         heroTag: 'like',
                         tooltip: 'Like',
+                        backgroundColor: quota.canLike
+                            ? LovelColors.terracotta
+                            : LovelColors.slate,
+                        foregroundColor: LovelColors.cream,
+                        elevation: 1,
                         onPressed: quota.canLike ? _like : null,
                         child: const Icon(Icons.favorite),
                       ),
@@ -136,13 +149,20 @@ class _ProfileCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: ColoredBox(
-              color: theme.colorScheme.primaryContainer,
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [LovelColors.slate, LovelColors.mist],
+                ),
+              ),
               child: Center(
                 child: Text(
                   profile.name.characters.first,
                   style: theme.textTheme.displayLarge?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer,
+                    color: LovelColors.cream,
+                    fontSize: 120,
                   ),
                 ),
               ),
@@ -187,61 +207,6 @@ class _EmptyState extends StatelessWidget {
         child: Text(
           'Das war’s für heute in deiner Nähe. Schau morgen wieder vorbei!',
           textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-}
-
-class _MatchDialog extends StatefulWidget {
-  const _MatchDialog({required this.profile});
-
-  final DemoProfile profile;
-
-  @override
-  State<_MatchDialog> createState() => _MatchDialogState();
-}
-
-class _MatchDialogState extends State<_MatchDialog> {
-  final _game = HeartsGame();
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      clipBehavior: Clip.antiAlias,
-      child: SizedBox(
-        height: 360,
-        child: Stack(
-          children: [
-            Positioned.fill(child: GameWidget(game: _game)),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Es ist ein Match!',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Du und ${widget.profile.name} mögt euch.'),
-                  const SizedBox(height: 24),
-                  FilledButton.icon(
-                    icon: const Icon(Icons.sports_esports),
-                    label: const Text('Eisbrecher-Spiel starten'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      context.push(Routes.games);
-                    },
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Weiter entdecken'),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
