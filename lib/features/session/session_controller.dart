@@ -1,26 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../core/config/env.dart';
 import '../auth/auth_repository.dart';
-import '../auth/supabase_auth_repository.dart';
-import '../onboarding/profile_repository.dart';
-import '../onboarding/supabase_profile_repository.dart';
+import 'repositories.dart';
 
-/// Echte Repositories mit Supabase, sonst Demo-Modus.
-final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => Env.hasSupabase
-      ? SupabaseAuthRepository(Supabase.instance.client)
-      : DemoAuthRepository(),
-);
-
-final profileRepositoryProvider = Provider<ProfileRepository>(
-  (ref) => Env.hasSupabase
-      ? SupabaseProfileRepository(Supabase.instance.client)
-      : DemoProfileRepository(),
-);
+export 'repositories.dart';
 
 enum SessionStatus {
   /// Prüft gerade, ob es schon ein Profil gibt.

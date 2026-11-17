@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../location/approx_location.dart';
 import 'profile_draft.dart';
 import 'profile_repository.dart';
 
@@ -44,6 +45,32 @@ class SupabaseProfileRepository implements ProfileRepository {
       throw const ProfileFailure(
         'Keine Verbindung zum Server. Bitte prüfe dein Internet.',
       );
+    }
+  }
+
+  @override
+  Future<OwnProfileSummary?> fetchOwnSummary(String userId) async {
+    final row = await _client
+        .from('profiles')
+        .select('display_name, location')
+        .eq('id', userId)
+        .maybeSingle();
+    if (row == null) return null;
+    return OwnProfileSummary(
+      displayName: row['display_name'] as String,
+      hasLocation: row['location'] != null,
+    );
+  }
+
+  @override
+  Future<void> updateLocation(String userId, ApproxLocation location) async {
+    try {
+      await _client
+          .from('profiles')
+          .update({'location': location.toEwkt()})
+          .eq('id', userId);
+    } on Exception {
+      throw const ProfileFailure('Standort konnte nicht gespeichert werden.');
     }
   }
 }

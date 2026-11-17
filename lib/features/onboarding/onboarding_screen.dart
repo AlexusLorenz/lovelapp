@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../session/session_controller.dart';
+import '../location/location_prompt.dart';
 import '../profile/profile_basics.dart';
 import '../profile/profile_prompts.dart';
 import 'date_input_formatter.dart';
@@ -21,7 +22,16 @@ class OnboardingScreen extends ConsumerStatefulWidget {
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-enum _Step { name, birthdate, gender, interests, basics, prompts, about }
+enum _Step {
+  name,
+  birthdate,
+  gender,
+  interests,
+  basics,
+  prompts,
+  location,
+  about,
+}
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _draft = ProfileDraft();
@@ -66,6 +76,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _draft.interestedIn.isNotEmpty && _draft.sensitiveConsentAt != null,
     _Step.basics => true,
     _Step.prompts => validatePromptSelection(_currentPrompts) == null,
+    _Step.location => true, // freiwillig, lässt sich später nachholen
     _Step.about => !_saving,
   };
 
@@ -97,6 +108,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         _draft.basics = _draft.basics.copyWith(heightCm: () => cm);
       case _Step.prompts:
         _draft.prompts = _currentPrompts;
+      case _Step.location:
+        break;
       case _Step.about:
         await _save();
         return;
@@ -384,6 +397,27 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     onChanged: () => setState(() {}),
                   ),
                 ),
+            ],
+          ),
+        );
+      case _Step.location:
+        return _StepLayout(
+          title: 'Wo bist du ungefähr?',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              LocationPrompt(
+                compact: true,
+                onLocation: (l) => setState(() => _draft.location = l),
+              ),
+              if (_draft.location == null) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Du kannst das auch später nachholen – ohne Standort '
+                  'zeigt dir der Entdecken-Feed aber niemanden.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ],
           ),
         );

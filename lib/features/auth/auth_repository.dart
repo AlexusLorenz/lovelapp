@@ -8,6 +8,15 @@ class AppUser {
   final String? email;
 }
 
+/// Anmeldung über einen externen Anbieter.
+enum SocialProvider {
+  apple('Apple'),
+  google('Google');
+
+  const SocialProvider(this.label);
+  final String label;
+}
+
 enum SignUpOutcome {
   /// Konto angelegt und direkt angemeldet.
   signedIn,
@@ -38,6 +47,10 @@ abstract interface class AuthRepository {
   });
 
   Future<void> signIn({required String email, required String password});
+
+  /// Öffnet die Anmeldeseite des Anbieters. Die Sitzung kommt danach über
+  /// [authStateChanges] (Rücksprung per Deep Link).
+  Future<void> signInWithProvider(SocialProvider provider);
 
   Future<void> signOut();
 }
@@ -76,6 +89,12 @@ class DemoAuthRepository implements AuthRepository {
     _set(
       AppUser(id: 'demo-${email.trim().toLowerCase()}', email: email.trim()),
     );
+  }
+
+  @override
+  Future<void> signInWithProvider(SocialProvider provider) async {
+    final email = 'demo-${provider.name}@lovel.app';
+    _set(AppUser(id: 'demo-$email', email: email));
   }
 
   @override

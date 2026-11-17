@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../discover/discover_providers.dart';
+import '../location/location_prompt.dart';
 import '../progress/level.dart';
 import '../session/session_controller.dart';
 
@@ -56,6 +58,24 @@ class ProfileScreen extends ConsumerWidget {
             title: Text('Profil bearbeiten'),
           ),
           const ListTile(leading: Icon(Icons.tune), title: Text('Suchfilter')),
+          ListTile(
+            leading: const Icon(Icons.near_me_outlined),
+            title: const Text('Standort aktualisieren'),
+            onTap: () => showModalBottomSheet<void>(
+              context: context,
+              showDragHandle: true,
+              builder: (_) => Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                child: LocationPrompt(
+                  compact: true,
+                  onSaved: () {
+                    ref.invalidate(ownSummaryProvider);
+                    ref.read(discoverFeedProvider.notifier).reload();
+                  },
+                ),
+              ),
+            ),
+          ),
           const ListTile(
             leading: Icon(Icons.privacy_tip_outlined),
             title: Text('Privatsphäre & Einwilligungen'),

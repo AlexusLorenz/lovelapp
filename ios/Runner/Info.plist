@@ -66,5 +66,20 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>de.lovelapp.lovelapp</string>
+			</array>
+		</dict>
+	</array>
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Lovel zeigt dir Menschen in deiner Nähe. Dein Standort wird nur ungefähr (ca. 1 km) gespeichert, andere sehen nur die Entfernung.</string>
 </dict>
 </plist>

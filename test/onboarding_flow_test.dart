@@ -16,7 +16,7 @@ void main() {
     await pumpLovelApp(tester, signedIn: false, hasProfile: false);
     expect(find.text('Erst spielen, dann daten.'), findsOneWidget);
 
-    await tapAndSettle(tester, find.text('Konto erstellen'));
+    await tapAndSettle(tester, find.text('Mit E-Mail registrieren'));
     await tester.enterText(field('E-Mail'), 'neu@lovel.app');
     await tester.enterText(field('Passwort'), 'geheim12345');
     await tester.enterText(field('Passwort wiederholen'), 'geheim12345');
@@ -89,6 +89,12 @@ void main() {
     expect(tester.widget<FilledButton>(weiter).onPressed, isNotNull);
     await tapAndSettle(tester, weiter);
 
+    // Standort (Demo: fester Ort)
+    expect(find.text('Wo bist du ungefähr?'), findsOneWidget);
+    await tapAndSettle(tester, find.text('Standort freigeben'));
+    expect(find.text('Standort übernommen'), findsOneWidget);
+    await tapAndSettle(tester, weiter);
+
     expect(find.text('Fast fertig!'), findsOneWidget);
     await tapAndSettle(tester, find.text('Los geht’s'));
 
@@ -130,5 +136,12 @@ void main() {
     await tester.enterText(field('Passwort'), 'irgendwas123');
     await tapAndSettle(tester, find.widgetWithText(FilledButton, 'Anmelden'));
     expect(find.text('Mia, 27'), findsOneWidget);
+  });
+
+  testWidgets('Login mit Google (Demo) führt ins Onboarding', (tester) async {
+    await pumpLovelApp(tester, signedIn: false, hasProfile: false);
+    // Social Login (Demo) → Onboarding
+    await tapAndSettle(tester, find.text('Mit Google fortfahren'));
+    expect(find.text('Wie heißt du?'), findsOneWidget);
   });
 }

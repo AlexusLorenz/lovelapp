@@ -6,9 +6,12 @@ import '../../core/widgets/placeholder_photo.dart';
 /// Bilder eines Profils; Tippen links/rechts blättert, Balken oben zeigen
 /// die Position.
 class PhotoGallery extends StatefulWidget {
-  const PhotoGallery({super.key, required this.photos});
+  const PhotoGallery({super.key, required this.photos, this.name = ''});
 
   final List<PhotoArt> photos;
+
+  /// Für die Initiale, solange es keine Bilder gibt.
+  final String name;
 
   @override
   State<PhotoGallery> createState() => _PhotoGalleryState();
@@ -33,7 +36,25 @@ class _PhotoGalleryState extends State<PhotoGallery> {
   Widget build(BuildContext context) {
     final photos = widget.photos;
     if (photos.isEmpty) {
-      return const ColoredBox(color: LovelColors.slate);
+      return DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [LovelColors.slate, LovelColors.mist],
+          ),
+        ),
+        child: Center(
+          child: Text(
+            widget.name.isEmpty ? '' : widget.name.characters.first,
+            style: const TextStyle(
+              fontFamily: AppTheme.displayFont,
+              fontSize: 140,
+              color: LovelColors.cream,
+            ),
+          ),
+        ),
+      );
     }
     return LayoutBuilder(
       builder: (context, constraints) => GestureDetector(

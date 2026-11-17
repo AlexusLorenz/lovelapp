@@ -1,6 +1,7 @@
 /// Profil-Entwurf aus dem Onboarding und seine Regeln (ohne Flutter-Abhängigkeit).
 library;
 
+import '../location/approx_location.dart';
 import '../profile/profile_basics.dart';
 import '../profile/profile_prompts.dart';
 
@@ -79,6 +80,9 @@ class ProfileDraft {
   String city = '';
   String bio = '';
 
+  /// Ungefährer Standort fürs Matching (optional, später nachholbar).
+  ApproxLocation? location;
+
   /// Steckbrief, alles freiwillig.
   ProfileBasics basics = const ProfileBasics();
 
@@ -112,6 +116,7 @@ class ProfileDraft {
       'city': city.trim().isEmpty ? null : city.trim(),
       'bio': bio.trim(),
       ...basics.toJson(),
+      if (location != null) 'location': location!.toEwkt(),
     };
   }
 

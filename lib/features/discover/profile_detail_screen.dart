@@ -1,11 +1,13 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/placeholder_photo.dart';
-import '../../data/demo_data.dart';
 import '../profile/profile_basics.dart';
 import '../profile/profile_prompts.dart';
+import 'discover_providers.dart';
+import 'photo_gallery.dart';
 import 'public_profile.dart';
 import 'swipe_card.dart';
 
@@ -13,7 +15,7 @@ import 'swipe_card.dart';
 ///
 /// Mit [showActions] gibt es unten „Weiter“ und „Like“; die Wahl kommt per
 /// `context.pop(SwipeDirection)` zurück an den Entdecken-Feed.
-class ProfileDetailScreen extends StatelessWidget {
+class ProfileDetailScreen extends ConsumerWidget {
   const ProfileDetailScreen({
     super.key,
     required this.profileId,
@@ -24,9 +26,12 @@ class ProfileDetailScreen extends StatelessWidget {
   final bool showActions;
 
   @override
-  Widget build(BuildContext context) {
-    // TODO(backend): über get_public_profiles + profile_prompts laden.
-    final profile = demoProfileById(profileId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(profileByIdProvider(profileId));
+    if (async.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    final profile = async.value;
     if (profile == null) {
       return Scaffold(
         appBar: AppBar(),
@@ -49,7 +54,7 @@ class ProfileDetailScreen extends StatelessWidget {
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   background: profile.photos.isEmpty
-                      ? const ColoredBox(color: LovelColors.slate)
+                      ? PhotoGallery(photos: const [], name: profile.name)
                       : PlaceholderPhoto(art: profile.photos.first),
                 ),
               ),
@@ -131,7 +136,11 @@ class ProfileDetailScreen extends StatelessWidget {
         children: [
           const Icon(Icons.place_outlined, size: 18, color: LovelColors.umber),
           const SizedBox(width: 4),
-          Text('${profile.city} · ${profile.distanceKm} km entfernt'),
+          Text(
+            profile.distanceKm == null
+                ? profile.city
+                : '${profile.locationLabel} entfernt',
+          ),
         ],
       ),
       if (profile.bio.isNotEmpty) ...[

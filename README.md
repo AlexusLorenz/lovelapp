@@ -35,6 +35,22 @@ Den **Secret Key** (`service_role`) und das Datenbank-Passwort niemals ins Repo 
 Jeder Push auf `main` baut die App für den Browser (Demo-Modus) und veröffentlicht sie unter
 https://alexuslorenz.github.io/lovelapp/ – Workflow `.github/workflows/web-preview.yml`.
 
+### Login mit Google und Apple einrichten
+
+Die App nutzt Supabase OAuth. Rücksprung in die App per Deep Link
+`de.lovelapp.lovelapp://login-callback` (in `AndroidManifest.xml` und `Info.plist` hinterlegt).
+
+1. Supabase → Authentication → URL Configuration → **Redirect URLs**: `de.lovelapp.lovelapp://login-callback` eintragen.
+2. Supabase → Authentication → Sign In / Providers → **Google**: Client-ID und Secret aus der Google Cloud Console
+   (OAuth-Client „Webanwendung“, autorisierte Weiterleitungs-URI: `https://<projekt>.supabase.co/auth/v1/callback`).
+3. Supabase → Authentication → Sign In / Providers → **Apple**: braucht ein Apple-Developer-Konto
+   (Services ID, Key, Team ID). Pflicht im App Store, sobald Google-Login angeboten wird.
+
+### Integrationstest gegen Supabase
+
+`test_supabase/` prüft Anmeldung, Feed, Like, Match und Live-Chat gegen ein echtes Projekt.
+Läuft nicht in der CI; Anleitung und benötigte Test-Konten stehen im Kopf der Datei.
+
 ### Datenbank lokal
 
 Voraussetzung: [Supabase CLI](https://supabase.com/docs/guides/cli) und Docker.
@@ -96,8 +112,9 @@ Die Werte stehen in `lib/features/economy/like_quota.dart` **und** `public.like_
 ## Offene nächste Schritte
 
 - Passwort vergessen / zurücksetzen (braucht Deep Links und die Site-URL in Supabase)
-- Standort fürs Matching (Berechtigung, auf ~1 km gerundet)
-- Demo-Daten durch Supabase-Repositories ersetzen
+- Melden/Blockieren im Chat an die Datenbank anschließen
+- Profil bearbeiten (Fragen, Steckbrief, Standort-Freigabe widerrufen)
+- Konto löschen (DSGVO)
 - Foto-Upload und Moderation (Freigabe-Workflow)
 - Edge Function für AdMob Server-Side Verification → `grant_rewarded_ad_bonus()`
 - Echte Mehrspieler-Runden über Realtime

@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../core/config/env.dart';
 
 import 'auth_repository.dart';
 
@@ -39,6 +42,25 @@ class SupabaseAuthRepository implements AuthRepository {
       _guard(
         () => _auth.signInWithPassword(email: email.trim(), password: password),
       );
+
+  @override
+  Future<void> signInWithProvider(SocialProvider provider) async {
+    final opened = await _guard(
+      () => _auth.signInWithOAuth(
+        switch (provider) {
+          SocialProvider.apple => OAuthProvider.apple,
+          SocialProvider.google => OAuthProvider.google,
+        },
+        // Im Browser zurück auf dieselbe Seite, in der App per Deep Link.
+        redirectTo: kIsWeb ? null : Env.authRedirectUrl,
+      ),
+    );
+    if (!opened) {
+      throw AuthFailure(
+        'Die Anmeldung mit ${provider.label} konnte nicht geöffnet werden.',
+      );
+    }
+  }
 
   @override
   Future<void> signOut() => _guard(_auth.signOut);
