@@ -129,6 +129,16 @@ class SupabaseMatchesRepository implements MatchesRepository {
   }
 
   @override
+  Future<void> markDelivered() async {
+    if (_client.auth.currentUser == null) return;
+    try {
+      await _client.rpc<int>('mark_messages_delivered');
+    } on Exception {
+      // Nicht schlimm – beim nächsten Ereignis erneut.
+    }
+  }
+
+  @override
   Future<void> markRead(String matchId) async {
     final me = _client.auth.currentUser?.id;
     if (me == null) return;

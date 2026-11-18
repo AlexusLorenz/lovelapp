@@ -47,6 +47,33 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
   }
 
+  Future<void> _sendReset() async {
+    final error = validateEmail(_email.text);
+    if (error != null) {
+      setState(() => _error = '$error Dann schicken wir dir einen Link.');
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await ref.read(authRepositoryProvider).sendPasswordReset(_email.text);
+      if (mounted) {
+        setState(
+          () => _info =
+              'Falls es zu ${_email.text.trim()} ein Konto gibt, kommt gleich '
+              'ein Link zum Zurücksetzen. Öffne ihn auf diesem Gerät im selben '
+              'Browser.',
+        );
+      }
+    } on AuthFailure catch (e) {
+      setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _sendLink() async {
     final error = validateEmail(_email.text);
     if (error != null) {
@@ -157,6 +184,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             : const Text('Anmelden'),
                       ),
                       const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: _busy ? null : _sendReset,
+                        child: const Text('Passwort vergessen?'),
+                      ),
                       TextButton(
                         onPressed: _busy ? null : _sendLink,
                         child: const Text(

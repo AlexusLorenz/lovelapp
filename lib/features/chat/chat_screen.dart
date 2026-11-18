@@ -9,6 +9,7 @@ import '../discover/discover_providers.dart';
 import '../matches/matches_repository.dart';
 import '../session/session_controller.dart';
 import '../profile/own_profile_providers.dart';
+import '../safety/safety_actions.dart';
 import 'chat_background.dart';
 import '../../core/widgets/profile_image.dart';
 
@@ -61,12 +62,42 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
+  /// Gesendete, aber vom Server noch nicht bestätigte Nachrichten (Uhr).
+  final _pending = <({ChatMessage message, int serverCount})>[];
+  int _pendingIds = 0;
+
+  /// Server-Liste plus noch ausstehende eigene Nachrichten. Eine ausstehende
+  /// verschwindet, sobald der Server sie (gleicher Text, neuer) zurückmeldet.
+  List<ChatMessage> _withPending(List<ChatMessage> server, String? myId) {
+    if (_pending.isEmpty) return server;
+    final result = List.of(server);
+    for (final p in _pending) {
+      final echoed = server
+          .skip(p.serverCount.clamp(0, server.length))
+          .any((m) => m.senderId == myId && m.body == p.message.body);
+      if (!echoed) result.add(p.message);
+    }
+    return result;
+  }
+
   Future<void> _send() async {
     final text = _controller.text.trim();
     // Fokus sofort zurück ins Eingabefeld, damit man weiterschreiben kann.
     _focus.requestFocus();
     if (text.isEmpty) return;
     _controller.clear();
+    final entry = (
+      message: ChatMessage(
+        id: 'local-${_pendingIds++}',
+        senderId: ref.read(sessionProvider).user?.id ?? '',
+        body: text,
+        createdAt: DateTime.now(),
+        pending: true,
+      ),
+      serverCount:
+          ref.read(messagesProvider(widget.matchId)).value?.length ?? 0,
+    );
+    setState(() => _pending.add(entry));
     try {
       await ref
           .read(matchesRepositoryProvider)
@@ -80,6 +111,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ..hideCurrentSnackBar()
           ..showSnackBar(SnackBar(content: Text(e.message)));
       }
+    } finally {
+      if (mounted) setState(() => _pending.remove(entry));
     }
   }
 
@@ -149,16 +182,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             icon: const Icon(Icons.sports_esports),
             onPressed: () => context.push(Routes.games),
           ),
-          PopupMenuButton<String>(
-            // TODO(safety): Melden/Blockieren an `reports`/`blocks` anbinden.
-            onSelected: (_) => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Danke, wir prüfen das.')),
+          if (partner != null)
+            PopupMenuButton<String>(
+              tooltip: 'Mehr',
+              onSelected: (action) => action == 'report'
+                  ? reportProfile(context, ref, partner)
+                  : blockProfile(context, ref, partner),
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'report', child: Text('Melden')),
+                PopupMenuItem(value: 'block', child: Text('Blockieren')),
+              ],
             ),
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'report', child: Text('Melden')),
-              PopupMenuItem(value: 'block', child: Text('Blockieren')),
-            ],
-          ),
         ],
       ),
       body: ChatBackground(
@@ -170,28 +204,33 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 error: (_, _) => const Center(
                   child: Text('Nachrichten konnten nicht geladen werden.'),
                 ),
-                data: (list) => list.isEmpty
-                    ? const Center(child: Text('Schreib die erste Nachricht!'))
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
-                        reverse: true, // neueste unten, Liste startet unten
-                        itemCount: list.length,
-                        itemBuilder: (context, i) {
-                          final index = list.length - 1 - i;
-                          final msg = list[index];
-                          final mine = msg.senderId == myId;
-                          // Bild nur an der letzten Nachricht einer Folge
-                          // desselben Absenders (wie in Messengern üblich).
-                          final lastOfRun =
-                              index == list.length - 1 ||
-                              list[index + 1].senderId != msg.senderId;
-                          return _MessageRow(
-                            text: msg.body,
-                            mine: mine,
-                            avatar: lastOfRun ? (mine ? me : them) : null,
-                          );
-                        },
-                      ),
+                data: (serverList) {
+                  final list = _withPending(serverList, myId);
+                  return list.isEmpty
+                      ? const Center(
+                          child: Text('Schreib die erste Nachricht!'),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
+                          reverse: true, // neueste unten, Liste startet unten
+                          itemCount: list.length,
+                          itemBuilder: (context, i) {
+                            final index = list.length - 1 - i;
+                            final msg = list[index];
+                            final mine = msg.senderId == myId;
+                            // Bild nur an der letzten Nachricht einer Folge
+                            // desselben Absenders (wie in Messengern üblich).
+                            final lastOfRun =
+                                index == list.length - 1 ||
+                                list[index + 1].senderId != msg.senderId;
+                            return _MessageRow(
+                              message: msg,
+                              mine: mine,
+                              avatar: lastOfRun ? (mine ? me : them) : null,
+                            );
+                          },
+                        );
+                },
               ),
             ),
             _InputBar(
@@ -269,9 +308,9 @@ class _Avatar extends StatelessWidget {
 }
 
 class _MessageRow extends StatelessWidget {
-  const _MessageRow({required this.text, required this.mine, this.avatar});
+  const _MessageRow({required this.message, required this.mine, this.avatar});
 
-  final String text;
+  final ChatMessage message;
   final bool mine;
 
   /// `null` = Platz frei lassen (Nachricht mitten in einer Folge).
@@ -282,12 +321,31 @@ class _MessageRow extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     const avatarSlot = SizedBox(width: 28);
     final avatarWidget = avatar == null ? avatarSlot : _Avatar(data: avatar!);
+    final textColor = mine ? LovelColors.ink : scheme.onSurface;
+    final time = TimeOfDay.fromDateTime(message.createdAt.toLocal());
+    final meta = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '${time.hour.toString().padLeft(2, '0')}:'
+          '${time.minute.toString().padLeft(2, '0')}',
+          style: TextStyle(
+            fontSize: 11,
+            color: textColor.withValues(alpha: 0.6),
+          ),
+        ),
+        if (mine) ...[
+          const SizedBox(width: 3),
+          DeliveryTicks(status: message.status),
+        ],
+      ],
+    );
     final bubble = Flexible(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 300),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.fromLTRB(12, 8, 10, 6),
         decoration: BoxDecoration(
-          color: mine ? scheme.primary : scheme.surface,
+          color: mine ? LovelColors.blush : scheme.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -302,9 +360,15 @@ class _MessageRow extends StatelessWidget {
             ),
           ],
         ),
-        child: Text(
-          text,
-          style: TextStyle(color: mine ? scheme.onPrimary : scheme.onSurface),
+        // Uhrzeit und Häkchen unten rechts, Text fließt darum herum.
+        child: Wrap(
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.end,
+          spacing: 8,
+          children: [
+            Text(message.body, style: TextStyle(color: textColor)),
+            Padding(padding: const EdgeInsets.only(top: 2), child: meta),
+          ],
         ),
       ),
     );
@@ -318,6 +382,39 @@ class _MessageRow extends StatelessWidget {
         children: mine
             ? [bubble, const SizedBox(width: 6), avatarWidget]
             : [avatarWidget, const SizedBox(width: 6), bubble],
+      ),
+    );
+  }
+}
+
+/// Uhr = wird gesendet, ✓ = gesendet, ✓✓ grau = angekommen, ✓✓ rot = gelesen.
+class DeliveryTicks extends StatelessWidget {
+  const DeliveryTicks({super.key, required this.status});
+
+  final DeliveryStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, color, label) = switch (status) {
+      DeliveryStatus.sending => (
+        Icons.schedule,
+        LovelColors.slate,
+        'Wird gesendet',
+      ),
+      DeliveryStatus.sent => (Icons.check, LovelColors.slate, 'Gesendet'),
+      DeliveryStatus.delivered => (
+        Icons.done_all,
+        LovelColors.slate,
+        'Zugestellt',
+      ),
+      DeliveryStatus.read => (Icons.done_all, LovelColors.unread, 'Gelesen'),
+    };
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: label,
+        child: Icon(icon, size: 16, color: color),
       ),
     );
   }

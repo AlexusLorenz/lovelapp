@@ -131,10 +131,8 @@ Die Werte stehen in `lib/features/economy/like_quota.dart` **und** `public.like_
 
 ## Offene nächste Schritte
 
-- Passwort vergessen / zurücksetzen (braucht Deep Links und die Site-URL in Supabase)
-- Melden/Blockieren im Chat an die Datenbank anschließen
+- Moderations-Oberfläche für Meldungen (`reports`, bisher nur per Dashboard/SQL)
 - Profil bearbeiten: Geburtsdatum, Geschlecht, Orientierung (mit Widerruf der Einwilligung)
-- Konto löschen (DSGVO)
 - Foto-Moderation: neue Fotos sind vorerst sofort sichtbar (Default `approved`); vor dem Launch Prüfung einbauen
 - Edge Function für AdMob Server-Side Verification → `grant_rewarded_ad_bonus()`
 - Echte Mehrspieler-Runden über Realtime

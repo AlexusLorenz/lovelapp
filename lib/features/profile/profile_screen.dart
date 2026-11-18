@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/router/app_router.dart';
+import '../account/delete_account.dart';
 import '../discover/discover_providers.dart';
 import '../location/location_prompt.dart';
 import '../../core/theme/app_theme.dart';
@@ -141,11 +142,28 @@ class ProfileScreen extends ConsumerWidget {
             leading: Icon(Icons.privacy_tip_outlined),
             title: Text('Privatsphäre & Einwilligungen'),
           ),
+          ListTile(
+            leading: const Icon(Icons.password),
+            title: Text(
+              ref.watch(authRepositoryProvider).hasPasswordLogin
+                  ? 'Passwort ändern'
+                  : 'Passwort festlegen',
+            ),
+            onTap: () => context.push(Routes.changePassword),
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Abmelden'),
             onTap: () => ref.read(authRepositoryProvider).signOut(),
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.delete_forever_outlined,
+              color: LovelColors.unread,
+            ),
+            title: const Text('Konto löschen'),
+            onTap: () => confirmAndDeleteAccount(context, ref),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../features/discover/discover_providers.dart';
+import '../../features/session/session_controller.dart';
 import '../theme/app_theme.dart';
 
 /// Grundgerüst mit unterer Navigationsleiste und Zählern für Neues.
@@ -24,9 +25,12 @@ class _AppShellState extends ConsumerState<AppShell> {
     // Zurück in der App (z. B. Tab/Handy wieder aktiv) → auf Stand bringen,
     // falls in der Zwischenzeit Live-Ereignisse verpasst wurden.
     _lifecycle = AppLifecycleListener(
-      onResume: () => ref
-        ..invalidate(matchesProvider)
-        ..invalidate(receivedLikesProvider),
+      onResume: () {
+        ref.read(matchesRepositoryProvider).markDelivered();
+        ref
+          ..invalidate(matchesProvider)
+          ..invalidate(receivedLikesProvider);
+      },
     );
   }
 

@@ -11,6 +11,8 @@ import 'public_profile.dart';
 import 'swipe_card.dart';
 import '../../core/widgets/pinch_zoom.dart';
 import '../interests/extras_providers.dart';
+import '../safety/safety_actions.dart';
+import '../session/session_controller.dart';
 import '../interests/extras_view.dart';
 import '../../core/widgets/profile_image.dart';
 
@@ -76,12 +78,24 @@ class ProfileDetailScreen extends ConsumerWidget {
                   showActions ? 120 : 32,
                 ),
                 sliver: SliverList.list(
-                  children: _content(
-                    context,
-                    profile,
-                    ref.watch(profileExtrasProvider(profile.id)).value ??
-                        ProfileExtras.empty,
-                  ),
+                  children: [
+                    ..._content(
+                      context,
+                      profile,
+                      ref.watch(profileExtrasProvider(profile.id)).value ??
+                          ProfileExtras.empty,
+                    ),
+                    // Nicht beim eigenen Profil.
+                    if (profile.id !=
+                        ref.watch(sessionProvider.select((s) => s.user?.id)))
+                      Center(
+                        child: TextButton.icon(
+                          icon: const Icon(Icons.flag_outlined),
+                          label: Text('${profile.name} melden'),
+                          onPressed: () => reportProfile(context, ref, profile),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ],

@@ -33,12 +33,30 @@ List<MatchSummary> sortChats(Iterable<MatchSummary> matches) =>
       ),
     );
 
+/// Zustand einer eigenen Nachricht wie in Messengern üblich.
+enum DeliveryStatus {
+  /// Noch unterwegs zum Server (Uhr).
+  sending,
+
+  /// Auf dem Server (ein Häkchen).
+  sent,
+
+  /// Beim Gegenüber angekommen (zwei graue Häkchen).
+  delivered,
+
+  /// Gelesen (zwei rote Häkchen).
+  read,
+}
+
 class ChatMessage {
   const ChatMessage({
     required this.id,
     required this.senderId,
     required this.body,
     required this.createdAt,
+    this.deliveredAt,
+    this.readAt,
+    this.pending = false,
   });
 
   factory ChatMessage.fromRow(Map<String, Object?> row) => ChatMessage(
@@ -46,12 +64,40 @@ class ChatMessage {
     senderId: row['sender_id']! as String,
     body: row['body']! as String,
     createdAt: DateTime.parse(row['created_at']! as String),
+    deliveredAt: _date(row['delivered_at']),
+    readAt: _date(row['read_at']),
   );
+
+  static DateTime? _date(Object? v) => v is String ? DateTime.parse(v) : null;
 
   final String id;
   final String senderId;
   final String body;
   final DateTime createdAt;
+  final DateTime? deliveredAt;
+  final DateTime? readAt;
+
+  /// Nur lokal: wird gerade gesendet.
+  final bool pending;
+
+  DeliveryStatus get status => pending
+      ? DeliveryStatus.sending
+      : readAt != null
+      ? DeliveryStatus.read
+      : deliveredAt != null
+      ? DeliveryStatus.delivered
+      : DeliveryStatus.sent;
+
+  ChatMessage copyWith({DateTime? deliveredAt, DateTime? readAt}) =>
+      ChatMessage(
+        id: id,
+        senderId: senderId,
+        body: body,
+        createdAt: createdAt,
+        deliveredAt: deliveredAt ?? this.deliveredAt,
+        readAt: readAt ?? this.readAt,
+        pending: pending,
+      );
 }
 
 class ChatFailure implements Exception {
@@ -73,6 +119,9 @@ abstract interface class MatchesRepository {
 
   /// Markiert alle Nachrichten des Gegenübers in diesem Match als gelesen.
   Future<void> markRead(String matchId);
+
+  /// Alle an mich gerichteten Nachrichten als „angekommen“ markieren.
+  Future<void> markDelivered();
 
   /// Meldet, wenn sich etwas für mich ändert: neue Nachricht, gelesen,
   /// neuer Like, neues Match. Die App lädt dann die Listen neu.
@@ -120,15 +169,29 @@ class DemoMatchesRepository implements MatchesRepository {
   @override
   Future<List<MatchSummary>> fetchMatches() async => [
     for (final m in demoMatches)
-      MatchSummary(
-        matchId: m.id,
-        profile: m.profile,
-        lastMessage: _seed(m.id).isEmpty ? null : _seed(m.id).last.body,
-        lastMessageAt: _seed(m.id).isEmpty ? null : _seed(m.id).last.createdAt,
-        unreadCount: _unread(m.id),
-        gamePending: m.gamePending,
-      ),
+      if (!_ended.contains(m.profile.id))
+        MatchSummary(
+          matchId: m.id,
+          profile: m.profile,
+          lastMessage: _seed(m.id).isEmpty ? null : _seed(m.id).last.body,
+          lastMessageAt: _seed(m.id).isEmpty
+              ? null
+              : _seed(m.id).last.createdAt,
+          unreadCount: _unread(m.id),
+          gamePending: m.gamePending,
+        ),
   ];
+
+  @override
+  Future<void> markDelivered() async {}
+
+  /// Demo: Match mit dieser Person beenden (nach Blockieren).
+  final _ended = <String>{};
+
+  void endMatchWith(String profileId) {
+    _ended.add(profileId);
+    _inbox.add(null);
+  }
 
   @override
   Future<void> markRead(String matchId) async {
@@ -162,6 +225,8 @@ class DemoMatchesRepository implements MatchesRepository {
           senderId: myUserId(),
           body: body.trim(),
           createdAt: DateTime.now(),
+          // Demo: Gegenüber ist „online“, also sofort angekommen.
+          deliveredAt: DateTime.now(),
         ),
       );
     _controllers[matchId]?.add(List.unmodifiable(list));

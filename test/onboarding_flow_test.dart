@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -31,7 +32,9 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) async {
 }
 
 Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
-  await tester.ensureVisible(finder);
+  // Mittig in den sichtbaren Bereich holen (oben läge es unter der AppBar).
+  unawaited(Scrollable.ensureVisible(tester.element(finder), alignment: 0.5));
+  await tester.pumpAndSettle();
   await tester.tap(finder);
   await tester.pumpAndSettle();
 }

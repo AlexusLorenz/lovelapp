@@ -77,6 +77,42 @@ class SupabaseAuthRepository implements AuthRepository {
   @override
   Future<void> signOut() => _guard(_auth.signOut);
 
+  @override
+  Future<void> sendPasswordReset(String email) => _guard(
+    () => _auth.resetPasswordForEmail(
+      email.trim(),
+      redirectTo: Env.authCallbackUrl,
+    ),
+  );
+
+  @override
+  Stream<void> passwordRecoveries() => _auth.onAuthStateChange
+      .where((s) => s.event == AuthChangeEvent.passwordRecovery)
+      .map((_) {});
+
+  @override
+  Future<void> updatePassword(String newPassword) =>
+      _guard(() => _auth.updateUser(UserAttributes(password: newPassword)));
+
+  @override
+  bool get hasPasswordLogin =>
+      _auth.currentUser?.identities?.any((i) => i.provider == 'email') ?? false;
+
+  @override
+  Future<void> deleteAccount() => _guard(() async {
+    final me = _auth.currentUser?.id;
+    if (me == null) return;
+    // Fotodateien zuerst (SQL darf Storage nicht direkt löschen).
+    final bucket = _client.storage.from('profile-photos');
+    final files = await bucket.list(path: me);
+    if (files.isNotEmpty) {
+      await bucket.remove([for (final f in files) '$me/${f.name}']);
+    }
+    await _client.rpc<void>('delete_own_account');
+    // Lokale Sitzung verwerfen; der Server kennt das Konto nicht mehr.
+    await _auth.signOut(scope: SignOutScope.local);
+  });
+
   Future<T> _guard<T>(Future<T> Function() action) async {
     try {
       return await action();

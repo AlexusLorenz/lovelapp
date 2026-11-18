@@ -56,6 +56,21 @@ abstract interface class AuthRepository {
   Future<void> sendLoginLink(String email);
 
   Future<void> signOut();
+
+  /// Schickt einen Link zum Zurücksetzen des Passworts.
+  Future<void> sendPasswordReset(String email);
+
+  /// Meldet, wenn die App über einen Passwort-Link geöffnet wurde.
+  Stream<void> passwordRecoveries();
+
+  /// Neues Passwort für das angemeldete Konto.
+  Future<void> updatePassword(String newPassword);
+
+  /// Löscht das eigene Konto mit allen Daten und meldet ab.
+  Future<void> deleteAccount();
+
+  /// Hat das Konto ein Passwort (E-Mail-Login) oder nur Google/Apple?
+  bool get hasPasswordLogin;
 }
 
 /// Demo-Modus: alles nur im Speicher, jede Eingabe wird akzeptiert.
@@ -105,4 +120,30 @@ class DemoAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async => _set(null);
+
+  final _recoveries = StreamController<void>.broadcast();
+
+  /// Für Tests: so tun, als käme die App über einen Passwort-Link.
+  void simulatePasswordRecovery() => _recoveries.add(null);
+
+  @override
+  Future<void> sendPasswordReset(String email) async {}
+
+  @override
+  Stream<void> passwordRecoveries() => _recoveries.stream;
+
+  @override
+  Future<void> updatePassword(String newPassword) async {}
+
+  /// Zuletzt gelöschtes Konto (für Tests).
+  String? deletedUserId;
+
+  @override
+  Future<void> deleteAccount() async {
+    deletedUserId = _user?.id;
+    _set(null);
+  }
+
+  @override
+  bool get hasPasswordLogin => true;
 }

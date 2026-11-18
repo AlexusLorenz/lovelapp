@@ -7,6 +7,7 @@ import '../auth/auth_repository.dart';
 import '../auth/supabase_auth_repository.dart';
 import '../discover/discover_repository.dart';
 import '../interests/extras_repository.dart';
+import '../safety/safety_repository.dart';
 import '../interests/supabase_extras_repository.dart';
 import '../discover/supabase_discover_repository.dart';
 import '../location/location_service.dart';
@@ -75,4 +76,15 @@ final catalogSearchProvider = Provider<CatalogSearch>(
   (ref) => Env.hasSupabase
       ? EdgeCatalogSearch(Supabase.instance.client)
       : const DemoCatalogSearch(),
+);
+
+final safetyRepositoryProvider = Provider<SafetyRepository>(
+  (ref) => Env.hasSupabase
+      ? SupabaseSafetyRepository(Supabase.instance.client)
+      : DemoSafetyRepository(
+          onBlock: (id) {
+            final matches = ref.read(matchesRepositoryProvider);
+            if (matches is DemoMatchesRepository) matches.endMatchWith(id);
+          },
+        ),
 );

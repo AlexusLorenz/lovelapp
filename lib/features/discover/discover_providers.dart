@@ -93,10 +93,14 @@ final openLikesCountProvider = Provider<int>(
 final inboxListenerProvider = Provider<void>((ref) {
   if (_userId(ref) == null) return;
   Timer? debounce;
-  final sub = ref.read(matchesRepositoryProvider).watchInbox().listen((_) {
+  final repo = ref.read(matchesRepositoryProvider);
+  // App ist offen → alles Empfangene gilt als angekommen.
+  unawaited(repo.markDelivered());
+  final sub = repo.watchInbox().listen((_) {
     // Mehrere Ereignisse kurz hintereinander nur einmal verarbeiten.
     debounce?.cancel();
     debounce = Timer(const Duration(milliseconds: 300), () {
+      unawaited(repo.markDelivered());
       ref
         ..invalidate(matchesProvider)
         ..invalidate(receivedLikesProvider);

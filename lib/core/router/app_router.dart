@@ -16,6 +16,8 @@ import '../../features/discover/profile_detail_screen.dart';
 import '../../features/games/games_screen.dart';
 import '../../features/games/this_or_that/this_or_that_screen.dart';
 import '../../features/likes/likes_screen.dart';
+import '../../features/account/account_providers.dart';
+import '../../features/account/change_password_screen.dart';
 import '../../features/interests/game_picker_screen.dart';
 import '../../features/interests/interest_picker_screen.dart';
 import '../../features/music/music_picker_screen.dart';
@@ -39,6 +41,7 @@ class Routes {
   /// Fest in web/spotify-callback.html eingetragen.
   static const editMusic = '/profile/music';
   static const ownPreview = '/me';
+  static const changePassword = '/account/password';
 
   static const splash = '/splash';
   static const welcome = '/welcome';
@@ -79,15 +82,29 @@ String? redirectFor(SessionStatus status, String location) {
 final appRouterProvider = Provider<GoRouter>((ref) {
   // Bei jeder Änderung der Sitzung prüft der Router die Weiterleitung neu.
   final refresh = ValueNotifier(0);
-  ref.listen(sessionProvider, (_, _) => refresh.value++);
+  ref
+    ..listen(sessionProvider, (_, _) => refresh.value++)
+    ..listen(passwordRecoveryProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
     initialLocation: Routes.discover,
     refreshListenable: refresh,
-    redirect: (context, state) =>
-        redirectFor(ref.read(sessionProvider).status, state.matchedLocation),
+    redirect: (context, state) {
+      final status = ref.read(sessionProvider).status;
+      // Über einen Passwort-Link gekommen → zuerst neues Passwort.
+      if (status == SessionStatus.ready &&
+          ref.read(passwordRecoveryProvider) &&
+          state.matchedLocation != Routes.changePassword) {
+        return Routes.changePassword;
+      }
+      return redirectFor(status, state.matchedLocation);
+    },
     routes: [
+      GoRoute(
+        path: Routes.changePassword,
+        builder: (context, state) => const ChangePasswordScreen(),
+      ),
       GoRoute(
         path: Routes.splash,
         builder: (context, state) => const SplashScreen(),
