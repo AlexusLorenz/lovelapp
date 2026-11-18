@@ -25,12 +25,13 @@ void main() {
   testWidgets('This or That ist spielbar', (tester) async {
     await pumpLovelApp(tester);
 
-    await tester.tap(find.text('Chats').last);
+    await tester.tap(find.text('Spiele').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Mia'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Eisbrecher-Spiel').first);
-    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('This or That'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('This or That'));
     await tester.pumpAndSettle();
 
@@ -76,7 +77,7 @@ void main() {
     for (var i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 50));
     }
-    expect(find.text('Eisbrecher-Spiele'), findsOneWidget);
+    expect(find.text('Quizduell 2 gegen 2'), findsOneWidget);
   });
 
   testWidgets('Match-Overlay respektiert „Bewegung reduzieren“', (

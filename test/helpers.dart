@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +9,7 @@ import 'package:lovelapp/app.dart';
 import 'package:lovelapp/features/auth/auth_repository.dart';
 import 'package:lovelapp/features/onboarding/profile_repository.dart';
 import 'package:lovelapp/features/profile/widgets/photo_editor.dart';
+import 'package:lovelapp/features/quiz/demo_quiz_repository.dart';
 import 'package:lovelapp/features/session/session_controller.dart';
 
 const testUser = AppUser(id: 'demo-test@lovel.app', email: 'test@lovel.app');
@@ -37,6 +40,15 @@ Future<void> pumpLovelApp(
         ),
         pickImagesProvider.overrideWithValue(
           pickImages ?? (limit) async => [testJpeg()],
+        ),
+        // Fragenkatalog synchron von der Platte (Asset-Laden hängt im Test).
+        quizRepositoryProvider.overrideWith(
+          (ref) => demoQuizRepository(
+            ref,
+            loadBank: () async => QuizBank.fromJson(
+              File('assets/quiz/questions.json').readAsStringSync(),
+            ),
+          ),
         ),
         profileRepositoryProvider.overrideWithValue(
           DemoProfileRepository(existingUserIds: [if (hasProfile) testUser.id]),

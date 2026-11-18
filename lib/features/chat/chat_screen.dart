@@ -9,6 +9,7 @@ import '../discover/discover_providers.dart';
 import '../matches/matches_repository.dart';
 import '../session/session_controller.dart';
 import '../profile/own_profile_providers.dart';
+import '../quiz/quiz_start_sheet.dart';
 import '../safety/safety_actions.dart';
 import 'chat_background.dart';
 import '../../core/widgets/profile_image.dart';
@@ -178,9 +179,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               onPressed: () => context.push(Routes.person(partner.id)),
             ),
           IconButton(
-            tooltip: 'Eisbrecher-Spiel',
+            tooltip: 'Quizduell zusammen spielen',
             icon: const Icon(Icons.sports_esports),
-            onPressed: () => context.push(Routes.games),
+            onPressed: () =>
+                showQuizStartSheet(context, matchId: widget.matchId),
           ),
           if (partner != null)
             PopupMenuButton<String>(

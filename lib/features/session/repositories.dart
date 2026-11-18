@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -7,6 +8,10 @@ import '../auth/auth_repository.dart';
 import '../auth/supabase_auth_repository.dart';
 import '../discover/discover_repository.dart';
 import '../interests/extras_repository.dart';
+import '../quiz/demo_quiz_repository.dart';
+import '../quiz/quiz_models.dart';
+import '../quiz/quiz_repository.dart';
+import '../quiz/supabase_quiz_repository.dart';
 import '../safety/safety_repository.dart';
 import '../interests/supabase_extras_repository.dart';
 import '../discover/supabase_discover_repository.dart';
@@ -88,3 +93,43 @@ final safetyRepositoryProvider = Provider<SafetyRepository>(
           },
         ),
 );
+
+final quizRepositoryProvider = Provider<QuizRepository>(
+  (ref) => Env.hasSupabase
+      ? SupabaseQuizRepository(Supabase.instance.client)
+      : demoQuizRepository(
+          ref,
+          loadBank: () async => QuizBank.fromJson(
+            // Ohne Cache: der Katalog wird pro Sitzung nur einmal geladen.
+            await rootBundle.loadString(
+              'assets/quiz/questions.json',
+              cache: false,
+            ),
+          ),
+        ),
+);
+
+/// Demo-Quiz: mein Team besteht aus mir und dem Demo-Match.
+DemoQuizRepository demoQuizRepository(
+  Ref ref, {
+  required Future<QuizBank> Function() loadBank,
+}) {
+  String me() => ref.read(authRepositoryProvider).currentUser?.id ?? 'me';
+  return DemoQuizRepository(
+    loadBank: loadBank,
+    myUserId: me,
+    teamFor: (matchId) {
+      for (final m in demoMatches) {
+        if (m.id != matchId) continue;
+        return QuizTeam(
+          matchId: m.id,
+          players: [
+            QuizPlayer(id: me(), name: demoMyName, isMe: true),
+            QuizPlayer(id: m.profile.id, name: m.profile.name),
+          ],
+        );
+      }
+      return null;
+    },
+  );
+}

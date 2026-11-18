@@ -66,6 +66,19 @@ Secrets unter Supabase → Edge Functions → Secrets:
 Ohne Secrets antwortet die Funktion mit 503 und die App zeigt „Die Suche ist noch nicht eingerichtet.“
 
 
+### Quizduell 2 gegen 2
+
+Ein Match ist ein Team; zwei Teams spielen 6 Runden à 3 Fragen (13 Kategorien).
+Pro Runde schlägt ein Teammitglied vor, das andere entscheidet – die Rollen wechseln.
+Kein Echtzeit-Zwang: Jede Person spielt, wann sie Zeit hat; die App zeigt im Tab
+„Spiele“, wer dran ist. Gegner zufällig oder per Einladungscode.
+
+- Spiellogik komplett serverseitig: `supabase/migrations/20261118161147_quiz_duel.sql`
+  (30 s pro Frage vom Server gemessen, Lösungen erst nach der eigenen Runde).
+- Fragen: `tool/quiz_questions.py` → erzeugt `assets/quiz/questions.json` (Demo) und
+  eine Seed-Migration: `python3 tool/quiz_questions.py supabase/migrations/<neu>_quiz_questions.sql`.
+  Bestehende Fragen nie umnummerieren; neue Fragen nur anhängen.
+
 ### Integrationstest gegen Supabase
 
 `test_supabase/` prüft Anmeldung, Feed, Like, Match und Live-Chat gegen ein echtes Projekt.

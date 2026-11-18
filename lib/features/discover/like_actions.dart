@@ -66,7 +66,7 @@ Future<void> _celebrate(
     matchPhoto: profile.photos.isEmpty ? null : profile.photos.first,
   );
   if (result == MatchOverlayResult.playGame && context.mounted) {
-    context.push(Routes.games);
+    context.go(Routes.games);
   }
 }
 

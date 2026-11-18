@@ -72,6 +72,7 @@ flutter:
 
   assets:
     - assets/fonts/OFL-Staatliches.txt
+    - assets/quiz/questions.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

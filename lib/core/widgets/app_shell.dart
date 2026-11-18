@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../features/discover/discover_providers.dart';
+import '../../features/quiz/quiz_providers.dart';
 import '../../features/session/session_controller.dart';
 import '../theme/app_theme.dart';
 
@@ -29,7 +30,8 @@ class _AppShellState extends ConsumerState<AppShell> {
         ref.read(matchesRepositoryProvider).markDelivered();
         ref
           ..invalidate(matchesProvider)
-          ..invalidate(receivedLikesProvider);
+          ..invalidate(receivedLikesProvider)
+          ..invalidate(quizGamesProvider);
       },
     );
   }
@@ -49,6 +51,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     ref.watch(receivedLikesProvider);
     final unread = ref.watch(unreadMessagesCountProvider);
     final likes = ref.watch(openLikesCountProvider);
+    ref.watch(quizLiveProvider);
+    final quizTurns = ref.watch(quizTurnCountProvider);
     final shell = widget.shell;
 
     return Scaffold(
@@ -86,6 +90,17 @@ class _AppShellState extends ConsumerState<AppShell> {
             ),
             label: 'Chats',
             tooltip: unread > 0 ? 'Chats, $unread ungelesen' : 'Chats',
+          ),
+          NavigationDestination(
+            icon: CountBadge(
+              count: quizTurns,
+              child: const Icon(Icons.sports_esports_outlined),
+            ),
+            selectedIcon: CountBadge(
+              count: quizTurns,
+              child: const Icon(Icons.sports_esports),
+            ),
+            label: 'Spiele',
           ),
           const NavigationDestination(
             icon: Icon(Icons.person_outline),

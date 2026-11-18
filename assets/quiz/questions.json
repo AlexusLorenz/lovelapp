@@ -1,0 +1,1930 @@
+{
+ "categories": [
+  {
+   "key": "allgemein",
+   "emoji": "🧠",
+   "label": "Allgemeinwissen"
+  },
+  {
+   "key": "geografie",
+   "emoji": "🌍",
+   "label": "Geografie"
+  },
+  {
+   "key": "geschichte",
+   "emoji": "🏛️",
+   "label": "Geschichte"
+  },
+  {
+   "key": "wissenschaft",
+   "emoji": "🔬",
+   "label": "Wissenschaft"
+  },
+  {
+   "key": "natur",
+   "emoji": "🐾",
+   "label": "Tiere & Natur"
+  },
+  {
+   "key": "sport",
+   "emoji": "⚽",
+   "label": "Sport"
+  },
+  {
+   "key": "musik",
+   "emoji": "🎵",
+   "label": "Musik"
+  },
+  {
+   "key": "film",
+   "emoji": "🎬",
+   "label": "Film & Serien"
+  },
+  {
+   "key": "gaming",
+   "emoji": "🎮",
+   "label": "Gaming"
+  },
+  {
+   "key": "essen",
+   "emoji": "🍝",
+   "label": "Essen & Trinken"
+  },
+  {
+   "key": "sprache",
+   "emoji": "📚",
+   "label": "Sprache & Literatur"
+  },
+  {
+   "key": "technik",
+   "emoji": "💻",
+   "label": "Technik & Internet"
+  },
+  {
+   "key": "liebe",
+   "emoji": "💘",
+   "label": "Liebe & Dating"
+  }
+ ],
+ "questions": [
+  {
+   "id": 1,
+   "category": "allgemein",
+   "question": "Wie viele Tage hat ein Schaltjahr?",
+   "answers": [
+    "366",
+    "365",
+    "364",
+    "367"
+   ]
+  },
+  {
+   "id": 2,
+   "category": "allgemein",
+   "question": "Wie viele Minuten hat ein Tag?",
+   "answers": [
+    "1440",
+    "1240",
+    "1600",
+    "1200"
+   ]
+  },
+  {
+   "id": 3,
+   "category": "allgemein",
+   "question": "Welche Farbe ergibt sich aus Blau und Gelb?",
+   "answers": [
+    "Grün",
+    "Lila",
+    "Orange",
+    "Braun"
+   ]
+  },
+  {
+   "id": 4,
+   "category": "allgemein",
+   "question": "Wie viele Seiten hat ein Sechseck?",
+   "answers": [
+    "6",
+    "5",
+    "7",
+    "8"
+   ]
+  },
+  {
+   "id": 5,
+   "category": "allgemein",
+   "question": "Was misst ein Barometer?",
+   "answers": [
+    "Luftdruck",
+    "Temperatur",
+    "Luftfeuchtigkeit",
+    "Windgeschwindigkeit"
+   ]
+  },
+  {
+   "id": 6,
+   "category": "allgemein",
+   "question": "Wie heißt die Hauptstadt von Australien?",
+   "answers": [
+    "Canberra",
+    "Sydney",
+    "Melbourne",
+    "Perth"
+   ]
+  },
+  {
+   "id": 7,
+   "category": "allgemein",
+   "question": "Wie viele Spieler einer Mannschaft stehen beim Fußball auf dem Feld?",
+   "answers": [
+    "11",
+    "10",
+    "12",
+    "9"
+   ]
+  },
+  {
+   "id": 8,
+   "category": "allgemein",
+   "question": "Welches Tier ist das Wappentier Deutschlands?",
+   "answers": [
+    "Adler",
+    "Löwe",
+    "Bär",
+    "Hirsch"
+   ]
+  },
+  {
+   "id": 9,
+   "category": "allgemein",
+   "question": "Wie viele Kontinente gibt es nach gängiger Zählung?",
+   "answers": [
+    "7",
+    "5",
+    "6",
+    "8"
+   ]
+  },
+  {
+   "id": 10,
+   "category": "allgemein",
+   "question": "Was ist die römische Zahl für 50?",
+   "answers": [
+    "L",
+    "C",
+    "D",
+    "X"
+   ]
+  },
+  {
+   "id": 11,
+   "category": "allgemein",
+   "question": "Wie viele Karten hat ein klassisches Skatblatt?",
+   "answers": [
+    "32",
+    "52",
+    "36",
+    "24"
+   ]
+  },
+  {
+   "id": 12,
+   "category": "allgemein",
+   "question": "In welcher Einheit wird elektrische Spannung gemessen?",
+   "answers": [
+    "Volt",
+    "Ampere",
+    "Watt",
+    "Ohm"
+   ]
+  },
+  {
+   "id": 13,
+   "category": "allgemein",
+   "question": "Wie viele Zähne hat ein erwachsener Mensch normalerweise (inkl. Weisheitszähne)?",
+   "answers": [
+    "32",
+    "28",
+    "30",
+    "36"
+   ]
+  },
+  {
+   "id": 14,
+   "category": "geografie",
+   "question": "Welcher Fluss fließt durch Hamburg?",
+   "answers": [
+    "Elbe",
+    "Weser",
+    "Rhein",
+    "Oder"
+   ]
+  },
+  {
+   "id": 15,
+   "category": "geografie",
+   "question": "Wie heißt der höchste Berg Deutschlands?",
+   "answers": [
+    "Zugspitze",
+    "Watzmann",
+    "Feldberg",
+    "Brocken"
+   ]
+  },
+  {
+   "id": 16,
+   "category": "geografie",
+   "question": "Welches Land hat die meisten Einwohner?",
+   "answers": [
+    "Indien",
+    "China",
+    "USA",
+    "Indonesien"
+   ]
+  },
+  {
+   "id": 17,
+   "category": "geografie",
+   "question": "Welcher Ozean ist der größte?",
+   "answers": [
+    "Pazifik",
+    "Atlantik",
+    "Indischer Ozean",
+    "Arktischer Ozean"
+   ]
+  },
+  {
+   "id": 18,
+   "category": "geografie",
+   "question": "Wie heißt die Hauptstadt von Kanada?",
+   "answers": [
+    "Ottawa",
+    "Toronto",
+    "Vancouver",
+    "Montreal"
+   ]
+  },
+  {
+   "id": 19,
+   "category": "geografie",
+   "question": "In welchem Land liegt Machu Picchu?",
+   "answers": [
+    "Peru",
+    "Bolivien",
+    "Chile",
+    "Mexiko"
+   ]
+  },
+  {
+   "id": 20,
+   "category": "geografie",
+   "question": "Welches ist das flächenmäßig größte Land der Erde?",
+   "answers": [
+    "Russland",
+    "Kanada",
+    "China",
+    "USA"
+   ]
+  },
+  {
+   "id": 21,
+   "category": "geografie",
+   "question": "Wie viele Bundesländer hat Deutschland?",
+   "answers": [
+    "16",
+    "15",
+    "12",
+    "18"
+   ]
+  },
+  {
+   "id": 22,
+   "category": "geografie",
+   "question": "An welchem Fluss liegt Köln?",
+   "answers": [
+    "Rhein",
+    "Main",
+    "Mosel",
+    "Ruhr"
+   ]
+  },
+  {
+   "id": 23,
+   "category": "geografie",
+   "question": "Welche Stadt ist die Hauptstadt von Spanien?",
+   "answers": [
+    "Madrid",
+    "Barcelona",
+    "Sevilla",
+    "Valencia"
+   ]
+  },
+  {
+   "id": 24,
+   "category": "geografie",
+   "question": "Auf welchem Kontinent liegt die Sahara?",
+   "answers": [
+    "Afrika",
+    "Asien",
+    "Australien",
+    "Südamerika"
+   ]
+  },
+  {
+   "id": 25,
+   "category": "geografie",
+   "question": "Welches Meer liegt zwischen Europa und Afrika?",
+   "answers": [
+    "Mittelmeer",
+    "Schwarzes Meer",
+    "Rotes Meer",
+    "Ostsee"
+   ]
+  },
+  {
+   "id": 26,
+   "category": "geografie",
+   "question": "Welches Land hat die Form eines Stiefels?",
+   "answers": [
+    "Italien",
+    "Griechenland",
+    "Portugal",
+    "Kroatien"
+   ]
+  },
+  {
+   "id": 27,
+   "category": "geschichte",
+   "question": "In welchem Jahr fiel die Berliner Mauer?",
+   "answers": [
+    "1989",
+    "1990",
+    "1987",
+    "1991"
+   ]
+  },
+  {
+   "id": 28,
+   "category": "geschichte",
+   "question": "Wer war der erste Bundeskanzler der Bundesrepublik Deutschland?",
+   "answers": [
+    "Konrad Adenauer",
+    "Willy Brandt",
+    "Ludwig Erhard",
+    "Helmut Schmidt"
+   ]
+  },
+  {
+   "id": 29,
+   "category": "geschichte",
+   "question": "In welchem Jahr landeten Menschen zum ersten Mal auf dem Mond?",
+   "answers": [
+    "1969",
+    "1965",
+    "1972",
+    "1959"
+   ]
+  },
+  {
+   "id": 30,
+   "category": "geschichte",
+   "question": "Wer erfand den Buchdruck mit beweglichen Lettern in Europa?",
+   "answers": [
+    "Johannes Gutenberg",
+    "Martin Luther",
+    "Leonardo da Vinci",
+    "Albrecht Dürer"
+   ]
+  },
+  {
+   "id": 31,
+   "category": "geschichte",
+   "question": "In welchem Jahr begann der Erste Weltkrieg?",
+   "answers": [
+    "1914",
+    "1912",
+    "1918",
+    "1939"
+   ]
+  },
+  {
+   "id": 32,
+   "category": "geschichte",
+   "question": "Wie hieß die erste Frau, die den Nobelpreis erhielt?",
+   "answers": [
+    "Marie Curie",
+    "Ada Lovelace",
+    "Florence Nightingale",
+    "Bertha von Suttner"
+   ]
+  },
+  {
+   "id": 33,
+   "category": "geschichte",
+   "question": "In welchem Jahr wurde die Deutsche Einheit vollzogen?",
+   "answers": [
+    "1990",
+    "1989",
+    "1991",
+    "1992"
+   ]
+  },
+  {
+   "id": 34,
+   "category": "geschichte",
+   "question": "Wer schlug 1517 der Überlieferung nach seine Thesen an?",
+   "answers": [
+    "Martin Luther",
+    "Johannes Calvin",
+    "Thomas Müntzer",
+    "Huldrych Zwingli"
+   ]
+  },
+  {
+   "id": 35,
+   "category": "geschichte",
+   "question": "Welches Schiff sank 1912 auf seiner Jungfernfahrt?",
+   "answers": [
+    "Titanic",
+    "Lusitania",
+    "Bismarck",
+    "Queen Mary"
+   ]
+  },
+  {
+   "id": 36,
+   "category": "geschichte",
+   "question": "Wer war der erste Kaiser Roms?",
+   "answers": [
+    "Augustus",
+    "Julius Caesar",
+    "Nero",
+    "Caligula"
+   ]
+  },
+  {
+   "id": 37,
+   "category": "geschichte",
+   "question": "In welchem Jahr endete der Zweite Weltkrieg in Europa?",
+   "answers": [
+    "1945",
+    "1944",
+    "1946",
+    "1943"
+   ]
+  },
+  {
+   "id": 38,
+   "category": "geschichte",
+   "question": "Welche Stadt war Hauptstadt der Bundesrepublik vor Berlin?",
+   "answers": [
+    "Bonn",
+    "Frankfurt am Main",
+    "Köln",
+    "München"
+   ]
+  },
+  {
+   "id": 39,
+   "category": "geschichte",
+   "question": "Wie hieß der erste Mensch im Weltall?",
+   "answers": [
+    "Juri Gagarin",
+    "Neil Armstrong",
+    "John Glenn",
+    "Alexei Leonow"
+   ]
+  },
+  {
+   "id": 40,
+   "category": "wissenschaft",
+   "question": "Was ist das chemische Symbol für Gold?",
+   "answers": [
+    "Au",
+    "Ag",
+    "Go",
+    "Gd"
+   ]
+  },
+  {
+   "id": 41,
+   "category": "wissenschaft",
+   "question": "Welcher Planet ist der Sonne am nächsten?",
+   "answers": [
+    "Merkur",
+    "Venus",
+    "Mars",
+    "Erde"
+   ]
+  },
+  {
+   "id": 42,
+   "category": "wissenschaft",
+   "question": "Wie viele Knochen hat ein erwachsener Mensch ungefähr?",
+   "answers": [
+    "206",
+    "180",
+    "250",
+    "312"
+   ]
+  },
+  {
+   "id": 43,
+   "category": "wissenschaft",
+   "question": "Bei wie viel Grad Celsius siedet Wasser auf Meereshöhe?",
+   "answers": [
+    "100",
+    "90",
+    "110",
+    "120"
+   ]
+  },
+  {
+   "id": 44,
+   "category": "wissenschaft",
+   "question": "Was ist H₂O?",
+   "answers": [
+    "Wasser",
+    "Wasserstoffperoxid",
+    "Salz",
+    "Sauerstoff"
+   ]
+  },
+  {
+   "id": 45,
+   "category": "wissenschaft",
+   "question": "Welcher ist der größte Planet unseres Sonnensystems?",
+   "answers": [
+    "Jupiter",
+    "Saturn",
+    "Neptun",
+    "Uranus"
+   ]
+  },
+  {
+   "id": 46,
+   "category": "wissenschaft",
+   "question": "Wie heißt das Kraftwerk der Zelle?",
+   "answers": [
+    "Mitochondrium",
+    "Zellkern",
+    "Ribosom",
+    "Vakuole"
+   ]
+  },
+  {
+   "id": 47,
+   "category": "wissenschaft",
+   "question": "Welches Gas atmen Pflanzen bei der Photosynthese hauptsächlich ein?",
+   "answers": [
+    "Kohlendioxid",
+    "Sauerstoff",
+    "Stickstoff",
+    "Helium"
+   ]
+  },
+  {
+   "id": 48,
+   "category": "wissenschaft",
+   "question": "Wer formulierte die Relativitätstheorie?",
+   "answers": [
+    "Albert Einstein",
+    "Isaac Newton",
+    "Max Planck",
+    "Niels Bohr"
+   ]
+  },
+  {
+   "id": 49,
+   "category": "wissenschaft",
+   "question": "Was ist das häufigste Gas in der Erdatmosphäre?",
+   "answers": [
+    "Stickstoff",
+    "Sauerstoff",
+    "Kohlendioxid",
+    "Argon"
+   ]
+  },
+  {
+   "id": 50,
+   "category": "wissenschaft",
+   "question": "Wie schnell ist Licht im Vakuum ungefähr?",
+   "answers": [
+    "300.000 km/s",
+    "30.000 km/s",
+    "3.000 km/s",
+    "3 Mio. km/s"
+   ]
+  },
+  {
+   "id": 51,
+   "category": "wissenschaft",
+   "question": "Welches Organ produziert Insulin?",
+   "answers": [
+    "Bauchspeicheldrüse",
+    "Leber",
+    "Niere",
+    "Milz"
+   ]
+  },
+  {
+   "id": 52,
+   "category": "wissenschaft",
+   "question": "Wie viele Chromosomen hat ein Mensch normalerweise?",
+   "answers": [
+    "46",
+    "23",
+    "44",
+    "48"
+   ]
+  },
+  {
+   "id": 53,
+   "category": "natur",
+   "question": "Welches ist das größte Säugetier der Erde?",
+   "answers": [
+    "Blauwal",
+    "Afrikanischer Elefant",
+    "Pottwal",
+    "Giraffe"
+   ]
+  },
+  {
+   "id": 54,
+   "category": "natur",
+   "question": "Wie viele Beine hat eine Spinne?",
+   "answers": [
+    "8",
+    "6",
+    "10",
+    "12"
+   ]
+  },
+  {
+   "id": 55,
+   "category": "natur",
+   "question": "Welches Tier ist das schnellste Landtier?",
+   "answers": [
+    "Gepard",
+    "Löwe",
+    "Antilope",
+    "Windhund"
+   ]
+  },
+  {
+   "id": 56,
+   "category": "natur",
+   "question": "Was frisst ein Großer Panda hauptsächlich?",
+   "answers": [
+    "Bambus",
+    "Fisch",
+    "Beeren",
+    "Insekten"
+   ]
+  },
+  {
+   "id": 57,
+   "category": "natur",
+   "question": "Wie nennt man ein junges Pferd?",
+   "answers": [
+    "Fohlen",
+    "Kalb",
+    "Lamm",
+    "Ferkel"
+   ]
+  },
+  {
+   "id": 58,
+   "category": "natur",
+   "question": "Welcher Vogel kann rückwärts fliegen?",
+   "answers": [
+    "Kolibri",
+    "Spatz",
+    "Schwalbe",
+    "Specht"
+   ]
+  },
+  {
+   "id": 59,
+   "category": "natur",
+   "question": "Wie viele Herzen hat ein Oktopus?",
+   "answers": [
+    "3",
+    "1",
+    "2",
+    "4"
+   ]
+  },
+  {
+   "id": 60,
+   "category": "natur",
+   "question": "Welches Tier hält Winterschlaf?",
+   "answers": [
+    "Igel",
+    "Eichhörnchen",
+    "Fuchs",
+    "Reh"
+   ]
+  },
+  {
+   "id": 61,
+   "category": "natur",
+   "question": "Zu welcher Tiergruppe gehört der Wal?",
+   "answers": [
+    "Säugetiere",
+    "Fische",
+    "Reptilien",
+    "Amphibien"
+   ]
+  },
+  {
+   "id": 62,
+   "category": "natur",
+   "question": "Welcher Baum trägt Eicheln?",
+   "answers": [
+    "Eiche",
+    "Buche",
+    "Linde",
+    "Ahorn"
+   ]
+  },
+  {
+   "id": 63,
+   "category": "natur",
+   "question": "Was ist die Hauptnahrung von Koalas?",
+   "answers": [
+    "Eukalyptusblätter",
+    "Bambus",
+    "Gras",
+    "Insekten"
+   ]
+  },
+  {
+   "id": 64,
+   "category": "natur",
+   "question": "Wie heißt das männliche Huhn?",
+   "answers": [
+    "Hahn",
+    "Kapaun",
+    "Erpel",
+    "Ganter"
+   ]
+  },
+  {
+   "id": 65,
+   "category": "natur",
+   "question": "Welche Farbe hat die Zunge einer Giraffe?",
+   "answers": [
+    "Dunkelblau bis schwarz",
+    "Rosa",
+    "Rot",
+    "Gelb"
+   ]
+  },
+  {
+   "id": 66,
+   "category": "sport",
+   "question": "Wie oft wurde Deutschland (Herren) Fußball-Weltmeister?",
+   "answers": [
+    "4",
+    "3",
+    "5",
+    "2"
+   ]
+  },
+  {
+   "id": 67,
+   "category": "sport",
+   "question": "Wie lang ist ein Marathon?",
+   "answers": [
+    "42,195 km",
+    "40 km",
+    "42 km",
+    "45,5 km"
+   ]
+  },
+  {
+   "id": 68,
+   "category": "sport",
+   "question": "In welcher Sportart gibt es einen 'Slam Dunk'?",
+   "answers": [
+    "Basketball",
+    "Volleyball",
+    "Tennis",
+    "Handball"
+   ]
+  },
+  {
+   "id": 69,
+   "category": "sport",
+   "question": "Wie viele Ringe hat das olympische Symbol?",
+   "answers": [
+    "5",
+    "4",
+    "6",
+    "7"
+   ]
+  },
+  {
+   "id": 70,
+   "category": "sport",
+   "question": "Wie viele Punkte ist ein Touchdown im American Football wert?",
+   "answers": [
+    "6",
+    "7",
+    "3",
+    "5"
+   ]
+  },
+  {
+   "id": 71,
+   "category": "sport",
+   "question": "Auf welchem Belag wird das Tennisturnier in Wimbledon gespielt?",
+   "answers": [
+    "Rasen",
+    "Sand",
+    "Hartplatz",
+    "Teppich"
+   ]
+  },
+  {
+   "id": 72,
+   "category": "sport",
+   "question": "Wie viele Spieler hat eine Volleyballmannschaft auf dem Feld?",
+   "answers": [
+    "6",
+    "5",
+    "7",
+    "8"
+   ]
+  },
+  {
+   "id": 73,
+   "category": "sport",
+   "question": "In welcher Stadt fanden die Olympischen Sommerspiele 1972 statt?",
+   "answers": [
+    "München",
+    "Berlin",
+    "Montreal",
+    "Moskau"
+   ]
+  },
+  {
+   "id": 74,
+   "category": "sport",
+   "question": "Wie viele Punkte sind beim Darts mit drei Pfeilen maximal möglich?",
+   "answers": [
+    "180",
+    "150",
+    "200",
+    "170"
+   ]
+  },
+  {
+   "id": 75,
+   "category": "sport",
+   "question": "Wie viele Löcher hat eine Standard-Golfrunde?",
+   "answers": [
+    "18",
+    "9",
+    "12",
+    "24"
+   ]
+  },
+  {
+   "id": 76,
+   "category": "sport",
+   "question": "Wie hoch ist ein Basketballkorb (Ringhöhe)?",
+   "answers": [
+    "3,05 m",
+    "2,85 m",
+    "3,25 m",
+    "2,95 m"
+   ]
+  },
+  {
+   "id": 77,
+   "category": "sport",
+   "question": "Welche Farbe hat das Trikot des Führenden der Tour de France?",
+   "answers": [
+    "Gelb",
+    "Grün",
+    "Rot",
+    "Weiß-rot gepunktet"
+   ]
+  },
+  {
+   "id": 78,
+   "category": "sport",
+   "question": "Wie viele Minuten dauert ein reguläres Fußballspiel?",
+   "answers": [
+    "90",
+    "80",
+    "100",
+    "120"
+   ]
+  },
+  {
+   "id": 79,
+   "category": "musik",
+   "question": "Wie viele Saiten hat eine Standardgitarre?",
+   "answers": [
+    "6",
+    "4",
+    "5",
+    "7"
+   ]
+  },
+  {
+   "id": 80,
+   "category": "musik",
+   "question": "Wer komponierte 'Für Elise'?",
+   "answers": [
+    "Ludwig van Beethoven",
+    "Wolfgang Amadeus Mozart",
+    "Johann Sebastian Bach",
+    "Frédéric Chopin"
+   ]
+  },
+  {
+   "id": 81,
+   "category": "musik",
+   "question": "Wie viele Tasten hat ein klassisches Klavier?",
+   "answers": [
+    "88",
+    "76",
+    "92",
+    "64"
+   ]
+  },
+  {
+   "id": 82,
+   "category": "musik",
+   "question": "Aus welchem Land stammt die Band ABBA?",
+   "answers": [
+    "Schweden",
+    "Norwegen",
+    "Dänemark",
+    "Finnland"
+   ]
+  },
+  {
+   "id": 83,
+   "category": "musik",
+   "question": "Welches Instrument spielte Jimi Hendrix hauptsächlich?",
+   "answers": [
+    "E-Gitarre",
+    "Schlagzeug",
+    "Saxofon",
+    "Bass"
+   ]
+  },
+  {
+   "id": 84,
+   "category": "musik",
+   "question": "Wie viele Linien hat ein Notensystem?",
+   "answers": [
+    "5",
+    "4",
+    "6",
+    "7"
+   ]
+  },
+  {
+   "id": 85,
+   "category": "musik",
+   "question": "Wie nennt man die Lautstärkeangabe 'sehr leise'?",
+   "answers": [
+    "Pianissimo",
+    "Fortissimo",
+    "Allegro",
+    "Crescendo"
+   ]
+  },
+  {
+   "id": 86,
+   "category": "musik",
+   "question": "Wie hieß der Sänger der Band Queen?",
+   "answers": [
+    "Freddie Mercury",
+    "Brian May",
+    "Mick Jagger",
+    "David Bowie"
+   ]
+  },
+  {
+   "id": 87,
+   "category": "musik",
+   "question": "Aus welcher Stadt stammten die Beatles?",
+   "answers": [
+    "Liverpool",
+    "London",
+    "Manchester",
+    "Birmingham"
+   ]
+  },
+  {
+   "id": 88,
+   "category": "musik",
+   "question": "Welches Tempo ist schneller?",
+   "answers": [
+    "Presto",
+    "Andante",
+    "Adagio",
+    "Largo"
+   ]
+  },
+  {
+   "id": 89,
+   "category": "musik",
+   "question": "Wer gilt als 'King of Pop'?",
+   "answers": [
+    "Michael Jackson",
+    "Elvis Presley",
+    "Prince",
+    "Justin Timberlake"
+   ]
+  },
+  {
+   "id": 90,
+   "category": "musik",
+   "question": "Wie viele Töne hat eine Dur-Tonleiter innerhalb einer Oktave (ohne Wiederholung des Grundtons)?",
+   "answers": [
+    "7",
+    "8",
+    "5",
+    "12"
+   ]
+  },
+  {
+   "id": 91,
+   "category": "musik",
+   "question": "Aus welchem Land stammt der Tango?",
+   "answers": [
+    "Argentinien",
+    "Spanien",
+    "Brasilien",
+    "Kuba"
+   ]
+  },
+  {
+   "id": 92,
+   "category": "film",
+   "question": "Wie heißt der Zauberer-Schüler mit der blitzförmigen Narbe?",
+   "answers": [
+    "Harry Potter",
+    "Frodo Beutlin",
+    "Percy Jackson",
+    "Merlin"
+   ]
+  },
+  {
+   "id": 93,
+   "category": "film",
+   "question": "Welcher Film gewann bei der Oscarverleihung 1998 als bester Film?",
+   "answers": [
+    "Titanic",
+    "Good Will Hunting",
+    "L.A. Confidential",
+    "Der Soldat James Ryan"
+   ]
+  },
+  {
+   "id": 94,
+   "category": "film",
+   "question": "Wie heißt der Erzschurke in 'Star Wars – Episode IV'?",
+   "answers": [
+    "Darth Vader",
+    "Darth Maul",
+    "Count Dooku",
+    "Kylo Ren"
+   ]
+  },
+  {
+   "id": 95,
+   "category": "film",
+   "question": "In welcher Serie kocht ein Chemielehrer Crystal Meth?",
+   "answers": [
+    "Breaking Bad",
+    "Ozark",
+    "Narcos",
+    "The Wire"
+   ]
+  },
+  {
+   "id": 96,
+   "category": "film",
+   "question": "Welche Stadt ist Schauplatz der Serie 'Friends'?",
+   "answers": [
+    "New York",
+    "Los Angeles",
+    "Chicago",
+    "Boston"
+   ]
+  },
+  {
+   "id": 97,
+   "category": "film",
+   "question": "Wer spielte Jack Sparrow in 'Fluch der Karibik'?",
+   "answers": [
+    "Johnny Depp",
+    "Orlando Bloom",
+    "Brad Pitt",
+    "Keanu Reeves"
+   ]
+  },
+  {
+   "id": 98,
+   "category": "film",
+   "question": "Wie heißt der Ring-Träger in 'Der Herr der Ringe'?",
+   "answers": [
+    "Frodo",
+    "Sam",
+    "Aragorn",
+    "Gandalf"
+   ]
+  },
+  {
+   "id": 99,
+   "category": "film",
+   "question": "Aus welchem Land stammt die Serie 'Dark'?",
+   "answers": [
+    "Deutschland",
+    "Dänemark",
+    "Schweden",
+    "Österreich"
+   ]
+  },
+  {
+   "id": 100,
+   "category": "film",
+   "question": "Welches Tier ist Simba in 'Der König der Löwen'?",
+   "answers": [
+    "Löwe",
+    "Tiger",
+    "Gepard",
+    "Leopard"
+   ]
+  },
+  {
+   "id": 101,
+   "category": "film",
+   "question": "Wie heißt die Stadt, in der die Simpsons leben?",
+   "answers": [
+    "Springfield",
+    "Shelbyville",
+    "Quahog",
+    "South Park"
+   ]
+  },
+  {
+   "id": 102,
+   "category": "film",
+   "question": "Welcher Regisseur drehte 'Pulp Fiction'?",
+   "answers": [
+    "Quentin Tarantino",
+    "Martin Scorsese",
+    "Steven Spielberg",
+    "Christopher Nolan"
+   ]
+  },
+  {
+   "id": 103,
+   "category": "film",
+   "question": "Wie heißt der Erste Detektiv der 'Drei ???'?",
+   "answers": [
+    "Justus Jonas",
+    "Peter Shaw",
+    "Bob Andrews",
+    "Kalle Blomquist"
+   ]
+  },
+  {
+   "id": 104,
+   "category": "film",
+   "question": "In welcher Serie gibt es das 'Upside Down'?",
+   "answers": [
+    "Stranger Things",
+    "Lost",
+    "The OA",
+    "Black Mirror"
+   ]
+  },
+  {
+   "id": 105,
+   "category": "gaming",
+   "question": "Wie heißt der Klempner, der Prinzessin Peach rettet?",
+   "answers": [
+    "Mario",
+    "Luigi",
+    "Wario",
+    "Toad"
+   ]
+  },
+  {
+   "id": 106,
+   "category": "gaming",
+   "question": "Welche Firma entwickelte die PlayStation?",
+   "answers": [
+    "Sony",
+    "Nintendo",
+    "Microsoft",
+    "Sega"
+   ]
+  },
+  {
+   "id": 107,
+   "category": "gaming",
+   "question": "Wie heißt das Spiel, in dem man aus Blöcken Welten baut und Creeper explodieren?",
+   "answers": [
+    "Minecraft",
+    "Terraria",
+    "Roblox",
+    "Fortnite"
+   ]
+  },
+  {
+   "id": 108,
+   "category": "gaming",
+   "question": "Welche Farbe hat Pac-Man?",
+   "answers": [
+    "Gelb",
+    "Rot",
+    "Blau",
+    "Grün"
+   ]
+  },
+  {
+   "id": 109,
+   "category": "gaming",
+   "question": "Wie heißt der Held der 'The Legend of Zelda'-Reihe?",
+   "answers": [
+    "Link",
+    "Zelda",
+    "Ganon",
+    "Navi"
+   ]
+  },
+  {
+   "id": 110,
+   "category": "gaming",
+   "question": "Aus welchem Jahr stammt das Spiel 'Tetris' ursprünglich?",
+   "answers": [
+    "1984",
+    "1979",
+    "1990",
+    "1995"
+   ]
+  },
+  {
+   "id": 111,
+   "category": "gaming",
+   "question": "Welches Pokémon ist das Maskottchen der Reihe?",
+   "answers": [
+    "Pikachu",
+    "Glumanda",
+    "Evoli",
+    "Mewtu"
+   ]
+  },
+  {
+   "id": 112,
+   "category": "gaming",
+   "question": "Wie heißt Microsofts Spielekonsole?",
+   "answers": [
+    "Xbox",
+    "GameCube",
+    "Dreamcast",
+    "Switch"
+   ]
+  },
+  {
+   "id": 113,
+   "category": "gaming",
+   "question": "In welchem Spiel kämpfen 100 Spieler auf einer Insel und bauen Festungen?",
+   "answers": [
+    "Fortnite",
+    "Apex Legends",
+    "PUBG",
+    "Overwatch"
+   ]
+  },
+  {
+   "id": 114,
+   "category": "gaming",
+   "question": "Wie heißt der blaue Igel von Sega?",
+   "answers": [
+    "Sonic",
+    "Knuckles",
+    "Tails",
+    "Shadow"
+   ]
+  },
+  {
+   "id": 115,
+   "category": "gaming",
+   "question": "Welche Konsole brachte Nintendo 2017 heraus?",
+   "answers": [
+    "Switch",
+    "Wii U",
+    "GameCube",
+    "3DS"
+   ]
+  },
+  {
+   "id": 116,
+   "category": "gaming",
+   "question": "Wie heißt die Spielfigur in 'Tomb Raider'?",
+   "answers": [
+    "Lara Croft",
+    "Jill Valentine",
+    "Samus Aran",
+    "Chun-Li"
+   ]
+  },
+  {
+   "id": 117,
+   "category": "gaming",
+   "question": "Welches Genre ist 'Stardew Valley'?",
+   "answers": [
+    "Farmsimulation",
+    "Ego-Shooter",
+    "Rennspiel",
+    "Kampfspiel"
+   ]
+  },
+  {
+   "id": 118,
+   "category": "essen",
+   "question": "Aus welchem Land stammt die Pizza Margherita?",
+   "answers": [
+    "Italien",
+    "Griechenland",
+    "Spanien",
+    "Frankreich"
+   ]
+  },
+  {
+   "id": 119,
+   "category": "essen",
+   "question": "Was ist die Hauptzutat von Guacamole?",
+   "answers": [
+    "Avocado",
+    "Erbse",
+    "Gurke",
+    "Zucchini"
+   ]
+  },
+  {
+   "id": 120,
+   "category": "essen",
+   "question": "Aus welcher Pflanze wird Tequila hergestellt?",
+   "answers": [
+    "Agave",
+    "Zuckerrohr",
+    "Kaktusfeige",
+    "Mais"
+   ]
+  },
+  {
+   "id": 121,
+   "category": "essen",
+   "question": "Was ist Tofu hauptsächlich?",
+   "answers": [
+    "Sojabohnen",
+    "Reis",
+    "Weizen",
+    "Kichererbsen"
+   ]
+  },
+  {
+   "id": 122,
+   "category": "essen",
+   "question": "Welches Gewürz ist das teuerste der Welt?",
+   "answers": [
+    "Safran",
+    "Vanille",
+    "Zimt",
+    "Kardamom"
+   ]
+  },
+  {
+   "id": 123,
+   "category": "essen",
+   "question": "Was ist die Hauptzutat von Hummus?",
+   "answers": [
+    "Kichererbsen",
+    "Linsen",
+    "Bohnen",
+    "Erbsen"
+   ]
+  },
+  {
+   "id": 124,
+   "category": "essen",
+   "question": "Aus welchem Land stammt Sushi?",
+   "answers": [
+    "Japan",
+    "China",
+    "Korea",
+    "Thailand"
+   ]
+  },
+  {
+   "id": 125,
+   "category": "essen",
+   "question": "Welches Getränk wird aus Hopfen und Malz gebraut?",
+   "answers": [
+    "Bier",
+    "Wein",
+    "Whisky",
+    "Sake"
+   ]
+  },
+  {
+   "id": 126,
+   "category": "essen",
+   "question": "Welche Nuss ist die Hauptzutat von Marzipan?",
+   "answers": [
+    "Mandel",
+    "Haselnuss",
+    "Walnuss",
+    "Cashew"
+   ]
+  },
+  {
+   "id": 127,
+   "category": "essen",
+   "question": "Aus welchem Land stammt die Paella?",
+   "answers": [
+    "Spanien",
+    "Portugal",
+    "Italien",
+    "Mexiko"
+   ]
+  },
+  {
+   "id": 128,
+   "category": "essen",
+   "question": "Welche Frucht wächst an einer Palme und hat 'Wasser' im Inneren?",
+   "answers": [
+    "Kokosnuss",
+    "Mango",
+    "Ananas",
+    "Dattel"
+   ]
+  },
+  {
+   "id": 129,
+   "category": "essen",
+   "question": "Wie heißt das italienische Dessert mit Löffelbiskuits und Mascarpone?",
+   "answers": [
+    "Tiramisu",
+    "Panna cotta",
+    "Cannoli",
+    "Zabaione"
+   ]
+  },
+  {
+   "id": 130,
+   "category": "essen",
+   "question": "Was ist Mozzarella traditionell?",
+   "answers": [
+    "Käse",
+    "Wurst",
+    "Nudel",
+    "Brot"
+   ]
+  },
+  {
+   "id": 131,
+   "category": "sprache",
+   "question": "Wer schrieb 'Faust'?",
+   "answers": [
+    "Johann Wolfgang von Goethe",
+    "Friedrich Schiller",
+    "Heinrich Heine",
+    "Thomas Mann"
+   ]
+  },
+  {
+   "id": 132,
+   "category": "sprache",
+   "question": "Wie viele Buchstaben hat das deutsche Alphabet (ohne Umlaute und ß)?",
+   "answers": [
+    "26",
+    "24",
+    "28",
+    "30"
+   ]
+  },
+  {
+   "id": 133,
+   "category": "sprache",
+   "question": "Wer schrieb 'Romeo und Julia'?",
+   "answers": [
+    "William Shakespeare",
+    "Charles Dickens",
+    "Oscar Wilde",
+    "Jane Austen"
+   ]
+  },
+  {
+   "id": 134,
+   "category": "sprache",
+   "question": "Was ist ein Palindrom?",
+   "answers": [
+    "Ein Wort, das rückwärts gleich lautet",
+    "Ein Wort mit drei Silben",
+    "Ein Fremdwort aus dem Griechischen",
+    "Ein Reim am Zeilenende"
+   ]
+  },
+  {
+   "id": 135,
+   "category": "sprache",
+   "question": "Welche Sprache hat weltweit die meisten Muttersprachler?",
+   "answers": [
+    "Chinesisch (Mandarin)",
+    "Englisch",
+    "Spanisch",
+    "Hindi"
+   ]
+  },
+  {
+   "id": 136,
+   "category": "sprache",
+   "question": "Wer schrieb 'Die Verwandlung'?",
+   "answers": [
+    "Franz Kafka",
+    "Hermann Hesse",
+    "Thomas Mann",
+    "Bertolt Brecht"
+   ]
+  },
+  {
+   "id": 137,
+   "category": "sprache",
+   "question": "Welche Wortart ist 'schnell'?",
+   "answers": [
+    "Adjektiv",
+    "Verb",
+    "Nomen",
+    "Präposition"
+   ]
+  },
+  {
+   "id": 138,
+   "category": "sprache",
+   "question": "Wer erfand die Figur Sherlock Holmes?",
+   "answers": [
+    "Arthur Conan Doyle",
+    "Agatha Christie",
+    "Edgar Allan Poe",
+    "Charles Dickens"
+   ]
+  },
+  {
+   "id": 139,
+   "category": "sprache",
+   "question": "Was bedeutet 'Carpe diem'?",
+   "answers": [
+    "Nutze den Tag",
+    "Gute Nacht",
+    "Liebe siegt",
+    "Alles fließt"
+   ]
+  },
+  {
+   "id": 140,
+   "category": "sprache",
+   "question": "Wer schrieb 'Harry Potter'?",
+   "answers": [
+    "J. K. Rowling",
+    "J. R. R. Tolkien",
+    "Cornelia Funke",
+    "Suzanne Collins"
+   ]
+  },
+  {
+   "id": 141,
+   "category": "sprache",
+   "question": "Wie nennt man ein Wort mit gegenteiliger Bedeutung?",
+   "answers": [
+    "Antonym",
+    "Synonym",
+    "Homonym",
+    "Akronym"
+   ]
+  },
+  {
+   "id": 142,
+   "category": "sprache",
+   "question": "Wer schrieb 'Die Räuber'?",
+   "answers": [
+    "Friedrich Schiller",
+    "Gotthold Ephraim Lessing",
+    "Goethe",
+    "Heinrich von Kleist"
+   ]
+  },
+  {
+   "id": 143,
+   "category": "sprache",
+   "question": "In welcher Sprache wurde 'Der kleine Prinz' ursprünglich geschrieben?",
+   "answers": [
+    "Französisch",
+    "Deutsch",
+    "Englisch",
+    "Italienisch"
+   ]
+  },
+  {
+   "id": 144,
+   "category": "technik",
+   "question": "Wofür steht 'WWW'?",
+   "answers": [
+    "World Wide Web",
+    "Wide World Web",
+    "World Web Wide",
+    "Web World Wide"
+   ]
+  },
+  {
+   "id": 145,
+   "category": "technik",
+   "question": "Wer gründete Microsoft zusammen mit Paul Allen?",
+   "answers": [
+    "Bill Gates",
+    "Steve Jobs",
+    "Mark Zuckerberg",
+    "Larry Page"
+   ]
+  },
+  {
+   "id": 146,
+   "category": "technik",
+   "question": "Wie viele Bit hat ein Byte?",
+   "answers": [
+    "8",
+    "4",
+    "16",
+    "10"
+   ]
+  },
+  {
+   "id": 147,
+   "category": "technik",
+   "question": "Was bedeutet 'CPU'?",
+   "answers": [
+    "Central Processing Unit",
+    "Computer Power Unit",
+    "Central Program Utility",
+    "Core Processing Unit"
+   ]
+  },
+  {
+   "id": 148,
+   "category": "technik",
+   "question": "In welchem Jahr kam das erste iPhone auf den Markt?",
+   "answers": [
+    "2007",
+    "2005",
+    "2009",
+    "2010"
+   ]
+  },
+  {
+   "id": 149,
+   "category": "technik",
+   "question": "Welche Programmiersprache ist nach einer Komikergruppe benannt?",
+   "answers": [
+    "Python",
+    "Java",
+    "Ruby",
+    "Swift"
+   ]
+  },
+  {
+   "id": 150,
+   "category": "technik",
+   "question": "Was ist ein 'Captcha'?",
+   "answers": [
+    "Ein Test, ob ein Mensch vor dem Gerät sitzt",
+    "Ein Computervirus",
+    "Ein Speicherformat",
+    "Eine Tastenkombination"
+   ]
+  },
+  {
+   "id": 151,
+   "category": "technik",
+   "question": "Wofür steht 'USB'?",
+   "answers": [
+    "Universal Serial Bus",
+    "Unified System Board",
+    "Universal Storage Box",
+    "User Service Bus"
+   ]
+  },
+  {
+   "id": 152,
+   "category": "technik",
+   "question": "Welches Unternehmen entwickelt das Betriebssystem Android hauptsächlich?",
+   "answers": [
+    "Google",
+    "Apple",
+    "Samsung",
+    "Microsoft"
+   ]
+  },
+  {
+   "id": 153,
+   "category": "technik",
+   "question": "Was ist die Hauptaufgabe eines Routers?",
+   "answers": [
+    "Datenpakete zwischen Netzwerken weiterleiten",
+    "Strom speichern",
+    "Dateien drucken",
+    "Bilder bearbeiten"
+   ]
+  },
+  {
+   "id": 154,
+   "category": "technik",
+   "question": "Wie heißt die Maßeinheit für Frequenz?",
+   "answers": [
+    "Hertz",
+    "Watt",
+    "Joule",
+    "Tesla"
+   ]
+  },
+  {
+   "id": 155,
+   "category": "technik",
+   "question": "Was bedeutet das 'S' in 'HTTPS'?",
+   "answers": [
+    "Secure",
+    "Simple",
+    "Server",
+    "Speed"
+   ]
+  },
+  {
+   "id": 156,
+   "category": "technik",
+   "question": "Wer gilt als erste Programmiererin der Welt?",
+   "answers": [
+    "Ada Lovelace",
+    "Grace Hopper",
+    "Marie Curie",
+    "Hedy Lamarr"
+   ]
+  },
+  {
+   "id": 157,
+   "category": "liebe",
+   "question": "An welchem Tag ist Valentinstag?",
+   "answers": [
+    "14. Februar",
+    "14. März",
+    "1. Mai",
+    "24. Februar"
+   ]
+  },
+  {
+   "id": 158,
+   "category": "liebe",
+   "question": "Welche Blume gilt als Symbol der Liebe?",
+   "answers": [
+    "Rote Rose",
+    "Tulpe",
+    "Sonnenblume",
+    "Lilie"
+   ]
+  },
+  {
+   "id": 159,
+   "category": "liebe",
+   "question": "Wie heißt der römische Liebesgott mit Pfeil und Bogen?",
+   "answers": [
+    "Amor",
+    "Mars",
+    "Merkur",
+    "Bacchus"
+   ]
+  },
+  {
+   "id": 160,
+   "category": "liebe",
+   "question": "Wie viele Jahre feiert man bei der 'Silberhochzeit'?",
+   "answers": [
+    "25",
+    "10",
+    "40",
+    "50"
+   ]
+  },
+  {
+   "id": 161,
+   "category": "liebe",
+   "question": "Wie heißt das Liebespaar aus Veronas berühmtestem Drama?",
+   "answers": [
+    "Romeo und Julia",
+    "Tristan und Isolde",
+    "Orpheus und Eurydike",
+    "Bonnie und Clyde"
+   ]
+  },
+  {
+   "id": 162,
+   "category": "liebe",
+   "question": "Wie nennt man die 'Goldene Hochzeit' in Jahren?",
+   "answers": [
+    "50",
+    "25",
+    "60",
+    "75"
+   ]
+  },
+  {
+   "id": 163,
+   "category": "liebe",
+   "question": "Welches Hormon wird oft 'Kuschelhormon' genannt?",
+   "answers": [
+    "Oxytocin",
+    "Adrenalin",
+    "Cortisol",
+    "Melatonin"
+   ]
+  },
+  {
+   "id": 164,
+   "category": "liebe",
+   "question": "In welcher Stadt hängten Verliebte bis 2015 Tausende Schlösser an die Brücke Pont des Arts?",
+   "answers": [
+    "Paris",
+    "Rom",
+    "Venedig",
+    "Prag"
+   ]
+  },
+  {
+   "id": 165,
+   "category": "liebe",
+   "question": "Wie heißt die griechische Göttin der Liebe?",
+   "answers": [
+    "Aphrodite",
+    "Athene",
+    "Hera",
+    "Artemis"
+   ]
+  },
+  {
+   "id": 166,
+   "category": "liebe",
+   "question": "Welche Farbe steht traditionell für Treue?",
+   "answers": [
+    "Blau",
+    "Rot",
+    "Gelb",
+    "Grün"
+   ]
+  },
+  {
+   "id": 167,
+   "category": "liebe",
+   "question": "Wie nennt man es, wenn sich jemand plötzlich ohne Erklärung nicht mehr meldet?",
+   "answers": [
+    "Ghosting",
+    "Benching",
+    "Breadcrumbing",
+    "Catfishing"
+   ]
+  },
+  {
+   "id": 168,
+   "category": "liebe",
+   "question": "Welches Edelmetall ist bei Eheringen in Deutschland am verbreitetsten?",
+   "answers": [
+    "Gold",
+    "Silber",
+    "Platin",
+    "Titan"
+   ]
+  },
+  {
+   "id": 169,
+   "category": "liebe",
+   "question": "Wie nennt man es, wenn jemand online mit einem falschen Profil auftritt?",
+   "answers": [
+    "Catfishing",
+    "Ghosting",
+    "Orbiting",
+    "Love Bombing"
+   ]
+  }
+ ]
+}

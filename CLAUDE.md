@@ -15,7 +15,8 @@ Gamifizierte Dating-App (Flutter + Supabase). Sprache in UI, Kommentaren und Com
 - Feature-Ordner unter `lib/features/<feature>/`; reine Logik ohne Flutter-Import, damit sie unit-testbar ist.
 - Material-Import: `package:material_ui/material_ui.dart` (Flutter 3.50).
 - State: Riverpod `Notifier`/`Provider` ohne Codegen. Navigation: go_router, Pfade in `Routes`.
-- Werte, die Client und DB teilen (Like-Kontingent, XP-Gründe, Level-Kurve, Spiel-Schlüssel), sind an beiden Stellen kommentiert und müssen synchron bleiben.
+- Werte, die Client und DB teilen (Like-Kontingent, XP-Gründe, Level-Kurve, Spiel-Schlüssel, Quizduell-Regeln in `quiz_rules.dart`, Interessen-Kategorien), sind an beiden Stellen kommentiert und müssen synchron bleiben.
+- Quizfragen nur in `tool/quiz_questions.py` pflegen (erzeugt JSON + Seed-Migration).
 - Schemaänderungen nur als **neue** Datei in `supabase/migrations/` – bestehende Migrationen nie ändern, sobald sie deployt sind.
 
 ## Vor jedem Commit

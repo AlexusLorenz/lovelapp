@@ -14,6 +14,8 @@ import '../../features/chat/chat_screen.dart';
 import '../../features/discover/discover_screen.dart';
 import '../../features/discover/profile_detail_screen.dart';
 import '../../features/games/games_screen.dart';
+import '../../features/quiz/quiz_game_screen.dart';
+import '../../features/quiz/quiz_play_screen.dart';
 import '../../features/games/this_or_that/this_or_that_screen.dart';
 import '../../features/likes/likes_screen.dart';
 import '../../features/account/account_providers.dart';
@@ -55,6 +57,8 @@ class Routes {
   static String person(String id, {bool withActions = false}) =>
       '/people/$id${withActions ? '?actions=1' : ''}';
   static String game(String gameKey) => '$games/$gameKey';
+  static String quizGame(String id) => '$games/quiz/$id';
+  static String quizPlay(String id) => '/play/quiz/$id';
 }
 
 /// Wohin gehört man je nach Sitzungsstand? `null` = bleiben.
@@ -167,6 +171,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: Routes.games,
+                builder: (context, state) => const GamesScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'quiz/:id',
+                    builder: (context, state) =>
+                        QuizGameScreen(gameId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: 'this_or_that',
+                    builder: (context, state) => const ThisOrThatScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: Routes.profile,
                 builder: (context, state) => const ProfileScreen(),
                 routes: [
@@ -209,15 +232,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ),
       ),
+      // Spielen ohne Tab-Leiste, damit nichts ablenkt.
       GoRoute(
-        path: Routes.games,
-        builder: (context, state) => const GamesScreen(),
-        routes: [
-          GoRoute(
-            path: 'this_or_that',
-            builder: (context, state) => const ThisOrThatScreen(),
-          ),
-        ],
+        path: '/play/quiz/:id',
+        pageBuilder: (context, state) => MaterialPage(
+          fullscreenDialog: true,
+          child: QuizPlayScreen(gameId: state.pathParameters['id']!),
+        ),
       ),
     ],
   );
