@@ -77,7 +77,7 @@ void main() {
     for (var i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 50));
     }
-    expect(find.text('Quizduell 2 gegen 2'), findsOneWidget);
+    expect(find.text('2 gegen 2'), findsOneWidget);
   });
 
   testWidgets('Match-Overlay respektiert „Bewegung reduzieren“', (

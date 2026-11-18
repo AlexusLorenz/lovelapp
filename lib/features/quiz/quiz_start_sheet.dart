@@ -14,18 +14,26 @@ Future<void> showQuizStartSheet(
   BuildContext context, {
   String? matchId,
   bool join = false,
+  QuizKind? kind,
 }) => showModalBottomSheet<void>(
   context: context,
   isScrollControlled: true,
   showDragHandle: true,
-  builder: (_) => _QuizStartSheet(matchId: matchId, join: join),
+  builder: (_) => _QuizStartSheet(matchId: matchId, join: join, kind: kind),
 );
 
 class _QuizStartSheet extends ConsumerStatefulWidget {
-  const _QuizStartSheet({required this.matchId, required this.join});
+  const _QuizStartSheet({
+    required this.matchId,
+    required this.join,
+    required this.kind,
+  });
 
   final String? matchId;
   final bool join;
+
+  /// Vorgewählte Spielart (sonst wählbar).
+  final QuizKind? kind;
 
   @override
   ConsumerState<_QuizStartSheet> createState() => _QuizStartSheetState();
@@ -33,6 +41,7 @@ class _QuizStartSheet extends ConsumerStatefulWidget {
 
 class _QuizStartSheetState extends ConsumerState<_QuizStartSheet> {
   late String? _match = widget.matchId;
+  late QuizKind _kind = widget.kind ?? QuizKind.quiz;
   final _code = TextEditingController();
   bool _busy = false;
   String? _error;
@@ -54,7 +63,7 @@ class _QuizStartSheetState extends ConsumerState<_QuizStartSheet> {
     try {
       final id = widget.join
           ? await repo.join(match, _code.text)
-          : await repo.start(match, invite: invite);
+          : await repo.start(match, invite: invite, kind: _kind);
       ref.invalidate(quizGamesProvider);
       if (!mounted) return;
       Navigator.of(context).pop();
@@ -79,15 +88,32 @@ class _QuizStartSheetState extends ConsumerState<_QuizStartSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.join ? 'Mit Code beitreten' : 'Neues Quizduell',
+              widget.join ? 'Mit Code beitreten' : 'Neues Spiel – 2 gegen 2',
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Ihr spielt zu zweit als Team gegen ein anderes Paar. Jede Runde '
-              'schlägt eine:r von euch Antworten vor, die andere Person '
-              'entscheidet – ganz ohne gleichzeitig online sein zu müssen.',
+            Text(
+              widget.join
+                  ? 'Gebt den Code ein, den euch das andere Paar geschickt hat.'
+                  : 'Ihr spielt zu zweit als Team gegen ein anderes Paar – '
+                        'ganz ohne gleichzeitig online sein zu müssen. '
+                        '${_kind.howTo}',
             ),
+            if (!widget.join) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final k in QuizKind.values)
+                    ChoiceChip(
+                      label: Text('${k.symbol} ${k.title}'),
+                      selected: _kind == k,
+                      onSelected: (_) => setState(() => _kind = k),
+                    ),
+                ],
+              ),
+            ],
             const SizedBox(height: 16),
             Text('Mit wem spielst du?', style: theme.textTheme.titleMedium),
             if (matches.isEmpty)

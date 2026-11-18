@@ -95,7 +95,10 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen>
       ..value = 1 - left / quizSecondsPerQuestion
       ..forward();
     // Zeit abgelaufen → keine Antwort.
-    _timeout = Timer(Duration(seconds: left), () => _answer(-1));
+    _timeout = Timer(
+      Duration(seconds: left),
+      () => _answer(-1, timedOut: true),
+    );
     setState(() {
       _view = view;
       _picked = null;
@@ -104,7 +107,9 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen>
     });
   }
 
-  Future<void> _answer(int choice) async {
+  /// [choice]: gewählte Antwort; [number]: Schätzung. Bei abgelaufener Zeit
+  /// wird im Schätzduell die bis dahin eingetippte Zahl nicht gewertet.
+  Future<void> _answer(int choice, {num? number, bool timedOut = false}) async {
     final view = _view;
     if (view == null || _sending) return;
     _timeout?.cancel();
@@ -116,7 +121,12 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen>
     await _guard(() async {
       final reply = await ref
           .read(quizRepositoryProvider)
-          .answer(widget.gameId, view.index, choice);
+          .answer(
+            widget.gameId,
+            view.index,
+            choice: choice,
+            number: timedOut ? null : number,
+          );
       await Future<void>.delayed(const Duration(milliseconds: 350));
       if (!mounted) return;
       if (view.index < quizQuestionsPerRound - 1) {
@@ -186,13 +196,21 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen>
                   picked: _picked,
                   partner: _partner,
                   category: categories[_view!.category],
-                  onAnswer: _sending ? null : _answer,
+                  onAnswer: _sending ? null : (i) => _answer(i),
+                  onEstimate: _sending
+                      ? null
+                      : (n) => _answer(n == null ? -1 : 0, number: n),
                 ),
                 _Phase.proposed => _Message(
-                  title: 'Vorschläge abgegeben!',
-                  text:
-                      '$_partner sieht jetzt deine Vorschläge und entscheidet. '
-                      'Die Auflösung seht ihr danach in der Spielübersicht.',
+                  title: _game?.summary.kind == QuizKind.soulmate
+                      ? 'Antworten abgegeben!'
+                      : 'Vorschläge abgegeben!',
+                  text: _game?.summary.kind == QuizKind.soulmate
+                      ? 'Jetzt ist $_partner dran und muss deine Antworten '
+                            'erraten. Die Auflösung seht ihr danach in der '
+                            'Spielübersicht.'
+                      : '$_partner sieht jetzt deine Vorschläge und entscheidet. '
+                            'Die Auflösung seht ihr danach in der Spielübersicht.',
                   actions: [
                     FilledButton(
                       onPressed: () => context.pop(),
@@ -321,6 +339,7 @@ class _QuestionView extends StatelessWidget {
     required this.partner,
     required this.category,
     required this.onAnswer,
+    required this.onEstimate,
   });
 
   final QuizQuestionView view;
@@ -329,11 +348,44 @@ class _QuestionView extends StatelessWidget {
   final String partner;
   final QuizCategory? category;
   final ValueChanged<int>? onAnswer;
+  final ValueChanged<num?>? onEstimate;
+
+  /// Hinweis unter der Frage – je nach Spiel und Rolle.
+  String? _hint() {
+    final deciding = view.role == QuizAction.decide;
+    switch (view.kind) {
+      case QuizKind.soulmate:
+        return deciding
+            ? 'Was hat $partner über sich geantwortet? Rate!'
+            : 'Antworte ehrlich über dich – $partner muss es erraten.';
+      case QuizKind.estimate:
+        if (!deciding) {
+          return 'Deine Schätzung – $partner kann sie noch ändern.';
+        }
+        return view.proposalNumber == null
+            ? '$partner hatte keine Zeit mehr für eine Schätzung.'
+            : '$partner schätzt ${formatQuizNumber(view.proposalNumber)} '
+                  '${view.unit ?? ''}. Übernimm oder ändere die Zahl.';
+      case QuizKind.quiz || QuizKind.emoji:
+        if (!deciding) return null;
+        return (view.proposal ?? -1) < 0
+            ? '$partner hatte keine Zeit mehr für einen Vorschlag.'
+            : 'Markiert: der Vorschlag von $partner. '
+                  'Ohne Auswahl zählt der Vorschlag.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final deciding = view.role == QuizAction.decide;
+    final hint = _hint();
+    final roleLabel = switch ((view.kind, deciding)) {
+      (QuizKind.soulmate, false) => 'Über dich',
+      (QuizKind.soulmate, true) => 'Du rätst',
+      (_, true) => 'Du entscheidest',
+      _ => 'Du schlägst vor',
+    };
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       children: [
@@ -347,7 +399,7 @@ class _QuestionView extends StatelessWidget {
               ),
             ),
             Text(
-              deciding ? 'Du entscheidest' : 'Du schlägst vor',
+              roleLabel,
               style: theme.textTheme.labelLarge?.copyWith(
                 color: LovelColors.terracotta,
               ),
@@ -391,38 +443,130 @@ class _QuestionView extends StatelessWidget {
         Card(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Text(
-              view.question,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge,
+            child: Column(
+              children: [
+                if (view.kind == QuizKind.emoji)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      'Was ist gemeint?',
+                      style: theme.textTheme.labelLarge,
+                    ),
+                  ),
+                Text(
+                  view.question,
+                  textAlign: TextAlign.center,
+                  style: view.kind == QuizKind.emoji
+                      ? const TextStyle(fontSize: 52, height: 1.2)
+                      : theme.textTheme.titleLarge,
+                ),
+              ],
             ),
           ),
         ),
-        if (deciding)
+        if (hint != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              (view.proposal ?? -1) < 0
-                  ? '$partner hatte keine Zeit mehr für einen Vorschlag.'
-                  : 'Markiert: der Vorschlag von $partner. '
-                        'Ohne Auswahl zählt der Vorschlag.',
+              hint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall,
             ),
           ),
         const SizedBox(height: 16),
+        if (view.kind == QuizKind.estimate)
+          _EstimateInput(
+            unit: view.unit,
+            initial: deciding ? view.proposalNumber : null,
+            onSubmit: onEstimate,
+          ),
         for (final (i, answer) in view.answers.indexed)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: _AnswerButton(
               text: answer,
               picked: picked == i,
-              proposedBy: deciding && view.proposal == i ? partner : null,
+              proposedBy:
+                  deciding && view.kind.showsProposal && view.proposal == i
+                  ? partner
+                  : null,
               onTap: onAnswer == null || picked != null
                   ? null
                   : () => onAnswer!(i),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// Zahleneingabe fürs Schätzduell.
+class _EstimateInput extends StatefulWidget {
+  const _EstimateInput({
+    required this.unit,
+    required this.initial,
+    required this.onSubmit,
+  });
+
+  final String? unit;
+  final num? initial;
+  final ValueChanged<num?>? onSubmit;
+
+  @override
+  State<_EstimateInput> createState() => _EstimateInputState();
+}
+
+class _EstimateInputState extends State<_EstimateInput> {
+  late final _controller = TextEditingController(
+    text: widget.initial == null ? '' : formatQuizNumber(widget.initial),
+  );
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final value = parseQuizNumber(_controller.text);
+    if (_controller.text.trim().isNotEmpty && value == null) {
+      setState(() => _error = 'Bitte nur eine Zahl eingeben.');
+      return;
+    }
+    widget.onSubmit?.call(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: _controller,
+          autofocus: true,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: AppTheme.displayFont,
+            fontSize: 36,
+            color: LovelColors.umber,
+          ),
+          decoration: InputDecoration(
+            hintText: '?',
+            suffixText: widget.unit,
+            errorText: _error,
+            filled: true,
+            fillColor: LovelColors.cream,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          onSubmitted: (_) => _submit(),
+        ),
+        const SizedBox(height: 12),
+        FilledButton(
+          onPressed: widget.onSubmit == null ? null : _submit,
+          child: const Text('Schätzung abgeben'),
+        ),
       ],
     );
   }
@@ -510,7 +654,15 @@ class _Results extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final right = results.where((r) => r.correct).length;
+    final kind = views.isEmpty ? QuizKind.quiz : views.last.kind;
+    final points = results.fold(0, (s, r) => s + r.points);
+    final headline = switch (kind) {
+      QuizKind.estimate => '$points von ${results.length * 3} Punkten',
+      QuizKind.soulmate =>
+        '${results.where((r) => r.correct).length} von '
+            '${results.length} Treffern',
+      _ => '$points von ${results.length} richtig',
+    };
     QuizQuestionView? viewFor(int i) {
       for (final v in views.reversed) {
         if (v.index == i) return v;
@@ -518,11 +670,50 @@ class _Results extends StatelessWidget {
       return null;
     }
 
+    String choice(QuizQuestionView v, int? i) =>
+        i == null || i < 0 || i >= v.answers.length
+        ? 'keine Antwort'
+        : v.answers[i];
+
+    List<Widget> details(QuizQuestionView v, QuizRoundOutcome r) =>
+        switch (kind) {
+          QuizKind.estimate => [
+            Text(
+              'Richtig: ${formatQuizNumber(r.numberAnswer)} ${r.unit ?? ''}',
+            ),
+            Text(
+              'Ihr: ${formatQuizNumber(r.finalNumber)} ${r.unit ?? ''} · '
+              '+${r.points} ${r.points == 1 ? 'Punkt' : 'Punkte'}',
+            ),
+            if (r.proposalNumber != null && r.proposalNumber != r.finalNumber)
+              Text(
+                'Schätzung von $partner: ${formatQuizNumber(r.proposalNumber)}',
+                style: theme.textTheme.bodySmall,
+              ),
+          ],
+          QuizKind.soulmate => [
+            Text('$partner: ${choice(v, r.proposal)}'),
+            Text('Dein Tipp: ${choice(v, r.finalChoice)}'),
+          ],
+          _ => [
+            if (r.correctIndex != null)
+              Text('Richtig: ${choice(v, r.correctIndex)}'),
+            if (!r.correct) Text('Ihr: ${choice(v, r.finalChoice)}'),
+            if (r.proposal != null &&
+                r.proposal! >= 0 &&
+                r.proposal != r.finalChoice)
+              Text(
+                'Vorschlag von $partner: ${choice(v, r.proposal)}',
+                style: theme.textTheme.bodySmall,
+              ),
+          ],
+        };
+
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         Text(
-          '$right von ${results.length} richtig',
+          headline,
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontFamily: AppTheme.displayFont,
@@ -555,20 +746,7 @@ class _Results extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text('Richtig: ${v.answers[r.correctIndex]}'),
-                    if (!r.correct)
-                      Text(
-                        r.finalChoice < 0
-                            ? 'Ihr: keine Antwort'
-                            : 'Ihr: ${v.answers[r.finalChoice]}',
-                      ),
-                    if (r.proposal != null &&
-                        r.proposal! >= 0 &&
-                        r.proposal != r.finalChoice)
-                      Text(
-                        'Vorschlag von $partner: ${v.answers[r.proposal!]}',
-                        style: theme.textTheme.bodySmall,
-                      ),
+                    ...details(v, r),
                   ],
                 ),
               ),

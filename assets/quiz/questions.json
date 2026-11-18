@@ -3,67 +3,182 @@
   {
    "key": "allgemein",
    "emoji": "🧠",
-   "label": "Allgemeinwissen"
+   "label": "Allgemeinwissen",
+   "kind": "quiz"
   },
   {
    "key": "geografie",
    "emoji": "🌍",
-   "label": "Geografie"
+   "label": "Geografie",
+   "kind": "quiz"
   },
   {
    "key": "geschichte",
    "emoji": "🏛️",
-   "label": "Geschichte"
+   "label": "Geschichte",
+   "kind": "quiz"
   },
   {
    "key": "wissenschaft",
    "emoji": "🔬",
-   "label": "Wissenschaft"
+   "label": "Wissenschaft",
+   "kind": "quiz"
   },
   {
    "key": "natur",
    "emoji": "🐾",
-   "label": "Tiere & Natur"
+   "label": "Tiere & Natur",
+   "kind": "quiz"
   },
   {
    "key": "sport",
    "emoji": "⚽",
-   "label": "Sport"
+   "label": "Sport",
+   "kind": "quiz"
   },
   {
    "key": "musik",
    "emoji": "🎵",
-   "label": "Musik"
+   "label": "Musik",
+   "kind": "quiz"
   },
   {
    "key": "film",
    "emoji": "🎬",
-   "label": "Film & Serien"
+   "label": "Film & Serien",
+   "kind": "quiz"
   },
   {
    "key": "gaming",
    "emoji": "🎮",
-   "label": "Gaming"
+   "label": "Gaming",
+   "kind": "quiz"
   },
   {
    "key": "essen",
    "emoji": "🍝",
-   "label": "Essen & Trinken"
+   "label": "Essen & Trinken",
+   "kind": "quiz"
   },
   {
    "key": "sprache",
    "emoji": "📚",
-   "label": "Sprache & Literatur"
+   "label": "Sprache & Literatur",
+   "kind": "quiz"
   },
   {
    "key": "technik",
    "emoji": "💻",
-   "label": "Technik & Internet"
+   "label": "Technik & Internet",
+   "kind": "quiz"
   },
   {
    "key": "liebe",
    "emoji": "💘",
-   "label": "Liebe & Dating"
+   "label": "Liebe & Dating",
+   "kind": "quiz"
+  },
+  {
+   "key": "est_geo",
+   "emoji": "🌍",
+   "label": "Erde & Länder",
+   "kind": "estimate"
+  },
+  {
+   "key": "est_bau",
+   "emoji": "🏗️",
+   "label": "Bauwerke",
+   "kind": "estimate"
+  },
+  {
+   "key": "est_jahr",
+   "emoji": "📅",
+   "label": "Jahreszahlen",
+   "kind": "estimate"
+  },
+  {
+   "key": "est_koerper",
+   "emoji": "🫀",
+   "label": "Mensch & Körper",
+   "kind": "estimate"
+  },
+  {
+   "key": "est_tiere",
+   "emoji": "🐘",
+   "label": "Tierisch",
+   "kind": "estimate"
+  },
+  {
+   "key": "est_alltag",
+   "emoji": "🧮",
+   "label": "Alltag in Zahlen",
+   "kind": "estimate"
+  },
+  {
+   "key": "emo_film",
+   "emoji": "🎬",
+   "label": "Filme",
+   "kind": "emoji"
+  },
+  {
+   "key": "emo_spruch",
+   "emoji": "💬",
+   "label": "Sprichwörter",
+   "kind": "emoji"
+  },
+  {
+   "key": "emo_ort",
+   "emoji": "🗺️",
+   "label": "Länder & Städte",
+   "kind": "emoji"
+  },
+  {
+   "key": "emo_beruf",
+   "emoji": "🧑‍🔧",
+   "label": "Berufe",
+   "kind": "emoji"
+  },
+  {
+   "key": "emo_maerchen",
+   "emoji": "🏰",
+   "label": "Märchen",
+   "kind": "emoji"
+  },
+  {
+   "key": "sm_alltag",
+   "emoji": "☕",
+   "label": "Alltag",
+   "kind": "soulmate"
+  },
+  {
+   "key": "sm_essen",
+   "emoji": "🍕",
+   "label": "Essen",
+   "kind": "soulmate"
+  },
+  {
+   "key": "sm_freizeit",
+   "emoji": "✈️",
+   "label": "Reisen & Freizeit",
+   "kind": "soulmate"
+  },
+  {
+   "key": "sm_liebe",
+   "emoji": "💘",
+   "label": "Liebe & Beziehung",
+   "kind": "soulmate"
+  },
+  {
+   "key": "sm_wenn",
+   "emoji": "🤔",
+   "label": "Was wäre wenn",
+   "kind": "soulmate"
+  },
+  {
+   "key": "sm_typ",
+   "emoji": "🎉",
+   "label": "Persönlichkeit",
+   "kind": "soulmate"
   }
  ],
  "questions": [
@@ -1924,6 +2039,1479 @@
     "Ghosting",
     "Orbiting",
     "Love Bombing"
+   ]
+  },
+  {
+   "id": 170,
+   "category": "est_geo",
+   "question": "Wie hoch ist der Mount Everest?",
+   "answers": [],
+   "number": 8849,
+   "unit": "m"
+  },
+  {
+   "id": 171,
+   "category": "est_geo",
+   "question": "Wie lang ist der Rhein insgesamt?",
+   "answers": [],
+   "number": 1233,
+   "unit": "km"
+  },
+  {
+   "id": 172,
+   "category": "est_geo",
+   "question": "Wie viele Einwohner hat Deutschland ungefähr (in Millionen)?",
+   "answers": [],
+   "number": 84,
+   "unit": "Mio."
+  },
+  {
+   "id": 173,
+   "category": "est_geo",
+   "question": "Wie groß ist die Fläche Deutschlands?",
+   "answers": [],
+   "number": 357600,
+   "unit": "km²"
+  },
+  {
+   "id": 174,
+   "category": "est_geo",
+   "question": "Wie hoch ist die Zugspitze?",
+   "answers": [],
+   "number": 2962,
+   "unit": "m"
+  },
+  {
+   "id": 175,
+   "category": "est_geo",
+   "question": "Wie weit ist es Luftlinie von Berlin nach München?",
+   "answers": [],
+   "number": 504,
+   "unit": "km"
+  },
+  {
+   "id": 176,
+   "category": "est_geo",
+   "question": "Wie tief ist der Bodensee an seiner tiefsten Stelle?",
+   "answers": [],
+   "number": 251,
+   "unit": "m"
+  },
+  {
+   "id": 177,
+   "category": "est_geo",
+   "question": "Wie viele Mitgliedsstaaten hat die EU?",
+   "answers": [],
+   "number": 27,
+   "unit": "Länder"
+  },
+  {
+   "id": 178,
+   "category": "est_geo",
+   "question": "Wie hoch ist der Brocken im Harz?",
+   "answers": [],
+   "number": 1141,
+   "unit": "m"
+  },
+  {
+   "id": 179,
+   "category": "est_bau",
+   "question": "Wie hoch ist der Eiffelturm (mit Antennen)?",
+   "answers": [],
+   "number": 330,
+   "unit": "m"
+  },
+  {
+   "id": 180,
+   "category": "est_bau",
+   "question": "Wie hoch ist der Burj Khalifa in Dubai?",
+   "answers": [],
+   "number": 828,
+   "unit": "m"
+  },
+  {
+   "id": 181,
+   "category": "est_bau",
+   "question": "Wie hoch ist der Kölner Dom?",
+   "answers": [],
+   "number": 157,
+   "unit": "m"
+  },
+  {
+   "id": 182,
+   "category": "est_bau",
+   "question": "Wie hoch ist der Berliner Fernsehturm?",
+   "answers": [],
+   "number": 368,
+   "unit": "m"
+  },
+  {
+   "id": 183,
+   "category": "est_bau",
+   "question": "Wie hoch ist die Freiheitsstatue mit Sockel?",
+   "answers": [],
+   "number": 93,
+   "unit": "m"
+  },
+  {
+   "id": 184,
+   "category": "est_bau",
+   "question": "Wie weit liegen die beiden Türme der Golden Gate Bridge auseinander?",
+   "answers": [],
+   "number": 1280,
+   "unit": "m"
+  },
+  {
+   "id": 185,
+   "category": "est_bau",
+   "question": "Wie hoch ist die Cheops-Pyramide heute?",
+   "answers": [],
+   "number": 139,
+   "unit": "m"
+  },
+  {
+   "id": 186,
+   "category": "est_bau",
+   "question": "Wie hoch ist der Turm mit dem Big Ben in London?",
+   "answers": [],
+   "number": 96,
+   "unit": "m"
+  },
+  {
+   "id": 187,
+   "category": "est_bau",
+   "question": "Wie hoch ist das Empire State Building mit Antenne?",
+   "answers": [],
+   "number": 443,
+   "unit": "m"
+  },
+  {
+   "id": 188,
+   "category": "est_jahr",
+   "question": "In welchem Jahr erreichte Kolumbus Amerika?",
+   "answers": [],
+   "number": 1492,
+   "unit": "Jahr"
+  },
+  {
+   "id": 189,
+   "category": "est_jahr",
+   "question": "In welchem Jahr begann die Französische Revolution?",
+   "answers": [],
+   "number": 1789,
+   "unit": "Jahr"
+  },
+  {
+   "id": 190,
+   "category": "est_jahr",
+   "question": "In welchem Jahr wurde die Bundesrepublik Deutschland gegründet?",
+   "answers": [],
+   "number": 1949,
+   "unit": "Jahr"
+  },
+  {
+   "id": 191,
+   "category": "est_jahr",
+   "question": "In welchem Jahr kam das erste iPhone heraus?",
+   "answers": [],
+   "number": 2007,
+   "unit": "Jahr"
+  },
+  {
+   "id": 192,
+   "category": "est_jahr",
+   "question": "In welchem Jahr fiel die Berliner Mauer?",
+   "answers": [],
+   "number": 1989,
+   "unit": "Jahr"
+  },
+  {
+   "id": 193,
+   "category": "est_jahr",
+   "question": "In welchem Jahr landeten Menschen erstmals auf dem Mond?",
+   "answers": [],
+   "number": 1969,
+   "unit": "Jahr"
+  },
+  {
+   "id": 194,
+   "category": "est_jahr",
+   "question": "In welchem Jahr wurde das Euro-Bargeld eingeführt?",
+   "answers": [],
+   "number": 2002,
+   "unit": "Jahr"
+  },
+  {
+   "id": 195,
+   "category": "est_jahr",
+   "question": "In welchem Jahr meldete Carl Benz sein Automobil zum Patent an?",
+   "answers": [],
+   "number": 1886,
+   "unit": "Jahr"
+  },
+  {
+   "id": 196,
+   "category": "est_jahr",
+   "question": "Um welches Jahr druckte Gutenberg mit beweglichen Lettern?",
+   "answers": [],
+   "number": 1450,
+   "unit": "Jahr"
+  },
+  {
+   "id": 197,
+   "category": "est_koerper",
+   "question": "Wie viele Knochen hat ein erwachsener Mensch?",
+   "answers": [],
+   "number": 206,
+   "unit": "Knochen"
+  },
+  {
+   "id": 198,
+   "category": "est_koerper",
+   "question": "Wie oft schlägt ein Herz in Ruhe pro Minute (Erwachsene, Durchschnitt)?",
+   "answers": [],
+   "number": 70,
+   "unit": "Schläge"
+  },
+  {
+   "id": 199,
+   "category": "est_koerper",
+   "question": "Wie viele Liter Blut hat ein erwachsener Mensch ungefähr?",
+   "answers": [],
+   "number": 5,
+   "unit": "Liter"
+  },
+  {
+   "id": 200,
+   "category": "est_koerper",
+   "question": "Wie viele Zähne hat ein vollständiges Milchgebiss?",
+   "answers": [],
+   "number": 20,
+   "unit": "Zähne"
+  },
+  {
+   "id": 201,
+   "category": "est_koerper",
+   "question": "Wie lang ist der Dünndarm eines Erwachsenen ungefähr?",
+   "answers": [],
+   "number": 6,
+   "unit": "m"
+  },
+  {
+   "id": 202,
+   "category": "est_koerper",
+   "question": "Wie viele Muskeln hat der Mensch ungefähr?",
+   "answers": [],
+   "number": 650,
+   "unit": "Muskeln"
+  },
+  {
+   "id": 203,
+   "category": "est_koerper",
+   "question": "Wie viel Prozent des Körpers eines Erwachsenen sind Wasser?",
+   "answers": [],
+   "number": 60,
+   "unit": "%"
+  },
+  {
+   "id": 204,
+   "category": "est_koerper",
+   "question": "Wie viele Haare hat ein Mensch ungefähr auf dem Kopf?",
+   "answers": [],
+   "number": 100000,
+   "unit": "Haare"
+  },
+  {
+   "id": 205,
+   "category": "est_koerper",
+   "question": "Wie viele Atemzüge macht ein Erwachsener in Ruhe pro Minute?",
+   "answers": [],
+   "number": 15,
+   "unit": "Atemzüge"
+  },
+  {
+   "id": 206,
+   "category": "est_tiere",
+   "question": "Wie schwer kann ein Afrikanischer Elefantenbulle werden?",
+   "answers": [],
+   "number": 6,
+   "unit": "t"
+  },
+  {
+   "id": 207,
+   "category": "est_tiere",
+   "question": "Wie lang kann ein Blauwal werden?",
+   "answers": [],
+   "number": 30,
+   "unit": "m"
+  },
+  {
+   "id": 208,
+   "category": "est_tiere",
+   "question": "Wie schnell kann ein Gepard im Sprint laufen?",
+   "answers": [],
+   "number": 110,
+   "unit": "km/h"
+  },
+  {
+   "id": 209,
+   "category": "est_tiere",
+   "question": "Wie viele Monate ist eine Elefantenkuh trächtig?",
+   "answers": [],
+   "number": 22,
+   "unit": "Monate"
+  },
+  {
+   "id": 210,
+   "category": "est_tiere",
+   "question": "Wie groß kann eine Giraffe werden?",
+   "answers": [],
+   "number": 5.5,
+   "unit": "m"
+  },
+  {
+   "id": 211,
+   "category": "est_tiere",
+   "question": "Wie viele Zähne hat ein erwachsener Hund?",
+   "answers": [],
+   "number": 42,
+   "unit": "Zähne"
+  },
+  {
+   "id": 212,
+   "category": "est_tiere",
+   "question": "Wie viele Stunden schläft eine Katze ungefähr pro Tag?",
+   "answers": [],
+   "number": 15,
+   "unit": "Stunden"
+  },
+  {
+   "id": 213,
+   "category": "est_tiere",
+   "question": "Wie hoch kann ein Riesenkänguru springen?",
+   "answers": [],
+   "number": 3,
+   "unit": "m"
+  },
+  {
+   "id": 214,
+   "category": "est_tiere",
+   "question": "Wie viele Eier legt ein Legehuhn ungefähr pro Jahr?",
+   "answers": [],
+   "number": 300,
+   "unit": "Eier"
+  },
+  {
+   "id": 215,
+   "category": "est_alltag",
+   "question": "Wie viele Sekunden hat eine Stunde?",
+   "answers": [],
+   "number": 3600,
+   "unit": "Sekunden"
+  },
+  {
+   "id": 216,
+   "category": "est_alltag",
+   "question": "Wie viele Kilokalorien hat ein Liter Vollmilch ungefähr?",
+   "answers": [],
+   "number": 640,
+   "unit": "kcal"
+  },
+  {
+   "id": 217,
+   "category": "est_alltag",
+   "question": "Wie viele Felder hat ein Schachbrett?",
+   "answers": [],
+   "number": 64,
+   "unit": "Felder"
+  },
+  {
+   "id": 218,
+   "category": "est_alltag",
+   "question": "Wie viele Augen hat ein Spielwürfel insgesamt?",
+   "answers": [],
+   "number": 21,
+   "unit": "Augen"
+  },
+  {
+   "id": 219,
+   "category": "est_alltag",
+   "question": "Wie viel wiegt eine 1-Euro-Münze?",
+   "answers": [],
+   "number": 7.5,
+   "unit": "g"
+  },
+  {
+   "id": 220,
+   "category": "est_alltag",
+   "question": "Wie viele Stichwörter hat der Rechtschreib-Duden (Auflage 2020) ungefähr?",
+   "answers": [],
+   "number": 148000,
+   "unit": "Wörter"
+  },
+  {
+   "id": 221,
+   "category": "est_alltag",
+   "question": "Wie lang ist das deutsche Autobahnnetz ungefähr?",
+   "answers": [],
+   "number": 13200,
+   "unit": "km"
+  },
+  {
+   "id": 222,
+   "category": "est_alltag",
+   "question": "Wie viele Stunden hat eine Woche?",
+   "answers": [],
+   "number": 168,
+   "unit": "Stunden"
+  },
+  {
+   "id": 223,
+   "category": "est_alltag",
+   "question": "Wie viele Minuten dauert ein Handballspiel (reguläre Spielzeit)?",
+   "answers": [],
+   "number": 60,
+   "unit": "Minuten"
+  },
+  {
+   "id": 224,
+   "category": "emo_film",
+   "question": "🧊🚢💔",
+   "answers": [
+    "Titanic",
+    "Life of Pi",
+    "Poseidon",
+    "Der Sturm"
+   ]
+  },
+  {
+   "id": 225,
+   "category": "emo_film",
+   "question": "🦁👑",
+   "answers": [
+    "Der König der Löwen",
+    "Madagascar",
+    "Das Dschungelbuch",
+    "Narnia"
+   ]
+  },
+  {
+   "id": 226,
+   "category": "emo_film",
+   "question": "🦖🏝️🔬",
+   "answers": [
+    "Jurassic Park",
+    "King Kong",
+    "Godzilla",
+    "Avatar"
+   ]
+  },
+  {
+   "id": 227,
+   "category": "emo_film",
+   "question": "👽📞🏠",
+   "answers": [
+    "E.T. – Der Außerirdische",
+    "Men in Black",
+    "Alien",
+    "Independence Day"
+   ]
+  },
+  {
+   "id": 228,
+   "category": "emo_film",
+   "question": "🧙‍♂️💍🌋",
+   "answers": [
+    "Der Herr der Ringe",
+    "Harry Potter",
+    "Merlin",
+    "Narnia"
+   ]
+  },
+  {
+   "id": 229,
+   "category": "emo_film",
+   "question": "🐠🔍",
+   "answers": [
+    "Findet Nemo",
+    "Arielle, die Meerjungfrau",
+    "Der weiße Hai",
+    "Vaiana"
+   ]
+  },
+  {
+   "id": 230,
+   "category": "emo_film",
+   "question": "❄️👸⛄",
+   "answers": [
+    "Die Eiskönigin",
+    "Cinderella",
+    "Schneewittchen",
+    "Rapunzel"
+   ]
+  },
+  {
+   "id": 231,
+   "category": "emo_film",
+   "question": "🦈🏖️😱",
+   "answers": [
+    "Der weiße Hai",
+    "Findet Nemo",
+    "Baywatch",
+    "Titanic"
+   ]
+  },
+  {
+   "id": 232,
+   "category": "emo_film",
+   "question": "🚗⏰⚡",
+   "answers": [
+    "Zurück in die Zukunft",
+    "Cars",
+    "Fast & Furious",
+    "Speed"
+   ]
+  },
+  {
+   "id": 233,
+   "category": "emo_spruch",
+   "question": "🍎🌳⬇️",
+   "answers": [
+    "Der Apfel fällt nicht weit vom Stamm",
+    "Ohne Fleiß kein Preis",
+    "Morgenstund hat Gold im Mund",
+    "Viele Köche verderben den Brei"
+   ]
+  },
+  {
+   "id": 234,
+   "category": "emo_spruch",
+   "question": "🌅🥇👄",
+   "answers": [
+    "Morgenstund hat Gold im Mund",
+    "Reden ist Silber, Schweigen ist Gold",
+    "Der frühe Vogel fängt den Wurm",
+    "Ende gut, alles gut"
+   ]
+  },
+  {
+   "id": 235,
+   "category": "emo_spruch",
+   "question": "🌙🐈🩶",
+   "answers": [
+    "Nachts sind alle Katzen grau",
+    "Wenn die Katze aus dem Haus ist, tanzen die Mäuse",
+    "Der Apfel fällt nicht weit vom Stamm",
+    "Lügen haben kurze Beine"
+   ]
+  },
+  {
+   "id": 236,
+   "category": "emo_spruch",
+   "question": "🗣️🥈🤐🥇",
+   "answers": [
+    "Reden ist Silber, Schweigen ist Gold",
+    "Morgenstund hat Gold im Mund",
+    "Wer zuletzt lacht, lacht am besten",
+    "Übung macht den Meister"
+   ]
+  },
+  {
+   "id": 237,
+   "category": "emo_spruch",
+   "question": "👨‍🍳👨‍🍳👨‍🍳🍲🤢",
+   "answers": [
+    "Viele Köche verderben den Brei",
+    "Hunger ist der beste Koch",
+    "Liebe geht durch den Magen",
+    "Was der Bauer nicht kennt, isst er nicht"
+   ]
+  },
+  {
+   "id": 238,
+   "category": "emo_spruch",
+   "question": "🤥🦵",
+   "answers": [
+    "Lügen haben kurze Beine",
+    "Wer A sagt, muss auch B sagen",
+    "Ehrlich währt am längsten",
+    "Der Klügere gibt nach"
+   ]
+  },
+  {
+   "id": 239,
+   "category": "emo_spruch",
+   "question": "🔁🏆",
+   "answers": [
+    "Übung macht den Meister",
+    "Ohne Fleiß kein Preis",
+    "Aller Anfang ist schwer",
+    "Rom wurde nicht an einem Tag erbaut"
+   ]
+  },
+  {
+   "id": 240,
+   "category": "emo_spruch",
+   "question": "🐦✋🆚🕊️🏠",
+   "answers": [
+    "Lieber den Spatz in der Hand als die Taube auf dem Dach",
+    "Der frühe Vogel fängt den Wurm",
+    "Ein Vogel, der singt, braucht keinen Käfig",
+    "Hochmut kommt vor dem Fall"
+   ]
+  },
+  {
+   "id": 241,
+   "category": "emo_spruch",
+   "question": "🆕🧹✨",
+   "answers": [
+    "Neue Besen kehren gut",
+    "Ordnung ist das halbe Leben",
+    "Aller Anfang ist schwer",
+    "Wer rastet, der rostet"
+   ]
+  },
+  {
+   "id": 242,
+   "category": "emo_ort",
+   "question": "🗼🥐🎨",
+   "answers": [
+    "Paris",
+    "Rom",
+    "London",
+    "Madrid"
+   ]
+  },
+  {
+   "id": 243,
+   "category": "emo_ort",
+   "question": "🍕🏛️🛵",
+   "answers": [
+    "Rom",
+    "Athen",
+    "Paris",
+    "Barcelona"
+   ]
+  },
+  {
+   "id": 244,
+   "category": "emo_ort",
+   "question": "🍺🥨🎡",
+   "answers": [
+    "München",
+    "Wien",
+    "Köln",
+    "Prag"
+   ]
+  },
+  {
+   "id": 245,
+   "category": "emo_ort",
+   "question": "🦘🏄☀️",
+   "answers": [
+    "Australien",
+    "Neuseeland",
+    "Südafrika",
+    "Kanada"
+   ]
+  },
+  {
+   "id": 246,
+   "category": "emo_ort",
+   "question": "🗽🍎🚕",
+   "answers": [
+    "New York",
+    "Los Angeles",
+    "Chicago",
+    "Washington"
+   ]
+  },
+  {
+   "id": 247,
+   "category": "emo_ort",
+   "question": "🌷🚲🧀",
+   "answers": [
+    "Niederlande",
+    "Belgien",
+    "Dänemark",
+    "Schweiz"
+   ]
+  },
+  {
+   "id": 248,
+   "category": "emo_ort",
+   "question": "🍁🏒🐻",
+   "answers": [
+    "Kanada",
+    "Russland",
+    "Finnland",
+    "Norwegen"
+   ]
+  },
+  {
+   "id": 249,
+   "category": "emo_ort",
+   "question": "🎭🛶🏛️",
+   "answers": [
+    "Venedig",
+    "Florenz",
+    "Neapel",
+    "Mailand"
+   ]
+  },
+  {
+   "id": 250,
+   "category": "emo_ort",
+   "question": "🍣🗻🌸",
+   "answers": [
+    "Japan",
+    "China",
+    "Korea",
+    "Thailand"
+   ]
+  },
+  {
+   "id": 251,
+   "category": "emo_beruf",
+   "question": "🦷🪥",
+   "answers": [
+    "Zahnarzt/Zahnärztin",
+    "Friseur/Friseurin",
+    "Optiker/Optikerin",
+    "Bäcker/Bäckerin"
+   ]
+  },
+  {
+   "id": 252,
+   "category": "emo_beruf",
+   "question": "🔥🚒",
+   "answers": [
+    "Feuerwehrmann/-frau",
+    "Polizist/Polizistin",
+    "Schornsteinfeger/-in",
+    "Rettungssanitäter/-in"
+   ]
+  },
+  {
+   "id": 253,
+   "category": "emo_beruf",
+   "question": "🍞🥐⏰",
+   "answers": [
+    "Bäcker/Bäckerin",
+    "Metzger/Metzgerin",
+    "Gärtner/Gärtnerin",
+    "Kellner/Kellnerin"
+   ]
+  },
+  {
+   "id": 254,
+   "category": "emo_beruf",
+   "question": "✂️💇",
+   "answers": [
+    "Friseur/Friseurin",
+    "Schneider/Schneiderin",
+    "Gärtner/Gärtnerin",
+    "Kosmetiker/-in"
+   ]
+  },
+  {
+   "id": 255,
+   "category": "emo_beruf",
+   "question": "🛫🧭☁️",
+   "answers": [
+    "Pilot/Pilotin",
+    "Kapitän/Kapitänin",
+    "Lokführer/-in",
+    "Busfahrer/-in"
+   ]
+  },
+  {
+   "id": 256,
+   "category": "emo_beruf",
+   "question": "🔧🚗🛢️",
+   "answers": [
+    "Kfz-Mechatroniker/-in",
+    "Elektriker/-in",
+    "Klempner/-in",
+    "Taxifahrer/-in"
+   ]
+  },
+  {
+   "id": 257,
+   "category": "emo_beruf",
+   "question": "📚✏️🏫",
+   "answers": [
+    "Lehrer/Lehrerin",
+    "Bäcker/Bäckerin",
+    "Gärtner/Gärtnerin",
+    "Ärztin/Arzt"
+   ]
+  },
+  {
+   "id": 258,
+   "category": "emo_beruf",
+   "question": "🐄🚜🌾",
+   "answers": [
+    "Landwirt/Landwirtin",
+    "Tierarzt/Tierärztin",
+    "Metzger/Metzgerin",
+    "Gärtner/Gärtnerin"
+   ]
+  },
+  {
+   "id": 259,
+   "category": "emo_beruf",
+   "question": "🎨🖌️🖼️",
+   "answers": [
+    "Maler/Malerin",
+    "Fotograf/Fotografin",
+    "Architekt/Architektin",
+    "Schreiner/Schreinerin"
+   ]
+  },
+  {
+   "id": 260,
+   "category": "emo_maerchen",
+   "question": "🍎👸🪞",
+   "answers": [
+    "Schneewittchen",
+    "Dornröschen",
+    "Aschenputtel",
+    "Rapunzel"
+   ]
+  },
+  {
+   "id": 261,
+   "category": "emo_maerchen",
+   "question": "👠🎃🕛",
+   "answers": [
+    "Aschenputtel",
+    "Rotkäppchen",
+    "Dornröschen",
+    "Frau Holle"
+   ]
+  },
+  {
+   "id": 262,
+   "category": "emo_maerchen",
+   "question": "🐺👵🧺",
+   "answers": [
+    "Rotkäppchen",
+    "Hänsel und Gretel",
+    "Der Froschkönig",
+    "Rumpelstilzchen"
+   ]
+  },
+  {
+   "id": 263,
+   "category": "emo_maerchen",
+   "question": "🍬🏠🧙‍♀️",
+   "answers": [
+    "Hänsel und Gretel",
+    "Frau Holle",
+    "Rapunzel",
+    "Schneewittchen"
+   ]
+  },
+  {
+   "id": 264,
+   "category": "emo_maerchen",
+   "question": "👸🐸👑",
+   "answers": [
+    "Der Froschkönig",
+    "Dornröschen",
+    "Rapunzel",
+    "Das tapfere Schneiderlein"
+   ]
+  },
+  {
+   "id": 265,
+   "category": "emo_maerchen",
+   "question": "💯😴🌹🏰",
+   "answers": [
+    "Dornröschen",
+    "Schneewittchen",
+    "Frau Holle",
+    "Der Froschkönig"
+   ]
+  },
+  {
+   "id": 266,
+   "category": "emo_maerchen",
+   "question": "🌾➡️🥇🤫",
+   "answers": [
+    "Rumpelstilzchen",
+    "Frau Holle",
+    "Die Bremer Stadtmusikanten",
+    "Hans im Glück"
+   ]
+  },
+  {
+   "id": 267,
+   "category": "emo_maerchen",
+   "question": "🐴🐶🐱🐓🎶",
+   "answers": [
+    "Die Bremer Stadtmusikanten",
+    "Der Wolf und die sieben Geißlein",
+    "Hans im Glück",
+    "Der gestiefelte Kater"
+   ]
+  },
+  {
+   "id": 268,
+   "category": "emo_maerchen",
+   "question": "🪡🪰7️⃣",
+   "answers": [
+    "Das tapfere Schneiderlein",
+    "Rumpelstilzchen",
+    "Hans im Glück",
+    "Der gestiefelte Kater"
+   ]
+  },
+  {
+   "id": 269,
+   "category": "sm_alltag",
+   "question": "Was brauchst du morgens zuerst?",
+   "answers": [
+    "Kaffee",
+    "Tee",
+    "Saft oder Wasser",
+    "Gar nichts"
+   ]
+  },
+  {
+   "id": 270,
+   "category": "sm_alltag",
+   "question": "Früh aufstehen oder ausschlafen?",
+   "answers": [
+    "Früh aufstehen",
+    "Ausschlafen"
+   ]
+  },
+  {
+   "id": 271,
+   "category": "sm_alltag",
+   "question": "Wie hältst du es mit dem Aufräumen?",
+   "answers": [
+    "Sofort",
+    "Wenn es sein muss",
+    "Einmal die Woche",
+    "Chaos ist Ordnung"
+   ]
+  },
+  {
+   "id": 272,
+   "category": "sm_alltag",
+   "question": "Wann duschst du lieber?",
+   "answers": [
+    "Morgens",
+    "Abends"
+   ]
+  },
+  {
+   "id": 273,
+   "category": "sm_alltag",
+   "question": "Wie pünktlich bist du?",
+   "answers": [
+    "Immer zu früh",
+    "Auf die Minute",
+    "Leicht zu spät",
+    "Chronisch zu spät"
+   ]
+  },
+  {
+   "id": 274,
+   "category": "sm_alltag",
+   "question": "Welche Tageszeit magst du am liebsten?",
+   "answers": [
+    "Morgen",
+    "Mittag",
+    "Abend",
+    "Nacht"
+   ]
+  },
+  {
+   "id": 275,
+   "category": "sm_alltag",
+   "question": "Wie oft ist das Handy beim Essen dabei?",
+   "answers": [
+    "Nie",
+    "Manchmal",
+    "Oft"
+   ]
+  },
+  {
+   "id": 276,
+   "category": "sm_alltag",
+   "question": "Socken im Bett?",
+   "answers": [
+    "Ja, immer",
+    "Nein, niemals"
+   ]
+  },
+  {
+   "id": 277,
+   "category": "sm_alltag",
+   "question": "Was machst du, wenn der Wecker klingelt?",
+   "answers": [
+    "Sofort aufstehen",
+    "Ein-, zweimal Schlummern",
+    "Wecker? Welcher Wecker?"
+   ]
+  },
+  {
+   "id": 278,
+   "category": "sm_essen",
+   "question": "Pizza oder Pasta?",
+   "answers": [
+    "Pizza",
+    "Pasta"
+   ]
+  },
+  {
+   "id": 279,
+   "category": "sm_essen",
+   "question": "Eher süß oder salzig?",
+   "answers": [
+    "Süß",
+    "Salzig"
+   ]
+  },
+  {
+   "id": 280,
+   "category": "sm_essen",
+   "question": "Welche Küche ist deine liebste?",
+   "answers": [
+    "Italienisch",
+    "Asiatisch",
+    "Deutsch",
+    "Mexikanisch"
+   ]
+  },
+  {
+   "id": 281,
+   "category": "sm_essen",
+   "question": "Ananas auf Pizza?",
+   "answers": [
+    "Ja, gerne",
+    "Auf keinen Fall"
+   ]
+  },
+  {
+   "id": 282,
+   "category": "sm_essen",
+   "question": "Wie stehst du zum Kochen?",
+   "answers": [
+    "Ich liebe es",
+    "Geht so",
+    "Lieferdienst ist mein Koch"
+   ]
+  },
+  {
+   "id": 283,
+   "category": "sm_essen",
+   "question": "Wie sieht dein ideales Frühstück aus?",
+   "answers": [
+    "Süß",
+    "Herzhaft",
+    "Ich frühstücke nicht"
+   ]
+  },
+  {
+   "id": 284,
+   "category": "sm_essen",
+   "question": "Wie scharf darf es sein?",
+   "answers": [
+    "Mild",
+    "Mittel",
+    "Scharf",
+    "Je schärfer, desto besser"
+   ]
+  },
+  {
+   "id": 285,
+   "category": "sm_essen",
+   "question": "Popcorn im Kino?",
+   "answers": [
+    "Süß",
+    "Salzig",
+    "Gemischt",
+    "Kein Popcorn"
+   ]
+  },
+  {
+   "id": 286,
+   "category": "sm_essen",
+   "question": "Dein Dessert teilen?",
+   "answers": [
+    "Gerne",
+    "Niemals"
+   ]
+  },
+  {
+   "id": 287,
+   "category": "sm_freizeit",
+   "question": "Berge oder Meer?",
+   "answers": [
+    "Berge",
+    "Meer"
+   ]
+  },
+  {
+   "id": 288,
+   "category": "sm_freizeit",
+   "question": "Städtetrip oder Natur?",
+   "answers": [
+    "Städtetrip",
+    "Natur"
+   ]
+  },
+  {
+   "id": 289,
+   "category": "sm_freizeit",
+   "question": "Camping oder Hotel?",
+   "answers": [
+    "Camping",
+    "Hotel"
+   ]
+  },
+  {
+   "id": 290,
+   "category": "sm_freizeit",
+   "question": "Wann packst du für eine Reise?",
+   "answers": [
+    "Last minute",
+    "Tage vorher mit Liste"
+   ]
+  },
+  {
+   "id": 291,
+   "category": "sm_freizeit",
+   "question": "Was muss im Urlaub sein?",
+   "answers": [
+    "Action",
+    "Entspannung",
+    "Kultur",
+    "Party"
+   ]
+  },
+  {
+   "id": 292,
+   "category": "sm_freizeit",
+   "question": "Wie sieht dein perfektes Wochenende aus?",
+   "answers": [
+    "Unterwegs sein",
+    "Couch und Serien",
+    "Zeit mit Freunden",
+    "Ein kleines Abenteuer"
+   ]
+  },
+  {
+   "id": 293,
+   "category": "sm_freizeit",
+   "question": "Welche Jahreszeit magst du am liebsten?",
+   "answers": [
+    "Frühling",
+    "Sommer",
+    "Herbst",
+    "Winter"
+   ]
+  },
+  {
+   "id": 294,
+   "category": "sm_freizeit",
+   "question": "Konzert oder Kino?",
+   "answers": [
+    "Konzert",
+    "Kino"
+   ]
+  },
+  {
+   "id": 295,
+   "category": "sm_freizeit",
+   "question": "Im Flugzeug lieber …",
+   "answers": [
+    "am Fenster",
+    "am Gang"
+   ]
+  },
+  {
+   "id": 296,
+   "category": "sm_liebe",
+   "question": "Wie sieht dein ideales erstes Date aus?",
+   "answers": [
+    "Kaffee trinken",
+    "Abendessen",
+    "Etwas unternehmen",
+    "Spazieren gehen"
+   ]
+  },
+  {
+   "id": 297,
+   "category": "sm_liebe",
+   "question": "Woran merkst du am meisten, dass dich jemand mag?",
+   "answers": [
+    "Liebe Worte",
+    "Gemeinsame Zeit",
+    "Kleine Geschenke",
+    "Nähe und Berührung"
+   ]
+  },
+  {
+   "id": 298,
+   "category": "sm_liebe",
+   "question": "Nach einem Streit …",
+   "answers": [
+    "sofort klären",
+    "erst mal abkühlen"
+   ]
+  },
+  {
+   "id": 299,
+   "category": "sm_liebe",
+   "question": "Valentinstag ist …",
+   "answers": [
+    "ein großes Ding",
+    "ganz nett",
+    "reiner Kommerz"
+   ]
+  },
+  {
+   "id": 300,
+   "category": "sm_liebe",
+   "question": "Wer schreibt nach einem Date zuerst?",
+   "answers": [
+    "Ich",
+    "Die andere Person",
+    "Egal, wer zuerst Lust hat"
+   ]
+  },
+  {
+   "id": 301,
+   "category": "sm_liebe",
+   "question": "Kuscheln beim Einschlafen?",
+   "answers": [
+    "Ja, die ganze Nacht",
+    "Kurz, dann jeder für sich",
+    "Lieber nicht"
+   ]
+  },
+  {
+   "id": 302,
+   "category": "sm_liebe",
+   "question": "Überraschungen …",
+   "answers": [
+    "liebe ich",
+    "plane ich lieber gemeinsam"
+   ]
+  },
+  {
+   "id": 303,
+   "category": "sm_liebe",
+   "question": "Was ist für dich am romantischsten?",
+   "answers": [
+    "Candle-Light-Dinner",
+    "Picknick",
+    "Roadtrip",
+    "Zusammen kochen"
+   ]
+  },
+  {
+   "id": 304,
+   "category": "sm_liebe",
+   "question": "Wie eifersüchtig bist du?",
+   "answers": [
+    "Gar nicht",
+    "Ein bisschen",
+    "Ziemlich"
+   ]
+  },
+  {
+   "id": 305,
+   "category": "sm_wenn",
+   "question": "Welche Superkraft hättest du gern?",
+   "answers": [
+    "Fliegen",
+    "Unsichtbar sein",
+    "Gedanken lesen",
+    "Teleportieren"
+   ]
+  },
+  {
+   "id": 306,
+   "category": "sm_wenn",
+   "question": "Zeitreise: wohin?",
+   "answers": [
+    "Vergangenheit",
+    "Zukunft"
+   ]
+  },
+  {
+   "id": 307,
+   "category": "sm_wenn",
+   "question": "Was nimmst du mit auf eine einsame Insel?",
+   "answers": [
+    "Ein Buch",
+    "Musik",
+    "Ein Messer",
+    "Einen Lieblingsmenschen"
+   ]
+  },
+  {
+   "id": 308,
+   "category": "sm_wenn",
+   "question": "Was machst du zuerst mit einem Lottogewinn?",
+   "answers": [
+    "Reisen",
+    "Ein Haus kaufen",
+    "Spenden",
+    "Sparen"
+   ]
+  },
+  {
+   "id": 309,
+   "category": "sm_wenn",
+   "question": "Worauf könntest du am ehesten für immer verzichten?",
+   "answers": [
+    "Musik",
+    "Filme und Serien",
+    "Schokolade",
+    "Social Media"
+   ]
+  },
+  {
+   "id": 310,
+   "category": "sm_wenn",
+   "question": "Welches Tier wärst du gern für einen Tag?",
+   "answers": [
+    "Vogel",
+    "Delfin",
+    "Katze",
+    "Hund"
+   ]
+  },
+  {
+   "id": 311,
+   "category": "sm_wenn",
+   "question": "Wo würdest du am liebsten leben?",
+   "answers": [
+    "Großstadt",
+    "Kleinstadt",
+    "Auf dem Land",
+    "Im Ausland"
+   ]
+  },
+  {
+   "id": 312,
+   "category": "sm_wenn",
+   "question": "Wofür hättest du gern unendlich Zeit?",
+   "answers": [
+    "Schlafen",
+    "Reisen",
+    "Lernen",
+    "Freunde"
+   ]
+  },
+  {
+   "id": 313,
+   "category": "sm_wenn",
+   "question": "Mit wem würdest du am liebsten mal essen gehen?",
+   "answers": [
+    "Einer Musikerin",
+    "Einem Sportler",
+    "Einer Schauspielerin",
+    "Einem Wissenschaftler"
+   ]
+  },
+  {
+   "id": 314,
+   "category": "sm_typ",
+   "question": "Wie bist du auf Partys?",
+   "answers": [
+    "Mittelpunkt",
+    "Mit Freunden in der Ecke",
+    "Taue erst spät auf",
+    "Lieber zu Hause"
+   ]
+  },
+  {
+   "id": 315,
+   "category": "sm_typ",
+   "question": "Planst du gern oder bist du spontan?",
+   "answers": [
+    "Planer:in",
+    "Spontan"
+   ]
+  },
+  {
+   "id": 316,
+   "category": "sm_typ",
+   "question": "Wie würdest du dich beschreiben?",
+   "answers": [
+    "Eher introvertiert",
+    "Eher extrovertiert",
+    "Irgendwo dazwischen"
+   ]
+  },
+  {
+   "id": 317,
+   "category": "sm_typ",
+   "question": "Weinst du bei Filmen?",
+   "answers": [
+    "Oft",
+    "Selten",
+    "Nie"
+   ]
+  },
+  {
+   "id": 318,
+   "category": "sm_typ",
+   "question": "Musik im Auto …",
+   "answers": [
+    "laut und mitsingen",
+    "im Hintergrund",
+    "lieber Stille"
+   ]
+  },
+  {
+   "id": 319,
+   "category": "sm_typ",
+   "question": "Sprachnachrichten?",
+   "answers": [
+    "Liebe ich",
+    "Nur kurze",
+    "Bitte nicht"
+   ]
+  },
+  {
+   "id": 320,
+   "category": "sm_typ",
+   "question": "Welches Gefühl suchst du am meisten?",
+   "answers": [
+    "Abenteuer",
+    "Geborgenheit",
+    "Freiheit",
+    "Erfolg"
+   ]
+  },
+  {
+   "id": 321,
+   "category": "sm_typ",
+   "question": "Bist du ein Morgenmuffel?",
+   "answers": [
+    "Ja, sehr",
+    "Ein bisschen",
+    "Gar nicht"
+   ]
+  },
+  {
+   "id": 322,
+   "category": "sm_typ",
+   "question": "Wie spielst du Gesellschaftsspiele?",
+   "answers": [
+    "Ehrgeizig",
+    "Spaß zählt",
+    "Lieber gar nicht"
    ]
   }
  ]

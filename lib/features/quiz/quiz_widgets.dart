@@ -7,9 +7,12 @@ const quizGreen = Color(0xFF3F8F5B);
 
 /// Ein Punkt pro Frage: grün richtig, rot falsch, grau offen/verdeckt.
 class QuizDot extends StatelessWidget {
-  const QuizDot({super.key, this.correct, this.hidden = false});
+  const QuizDot({super.key, this.correct, this.points, this.hidden = false});
 
   final bool? correct;
+
+  /// Schätzduell: Punkte (0–3) im Punkt anzeigen.
+  final int? points;
 
   /// Gegner hat gespielt, aber ich sehe es erst nach meiner Runde.
   final bool hidden;
@@ -32,6 +35,17 @@ class QuizDot extends StatelessWidget {
       ),
       child: hidden && correct == null
           ? const Icon(Icons.question_mark, size: 12, color: LovelColors.cream)
+          : points != null
+          ? Center(
+              child: Text(
+                '$points',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: LovelColors.cream,
+                ),
+              ),
+            )
           : null,
     );
   }
@@ -76,11 +90,12 @@ class QuizGameTile extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: myTurn ? LovelColors.terracotta : LovelColors.mist,
           foregroundColor: myTurn ? LovelColors.cream : LovelColors.umber,
-          child: const Icon(Icons.quiz_outlined),
+          child: Text(game.kind.symbol, style: const TextStyle(fontSize: 20)),
         ),
         title: Text(
-          '${game.myTeam.names} vs. ${game.opponent?.names ?? '?'}',
-          maxLines: 1,
+          '${game.kind.title}: ${game.myTeam.names} vs. '
+          '${game.opponent?.names ?? '?'}',
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(

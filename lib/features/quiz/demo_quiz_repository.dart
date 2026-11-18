@@ -6,8 +6,17 @@ import 'quiz_models.dart';
 import 'quiz_repository.dart';
 import 'quiz_rules.dart';
 
+typedef BankQuestion = ({
+  int id,
+  String category,
+  String question,
+  List<String> answers,
+  num? number,
+  String? unit,
+});
+
 /// Fragenkatalog (assets/quiz/questions.json, erzeugt von
-/// tool/quiz_questions.py). Erste Antwort ist richtig.
+/// tool/quiz_questions.py). Bei Quiz/Emoji ist die erste Antwort richtig.
 class QuizBank {
   QuizBank(this.categories, this.questions);
 
@@ -21,6 +30,7 @@ class QuizBank {
             c['key']! as String,
             c['emoji']! as String,
             c['label']! as String,
+            QuizKind.parse(c['kind'] as String?),
           ),
       ],
       [
@@ -30,22 +40,29 @@ class QuizBank {
             category: q['category']! as String,
             question: q['question']! as String,
             answers: (q['answers']! as List<Object?>).cast<String>(),
+            number: q['number'] as num?,
+            unit: q['unit'] as String?,
           ),
       ],
     );
   }
 
   final List<QuizCategory> categories;
-  final List<({int id, String category, String question, List<String> answers})>
-  questions;
+  final List<BankQuestion> questions;
+
+  BankQuestion byId(int id) => questions.firstWhere((q) => q.id == id);
 }
 
 class _Answer {
   int? proposal;
+  num? proposalNumber;
   int? finalChoice;
-  bool? correct;
+  num? finalNumber;
+  int? points;
   DateTime? proposalShown;
   DateTime? finalShown;
+
+  bool get done => finalChoice != null;
 }
 
 class _Round {
@@ -58,19 +75,21 @@ class _Round {
   final mine = List.generate(quizQuestionsPerRound, (_) => _Answer());
   final theirs = List.generate(quizQuestionsPerRound, (_) => _Answer());
 
-  bool get myDone => mine.every((a) => a.finalChoice != null);
-  bool get theirDone => theirs.every((a) => a.finalChoice != null);
+  bool get myDone => mine.every((a) => a.done);
+  bool get theirDone => theirs.every((a) => a.done);
 }
 
 class _Game {
   _Game({
     required this.id,
+    required this.kind,
     required this.myTeam,
     required this.iAmTeamA,
     this.inviteCode,
   });
 
   final String id;
+  final QuizKind kind;
   final QuizTeam myTeam;
 
   /// Team A wählt in ungeraden Runden die Kategorie.
@@ -86,17 +105,14 @@ class _Game {
   bool? won;
   DateTime updatedAt = DateTime.now();
 
-  int get myScore => rounds.fold(
-    0,
-    (s, r) => s + r.mine.where((a) => a.correct ?? false).length,
-  );
-  int get theirScore => rounds.fold(
-    0,
-    (s, r) => s + r.theirs.where((a) => a.correct ?? false).length,
-  );
+  int _sum(Iterable<_Answer> answers) =>
+      answers.fold(0, (s, a) => s + (a.points ?? 0));
+  int get myScore => _sum(rounds.expand((r) => r.mine));
+  int get theirScore => _sum(rounds.expand((r) => r.theirs));
 }
 
 /// Demo: Partner:in und Gegnerteam sind Bots, die sofort reagieren.
+/// Bildet die Regeln der Datenbank nach (quiz_duel/party_games).
 class DemoQuizRepository implements QuizRepository {
   DemoQuizRepository({
     required this.loadBank,
@@ -125,6 +141,7 @@ class DemoQuizRepository implements QuizRepository {
   ];
 
   Future<QuizBank> _loadBank() async => _bank ??= await loadBank();
+  QuizBank get _b => _bank!;
 
   _Game _game(String id) =>
       _games[id] ?? (throw const QuizFailure('Spiel nicht gefunden'));
@@ -150,7 +167,10 @@ class DemoQuizRepository implements QuizRepository {
 
   void _openRound(_Game g) {
     final used = g.rounds.map((r) => r.category).toSet();
-    final cats = [..._bank!.categories]..shuffle(_random);
+    final cats = [
+      for (final c in _b.categories)
+        if (c.kind == g.kind) c,
+    ]..shuffle(_random);
     cats.sort(
       (a, b) => (used.contains(a.key) ? 1 : 0).compareTo(
         used.contains(b.key) ? 1 : 0,
@@ -165,18 +185,22 @@ class DemoQuizRepository implements QuizRepository {
 
   _Round _current(_Game g) => g.rounds[g.round - 1];
 
-  /// Gezeigte Reihenfolge: Positionen der Antworten, je Spiel/Frage fest.
-  List<int> _order(_Game g, int questionId) =>
-      [0, 1, 2, 3]..shuffle(Random(Object.hash(g.id, questionId)));
+  /// Gezeigte Reihenfolge der Antworten (Positionen in `answers`).
+  /// Gemischt nur bei Spielen mit richtiger Antwort.
+  List<int> _order(_Game g, BankQuestion q) {
+    final order = [for (var i = 0; i < q.answers.length; i++) i];
+    if (g.kind.hasRightAnswer) order.shuffle(Random(Object.hash(g.id, q.id)));
+    return order;
+  }
 
-  int _correctIndex(_Game g, int questionId) =>
-      _order(g, questionId).indexOf(0);
+  int? _correctIndex(_Game g, BankQuestion q) =>
+      g.kind.hasRightAnswer ? _order(g, q).indexOf(0) : null;
 
   void _choose(_Game g, String category) {
     final round = _current(g);
     final used = {for (final r in g.rounds) ...r.questionIds};
     final pool = [
-      for (final q in _bank!.questions)
+      for (final q in _b.questions)
         if (q.category == category && !used.contains(q.id)) q.id,
     ]..shuffle(_random);
     round
@@ -200,19 +224,82 @@ class DemoQuizRepository implements QuizRepository {
     return iPropose ? QuizAction.waitPartner : QuizAction.decide;
   }
 
-  /// Bot-Antwort: mit Wahrscheinlichkeit [skill] richtig.
-  int _botChoice(_Game g, int questionId, double skill) {
-    final correct = _correctIndex(g, questionId);
-    return _random.nextDouble() < skill
+  /// Entscheidung werten (wie quiz_answer in der Datenbank).
+  void _decide(
+    _Game g,
+    _Answer a,
+    BankQuestion q, {
+    int choice = -1,
+    num? number,
+  }) {
+    switch (g.kind) {
+      case QuizKind.estimate:
+        final n = number ?? a.proposalNumber;
+        a
+          ..finalNumber = n
+          ..finalChoice = n == null ? -1 : 0
+          ..points = estimatePoints(n, q.number!, q.unit);
+      case QuizKind.soulmate:
+        a
+          ..finalChoice = choice
+          ..points = choice >= 0 && choice == a.proposal ? 1 : 0;
+      case QuizKind.quiz || QuizKind.emoji:
+        final c = choice == -1 ? (a.proposal ?? -1) : choice;
+        a
+          ..finalChoice = c
+          ..points = c == _correctIndex(g, q) ? 1 : 0;
+    }
+  }
+
+  /// Bot-Antwort: Auswahl oder Schätzung, mit [skill] gut.
+  void _botPropose(_Game g, _Answer a, BankQuestion q, double skill) {
+    if (g.kind == QuizKind.estimate) {
+      final factor = 1 + (_random.nextDouble() - 0.5) * (1.2 - skill);
+      final guess = q.number! * factor;
+      a
+        ..proposalNumber = q.unit == 'Jahr' || q.number! >= 20
+            ? guess.round()
+            : double.parse(guess.toStringAsFixed(1))
+        ..proposal = 0;
+      return;
+    }
+    if (g.kind == QuizKind.soulmate) {
+      a.proposal = _random.nextInt(q.answers.length);
+      return;
+    }
+    final correct = _correctIndex(g, q)!;
+    a.proposal = _random.nextDouble() < skill
         ? correct
-        : (correct + 1 + _random.nextInt(3)) % 4;
+        : (correct + 1 + _random.nextInt(q.answers.length - 1)) %
+              q.answers.length;
+  }
+
+  void _botDecide(_Game g, _Answer a, BankQuestion q, double skill) {
+    switch (g.kind) {
+      case QuizKind.estimate:
+        _decide(g, a, q); // übernimmt den Vorschlag
+      case QuizKind.soulmate:
+        // Rät richtig mit Wahrscheinlichkeit [skill].
+        final guess = _random.nextDouble() < skill && (a.proposal ?? -1) >= 0
+            ? a.proposal!
+            : _random.nextInt(q.answers.length);
+        _decide(g, a, q, choice: guess);
+      case QuizKind.quiz || QuizKind.emoji:
+        final follow = (a.proposal ?? -1) >= 0 && _random.nextDouble() < 0.8;
+        if (follow) {
+          _decide(g, a, q);
+        } else {
+          final tmp = _Answer();
+          _botPropose(g, tmp, q, skill);
+          _decide(g, a, q, choice: tmp.proposal!);
+        }
+    }
   }
 
   /// Nach dem Ende einer Teamrunde weiterziehen (wie quiz_answer im Server).
   void _teamFinished(_Game g, {required bool mine}) {
     final round = _current(g);
-    final chooserIsMe = round.chooserIsMe;
-    if (mine == chooserIsMe) {
+    if (mine == round.chooserIsMe) {
       g.myTurn = mine ? (g.opponent == null ? null : false) : true;
     } else if (g.round == quizRounds) {
       g
@@ -238,39 +325,27 @@ class DemoQuizRepository implements QuizRepository {
           _choose(g, round.options[_random.nextInt(round.options.length)]);
         }
         for (var i = 0; i < quizQuestionsPerRound; i++) {
-          final c = _botChoice(g, round.questionIds[i], 0.55);
-          round.theirs[i]
-            ..proposal = c
-            ..finalChoice = c
-            ..correct = c == _correctIndex(g, round.questionIds[i]);
+          final q = _b.byId(round.questionIds[i]);
+          _botPropose(g, round.theirs[i], q, 0.55);
+          _botDecide(g, round.theirs[i], q, 0.55);
         }
         _teamFinished(g, mine: false);
         continue;
       }
       if (g.myTurn != true) return;
       final round = _current(g);
-      switch (_action(g)) {
-        case QuizAction.waitPartner when round.category == null:
-          _choose(g, round.options.first);
-        case QuizAction.waitPartner
-            when round.mine.any((a) => a.proposal == null):
-          for (var i = 0; i < quizQuestionsPerRound; i++) {
-            round.mine[i].proposal = _botChoice(g, round.questionIds[i], 0.65);
-          }
-        case QuizAction.waitPartner:
-          // Partner:in entscheidet; folgt meinem Vorschlag meistens.
-          for (var i = 0; i < quizQuestionsPerRound; i++) {
-            final a = round.mine[i];
-            final choice = (a.proposal ?? -1) >= 0 && _random.nextDouble() < 0.8
-                ? a.proposal!
-                : _botChoice(g, round.questionIds[i], 0.6);
-            a
-              ..finalChoice = choice
-              ..correct = choice == _correctIndex(g, round.questionIds[i]);
-          }
-          _teamFinished(g, mine: true);
-        default:
-          return;
+      if (_action(g) != QuizAction.waitPartner) return;
+      if (round.category == null) {
+        _choose(g, round.options.first);
+      } else if (round.mine.any((a) => a.proposal == null)) {
+        for (var i = 0; i < quizQuestionsPerRound; i++) {
+          _botPropose(g, round.mine[i], _b.byId(round.questionIds[i]), 0.65);
+        }
+      } else {
+        for (var i = 0; i < quizQuestionsPerRound; i++) {
+          _botDecide(g, round.mine[i], _b.byId(round.questionIds[i]), 0.6);
+        }
+        _teamFinished(g, mine: true);
       }
     }
   }
@@ -288,6 +363,7 @@ class DemoQuizRepository implements QuizRepository {
 
   QuizGameSummary _summary(_Game g) => QuizGameSummary(
     id: g.id,
+    kind: g.kind,
     status: g.status,
     round: g.round,
     action: _action(g),
@@ -296,10 +372,8 @@ class DemoQuizRepository implements QuizRepository {
     myScore: g.myScore,
     opponentScore: g.rounds
         .where((r) => r.myDone || g.status == 'finished')
-        .fold(
-          0,
-          (s, r) => s + r.theirs.where((a) => a.correct ?? false).length,
-        ),
+        .expand((r) => r.theirs)
+        .fold(0, (s, a) => s + (a.points ?? 0)),
     inviteCode: g.inviteCode,
     won: g.won,
     updatedAt: g.updatedAt,
@@ -313,15 +387,38 @@ class DemoQuizRepository implements QuizRepository {
   @override
   Future<QuizGameState> state(String gameId) async {
     final g = _game(gameId);
-    final bank = await _loadBank();
+    await _loadBank();
     final over = g.status == 'finished' || g.status == 'abandoned';
-    QuizAnswerResult? result(_Answer a) => a.finalChoice == null
+    QuizAnswerResult? mine(_Answer a) => !a.done
         ? null
         : QuizAnswerResult(
-            correct: a.correct,
+            correct: (a.points ?? 0) > 0,
+            points: a.points,
             finalChoice: a.finalChoice,
             proposal: a.proposal,
+            finalNumber: a.finalNumber,
+            proposalNumber: a.proposalNumber,
           );
+    QuizAnswerResult? theirs(_Answer a) => !a.done
+        ? null
+        : QuizAnswerResult(
+            correct: (a.points ?? 0) > 0,
+            points: a.points,
+            // Antworten über sich selbst bleiben privat (Seelenverwandt).
+            finalChoice: g.kind.hasRightAnswer ? a.finalChoice : null,
+            finalNumber: a.finalNumber,
+          );
+    QuizReview review(int id) {
+      final q = _b.byId(id);
+      return QuizReview(
+        question: q.question,
+        answers: [for (final o in _order(g, q)) q.answers[o]],
+        correctIndex: _correctIndex(g, q),
+        numberAnswer: q.number,
+        unit: q.unit,
+      );
+    }
+
     final action = _action(g);
     return QuizGameState(
       summary: _summary(g),
@@ -338,36 +435,22 @@ class DemoQuizRepository implements QuizRepository {
                 ? r.options
                 : null,
             myProposer: _iPropose(g, i + 1)
-                ? (g.myTeam.players.firstWhere((p) => p.isMe).name)
+                ? g.myTeam.players.firstWhere((p) => p.isMe).name
                 : (g.myTeam.partner?.name ?? ''),
             myDone: r.myDone,
             opponentDone: r.theirDone,
             myProposed: r.mine.where((a) => a.proposal != null).length,
-            myDecided: r.mine.where((a) => a.finalChoice != null).length,
+            myDecided: r.mine.where((a) => a.done).length,
             questions: r.category == null
                 ? const []
                 : [
                     for (var q = 0; q < quizQuestionsPerRound; q++)
                       QuizQuestionSlot(
-                        mine: result(r.mine[q]),
+                        mine: mine(r.mine[q]),
                         opponent: (r.myDone || over)
-                            ? result(r.theirs[q])
+                            ? theirs(r.theirs[q])
                             : null,
-                        review: r.myDone
-                            ? () {
-                                final question = bank.questions.firstWhere(
-                                  (x) => x.id == r.questionIds[q],
-                                );
-                                final order = _order(g, question.id);
-                                return QuizReview(
-                                  question: question.question,
-                                  answers: [
-                                    for (final o in order) question.answers[o],
-                                  ],
-                                  correctIndex: order.indexOf(0),
-                                );
-                              }()
-                            : null,
+                        review: r.myDone ? review(r.questionIds[q]) : null,
                       ),
                   ],
           ),
@@ -376,13 +459,18 @@ class DemoQuizRepository implements QuizRepository {
   }
 
   @override
-  Future<String> start(String matchId, {bool invite = false}) async {
+  Future<String> start(
+    String matchId, {
+    bool invite = false,
+    QuizKind kind = QuizKind.quiz,
+  }) async {
     await _loadBank();
     final team = teamFor(matchId);
     if (team == null) throw const QuizFailure('Kein aktives Match');
     if (!invite) {
       for (final g in _games.values) {
         if (g.myTeam.matchId == matchId &&
+            g.kind == kind &&
             g.status == 'searching' &&
             g.inviteCode == null) {
           return g.id;
@@ -391,6 +479,7 @@ class DemoQuizRepository implements QuizRepository {
     }
     final g = _Game(
       id: 'quiz-${_ids++}',
+      kind: kind,
       myTeam: team,
       iAmTeamA: true,
       inviteCode: invite ? 'DEMO42' : null,
@@ -417,10 +506,16 @@ class DemoQuizRepository implements QuizRepository {
       throw const QuizFailure('Code ungültig oder schon benutzt');
     }
     // Demo: Code gehört immer einem Bot-Team, das Runde 1 schon gespielt hat.
-    final g = _Game(id: 'quiz-${_ids++}', myTeam: team, iAmTeamA: false)
-      ..opponent = _botTeam()
-      ..status = 'active'
-      ..myTurn = false;
+    final g =
+        _Game(
+            id: 'quiz-${_ids++}',
+            kind: QuizKind.quiz,
+            myTeam: team,
+            iAmTeamA: false,
+          )
+          ..opponent = _botTeam()
+          ..status = 'active'
+          ..myTurn = false;
     _games[g.id] = g;
     _openRound(g);
     _runBots(g);
@@ -444,7 +539,7 @@ class DemoQuizRepository implements QuizRepository {
   @override
   Future<QuizQuestionView> showQuestion(String gameId, int index) async {
     final g = _game(gameId);
-    final bank = await _loadBank();
+    await _loadBank();
     final action = _action(g);
     if (action != QuizAction.propose && action != QuizAction.decide) {
       throw const QuizFailure('Du bist gerade nicht dran');
@@ -455,33 +550,48 @@ class DemoQuizRepository implements QuizRepository {
     final shown = action == QuizAction.propose
         ? (a.proposalShown ??= now)
         : (a.finalShown ??= now);
-    final question = bank.questions.firstWhere(
-      (q) => q.id == round.questionIds[index],
-    );
-    final order = _order(g, question.id);
+    final q = _b.byId(round.questionIds[index]);
+    final deciding = action == QuizAction.decide;
     return QuizQuestionView(
+      kind: g.kind,
       round: g.round,
       index: index,
       role: action,
       category: round.category!,
-      question: question.question,
-      answers: [for (final o in order) question.answers[o]],
+      question: q.question,
+      answers: [for (final o in _order(g, q)) q.answers[o]],
+      unit: q.unit,
       secondsLeft: max(
         0,
         quizSecondsPerQuestion - now.difference(shown).inSeconds,
       ),
-      proposal: action == QuizAction.decide ? a.proposal : null,
+      proposal: deciding && g.kind.hasRightAnswer ? a.proposal : null,
+      proposalNumber: deciding && g.kind == QuizKind.estimate
+          ? a.proposalNumber
+          : null,
     );
   }
 
   @override
-  Future<QuizAnswerReply> answer(String gameId, int index, int choice) async {
+  Future<QuizAnswerReply> answer(
+    String gameId,
+    int index, {
+    int choice = -1,
+    num? number,
+  }) async {
     final g = _game(gameId);
     final action = _action(g);
     final round = _current(g);
     final a = round.mine[index];
+    final q = _b.byId(round.questionIds[index]);
     if (action == QuizAction.propose) {
-      a.proposal = choice;
+      if (g.kind == QuizKind.estimate) {
+        a
+          ..proposalNumber = number
+          ..proposal = number == null ? -1 : 0;
+      } else {
+        a.proposal = choice;
+      }
       _changed(g);
       if (index < quizQuestionsPerRound - 1) {
         return const QuizAnswerReply(done: false);
@@ -493,22 +603,28 @@ class DemoQuizRepository implements QuizRepository {
     if (action != QuizAction.decide) {
       throw const QuizFailure('Du bist gerade nicht dran');
     }
-    final finalChoice = choice == -1 ? (a.proposal ?? -1) : choice;
-    a
-      ..finalChoice = finalChoice
-      ..correct = finalChoice == _correctIndex(g, round.questionIds[index]);
+    _decide(g, a, q, choice: choice, number: number);
     if (index < quizQuestionsPerRound - 1) {
       _changed(g);
       return const QuizAnswerReply(done: false);
     }
     final results = [
       for (var i = 0; i < quizQuestionsPerRound; i++)
-        QuizRoundOutcome(
-          index: i,
-          finalChoice: round.mine[i].finalChoice!,
-          proposal: round.mine[i].proposal,
-          correctIndex: _correctIndex(g, round.questionIds[i]),
-        ),
+        () {
+          final r = round.mine[i];
+          final rq = _b.byId(round.questionIds[i]);
+          return QuizRoundOutcome(
+            index: i,
+            finalChoice: r.finalChoice!,
+            proposal: r.proposal,
+            points: r.points ?? 0,
+            correctIndex: _correctIndex(g, rq),
+            finalNumber: r.finalNumber,
+            proposalNumber: r.proposalNumber,
+            numberAnswer: rq.number,
+            unit: rq.unit,
+          );
+        }(),
     ];
     _teamFinished(g, mine: true);
     _runBots(g);

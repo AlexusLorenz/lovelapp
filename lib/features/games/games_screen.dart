@@ -47,49 +47,58 @@ class GamesScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Quizduell 2 gegen 2',
+                      '2 gegen 2',
                       style: TextStyle(
                         fontFamily: AppTheme.displayFont,
-                        fontSize: 30,
+                        fontSize: 34,
                         color: LovelColors.cream,
                       ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
                       'Spielt mit einem Match als Team gegen ein anderes Paar. '
-                      '6 Runden, 13 Kategorien – und ihr entscheidet gemeinsam, '
-                      'wann es euch passt.',
+                      '6 Runden – und jede:r spielt, wann es passt.',
                       style: TextStyle(color: LovelColors.cream),
                     ),
                     const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        FilledButton.icon(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: LovelColors.terracotta,
-                          ),
-                          onPressed: () => showQuizStartSheet(context),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Neues Quizduell'),
-                        ),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: LovelColors.cream,
-                            side: const BorderSide(color: LovelColors.cream),
-                          ),
-                          onPressed: () =>
-                              showQuizStartSheet(context, join: true),
-                          icon: const Icon(Icons.vpn_key_outlined),
-                          label: const Text('Code eingeben'),
-                        ),
-                      ],
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: LovelColors.cream,
+                        side: const BorderSide(color: LovelColors.cream),
+                      ),
+                      onPressed: () => showQuizStartSheet(context, join: true),
+                      icon: const Icon(Icons.vpn_key_outlined),
+                      label: const Text('Code eingeben'),
                     ),
                   ],
                 ),
               ),
             ),
+            const SizedBox(height: 8),
+            for (final kind in QuizKind.values)
+              Card(
+                child: ListTile(
+                  contentPadding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                  leading: Text(
+                    kind.symbol,
+                    style: const TextStyle(fontSize: 32),
+                  ),
+                  title: Text(
+                    kind.title,
+                    style: const TextStyle(
+                      fontFamily: AppTheme.displayFont,
+                      fontSize: 22,
+                      color: LovelColors.umber,
+                    ),
+                  ),
+                  subtitle: Text(kind.tagline),
+                  trailing: FilledButton(
+                    onPressed: () => showQuizStartSheet(context, kind: kind),
+                    child: const Text('Spielen'),
+                  ),
+                  onTap: () => showQuizStartSheet(context, kind: kind),
+                ),
+              ),
             if (games.hasError)
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -97,7 +106,7 @@ class GamesScreen extends ConsumerWidget {
               ),
             if (running.isNotEmpty) ...[
               const SizedBox(height: 16),
-              Text('Laufende Duelle', style: theme.textTheme.titleMedium),
+              Text('Laufende Spiele', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               for (final g in running)
                 QuizGameTile(

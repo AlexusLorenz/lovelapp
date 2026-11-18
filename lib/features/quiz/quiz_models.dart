@@ -3,11 +3,17 @@
 import 'quiz_rules.dart';
 
 class QuizCategory {
-  const QuizCategory(this.key, this.emoji, this.label);
+  const QuizCategory(
+    this.key,
+    this.emoji,
+    this.label, [
+    this.kind = QuizKind.quiz,
+  ]);
 
   final String key;
   final String emoji;
   final String label;
+  final QuizKind kind;
 
   String get display => '$emoji $label';
 }
@@ -63,6 +69,7 @@ class QuizGameSummary {
     required this.myScore,
     required this.opponentScore,
     required this.updatedAt,
+    this.kind = QuizKind.quiz,
     this.opponent,
     this.inviteCode,
     this.won,
@@ -70,6 +77,7 @@ class QuizGameSummary {
 
   factory QuizGameSummary.fromJson(Map<String, Object?> j) => QuizGameSummary(
     id: j['id']! as String,
+    kind: QuizKind.parse(j['kind'] as String?),
     status: j['status']! as String,
     round: (j['round'] as num?)?.toInt() ?? 1,
     action: QuizAction.parse(j['action'] as String?),
@@ -85,6 +93,7 @@ class QuizGameSummary {
   );
 
   final String id;
+  final QuizKind kind;
   final String status;
   final int round;
   final QuizAction action;
@@ -99,17 +108,32 @@ class QuizGameSummary {
 
 /// Ergebnis eines Teams bei einer Frage.
 class QuizAnswerResult {
-  const QuizAnswerResult({this.correct, this.finalChoice, this.proposal});
+  const QuizAnswerResult({
+    this.correct,
+    this.points,
+    this.finalChoice,
+    this.proposal,
+    this.finalNumber,
+    this.proposalNumber,
+  });
 
   factory QuizAnswerResult.fromJson(Map<String, Object?> j) => QuizAnswerResult(
     correct: j['correct'] as bool?,
+    points: (j['points'] as num?)?.toInt(),
     finalChoice: (j['final'] as num?)?.toInt(),
     proposal: (j['proposal'] as num?)?.toInt(),
+    finalNumber: j['final_number'] as num?,
+    proposalNumber: j['proposal_number'] as num?,
   );
 
   final bool? correct;
+
+  /// 0–3 im Schätzduell, sonst 0/1.
+  final int? points;
   final int? finalChoice;
   final int? proposal;
+  final num? finalNumber;
+  final num? proposalNumber;
 }
 
 /// Frage zum Nachlesen (erst nach der eigenen Runde verfügbar).
@@ -117,18 +141,31 @@ class QuizReview {
   const QuizReview({
     required this.question,
     required this.answers,
-    required this.correctIndex,
+    this.correctIndex,
+    this.numberAnswer,
+    this.unit,
   });
 
   factory QuizReview.fromJson(Map<String, Object?> j) => QuizReview(
     question: j['question']! as String,
-    answers: [for (final a in j['answers']! as List<Object?>) a! as String],
-    correctIndex: (j['correct_index']! as num).toInt(),
+    answers: [
+      for (final a in (j['answers'] as List<Object?>? ?? const []))
+        a! as String,
+    ],
+    correctIndex: (j['correct_index'] as num?)?.toInt(),
+    numberAnswer: j['number_answer'] as num?,
+    unit: j['unit'] as String?,
   );
 
   final String question;
   final List<String> answers;
-  final int correctIndex;
+
+  /// Nur bei Spielen mit richtiger Antwort (Quiz, Emoji).
+  final int? correctIndex;
+
+  /// Nur im Schätzduell.
+  final num? numberAnswer;
+  final String? unit;
 }
 
 class QuizQuestionSlot {
@@ -235,22 +272,38 @@ class QuizQuestionView {
     required this.question,
     required this.answers,
     required this.secondsLeft,
+    this.kind = QuizKind.quiz,
+    this.unit,
     this.proposal,
+    this.proposalNumber,
   });
 
   factory QuizQuestionView.fromJson(Map<String, Object?> j) => QuizQuestionView(
+    kind: QuizKind.parse(j['kind'] as String?),
+    unit: j['unit'] as String?,
+    proposalNumber: j['proposal_number'] as num?,
     round: (j['round']! as num).toInt(),
     index: (j['q_index']! as num).toInt(),
     role: QuizAction.parse(j['role'] as String?),
     category: j['category']! as String,
     question: j['question']! as String,
-    answers: [for (final a in j['answers']! as List<Object?>) a! as String],
+    answers: [
+      for (final a in (j['answers'] as List<Object?>? ?? const []))
+        a! as String,
+    ],
     secondsLeft: (j['seconds_left']! as num).toInt(),
     proposal: (j['proposal'] as num?)?.toInt(),
   );
 
+  final QuizKind kind;
   final int round;
   final int index;
+
+  /// Einheit der Schätzung (Schätzduell).
+  final String? unit;
+
+  /// Vorschlag beim Entscheiden im Schätzduell.
+  final num? proposalNumber;
 
   /// [QuizAction.propose] oder [QuizAction.decide].
   final QuizAction role;
@@ -259,7 +312,8 @@ class QuizQuestionView {
   final List<String> answers;
   final int secondsLeft;
 
-  /// Vorschlag der Partnerin/des Partners (nur beim Entscheiden), -1 = keiner.
+  /// Vorschlag der Partnerin/des Partners (nur beim Entscheiden; nicht bei
+  /// Seelenverwandt), -1 = keiner.
   final int? proposal;
 }
 
@@ -268,23 +322,42 @@ class QuizRoundOutcome {
   const QuizRoundOutcome({
     required this.index,
     required this.finalChoice,
-    required this.correctIndex,
+    required this.points,
+    this.correctIndex,
     this.proposal,
+    this.finalNumber,
+    this.proposalNumber,
+    this.numberAnswer,
+    this.unit,
   });
 
   factory QuizRoundOutcome.fromJson(Map<String, Object?> j) => QuizRoundOutcome(
     index: (j['q_index']! as num).toInt(),
     finalChoice: (j['final'] as num?)?.toInt() ?? -1,
     proposal: (j['proposal'] as num?)?.toInt(),
-    correctIndex: (j['correct_index']! as num).toInt(),
+    points: (j['points'] as num?)?.toInt() ?? ((j['correct'] == true) ? 1 : 0),
+    correctIndex: (j['correct_index'] as num?)?.toInt(),
+    finalNumber: j['final_number'] as num?,
+    proposalNumber: j['proposal_number'] as num?,
+    numberAnswer: j['number_answer'] as num?,
+    unit: j['unit'] as String?,
   );
 
   final int index;
   final int finalChoice;
   final int? proposal;
-  final int correctIndex;
+  final int points;
 
-  bool get correct => finalChoice == correctIndex;
+  /// Quiz/Emoji: richtige Antwort.
+  final int? correctIndex;
+
+  /// Schätzduell.
+  final num? finalNumber;
+  final num? proposalNumber;
+  final num? numberAnswer;
+  final String? unit;
+
+  bool get correct => points > 0;
 }
 
 class QuizAnswerReply {

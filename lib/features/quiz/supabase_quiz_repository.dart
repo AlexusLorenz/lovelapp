@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'quiz_models.dart';
 import 'quiz_repository.dart';
+import 'quiz_rules.dart';
 
 class SupabaseQuizRepository implements QuizRepository {
   SupabaseQuizRepository(this._client);
@@ -32,7 +33,7 @@ class SupabaseQuizRepository implements QuizRepository {
     try {
       final rows = await _client
           .from('quiz_categories')
-          .select('key, emoji, label')
+          .select('key, emoji, label, kind')
           .order('label', ascending: true);
       return _categories = [
         for (final r in rows)
@@ -40,6 +41,7 @@ class SupabaseQuizRepository implements QuizRepository {
             r['key']! as String,
             r['emoji']! as String,
             r['label']! as String,
+            QuizKind.parse(r['kind'] as String?),
           ),
       ];
     } on PostgrestException {
@@ -59,10 +61,15 @@ class SupabaseQuizRepository implements QuizRepository {
   );
 
   @override
-  Future<String> start(String matchId, {bool invite = false}) => _rpc<String>(
-    'quiz_start',
-    {'p_match': matchId, 'p_mode': invite ? 'invite' : 'random'},
-  );
+  Future<String> start(
+    String matchId, {
+    bool invite = false,
+    QuizKind kind = QuizKind.quiz,
+  }) => _rpc<String>('quiz_start', {
+    'p_match': matchId,
+    'p_mode': invite ? 'invite' : 'random',
+    'p_kind': kind.key,
+  });
 
   @override
   Future<String> join(String matchId, String code) =>
@@ -86,16 +93,21 @@ class SupabaseQuizRepository implements QuizRepository {
       );
 
   @override
-  Future<QuizAnswerReply> answer(String gameId, int index, int choice) async =>
-      QuizAnswerReply.fromJson(
-        _map(
-          await _rpc<Object?>('quiz_answer', {
-            'p_game': gameId,
-            'p_q_index': index,
-            'p_choice': choice,
-          }),
-        ),
-      );
+  Future<QuizAnswerReply> answer(
+    String gameId,
+    int index, {
+    int choice = -1,
+    num? number,
+  }) async => QuizAnswerReply.fromJson(
+    _map(
+      await _rpc<Object?>('quiz_answer', {
+        'p_game': gameId,
+        'p_q_index': index,
+        'p_choice': choice,
+        'p_number': number,
+      }),
+    ),
+  );
 
   @override
   Future<void> giveUp(String gameId) =>

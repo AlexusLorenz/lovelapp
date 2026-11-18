@@ -56,7 +56,7 @@ class QuizGameScreen extends ConsumerWidget {
     final categories = ref.watch(quizCategoriesProvider).value ?? const {};
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quizduell'),
+        title: Text(game.value?.summary.kind.title ?? 'Spiel'),
         leading: BackButton(onPressed: () => context.go(Routes.games)),
         actions: [
           if (game.value?.summary.action.isOver == false)
@@ -87,6 +87,7 @@ class QuizGameScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               for (var r = 1; r <= quizRounds; r++)
                 _RoundRow(
+                  kind: state.summary.kind,
                   number: r,
                   round: r <= state.rounds.length ? state.rounds[r - 1] : null,
                   categories: categories,
@@ -185,12 +186,16 @@ class _NextStep extends ConsumerWidget {
     final play = FilledButton.icon(
       onPressed: () => context.push(Routes.quizPlay(s.id)),
       icon: const Icon(Icons.play_arrow),
-      label: Text(switch (s.action) {
-        QuizAction.choose => 'Kategorie wählen',
-        QuizAction.propose => 'Antworten vorschlagen',
+      label: Text(switch ((s.action, s.kind)) {
+        (QuizAction.choose, _) => 'Kategorie wählen',
+        (QuizAction.propose, QuizKind.estimate) => 'Jetzt schätzen',
+        (QuizAction.propose, QuizKind.soulmate) => 'Fragen beantworten',
+        (QuizAction.propose, _) => 'Antworten vorschlagen',
+        (_, QuizKind.soulmate) => 'Jetzt raten',
         _ => 'Jetzt entscheiden',
       }),
     );
+    final soulmate = s.kind == QuizKind.soulmate;
     final toChat = OutlinedButton.icon(
       onPressed: () => context.go(Routes.chat(s.myTeam.matchId)),
       icon: const Icon(Icons.chat_bubble_outline),
@@ -200,28 +205,45 @@ class _NextStep extends ConsumerWidget {
     return switch (s.action) {
       QuizAction.choose => box(
         'Runde ${s.round}: Du wählst die Kategorie',
-        'Danach schlägst du für alle drei Fragen eine Antwort vor, '
-            '$partner entscheidet. 30 Sekunden pro Frage.',
+        soulmate
+            ? 'Danach beantwortest du drei Fragen ehrlich über dich – '
+                  '$partner muss deine Antworten erraten.'
+            : 'Danach schlägst du für alle drei Fragen eine Antwort vor, '
+                  '$partner entscheidet. 30 Sekunden pro Frage.',
         actions: [play],
       ),
       QuizAction.propose => box(
-        'Runde ${s.round}: Du schlägst vor',
-        '$partner sieht deine Vorschläge und trifft die Entscheidung. '
-            '30 Sekunden pro Frage.',
+        soulmate
+            ? 'Runde ${s.round}: Du antwortest über dich'
+            : 'Runde ${s.round}: Du schlägst vor',
+        soulmate
+            ? 'Beantworte drei Fragen ehrlich. $partner sieht deine '
+                  'Antworten nicht und muss sie erraten.'
+            : '$partner sieht deine Vorschläge und trifft die Entscheidung. '
+                  '30 Sekunden pro Frage.',
         actions: [play],
       ),
       QuizAction.decide => box(
-        'Runde ${s.round}: Du entscheidest',
-        '$partner hat Antworten vorgeschlagen. Übernimm sie oder wähle '
-            'selbst – deine Antwort zählt.',
+        soulmate
+            ? 'Runde ${s.round}: Du rätst'
+            : 'Runde ${s.round}: Du entscheidest',
+        soulmate
+            ? '$partner hat drei Fragen über sich beantwortet. Wie gut '
+                  'kennst du $partner?'
+            : '$partner hat Antworten vorgeschlagen. Übernimm sie oder wähle '
+                  'selbst – deine Antwort zählt.',
         actions: [play],
       ),
       QuizAction.waitPartner => box(
         'Wartet auf $partner',
         round?.category == null ||
                 (round?.myProposed ?? 0) < quizQuestionsPerRound
-            ? '$partner wählt die Kategorie und schlägt Antworten vor.'
-            : '$partner entscheidet gerade über deine Vorschläge.',
+            ? (soulmate
+                  ? '$partner beantwortet gerade Fragen über sich.'
+                  : '$partner wählt die Kategorie und schlägt Antworten vor.')
+            : (soulmate
+                  ? '$partner rät gerade deine Antworten.'
+                  : '$partner entscheidet gerade über deine Vorschläge.'),
         actions: [toChat],
       ),
       QuizAction.waitOpponent => box(
@@ -251,8 +273,11 @@ class _NextStep extends ConsumerWidget {
                   'Lust auf eine Revanche?',
         actions: [
           FilledButton.icon(
-            onPressed: () =>
-                showQuizStartSheet(context, matchId: s.myTeam.matchId),
+            onPressed: () => showQuizStartSheet(
+              context,
+              matchId: s.myTeam.matchId,
+              kind: s.kind,
+            ),
             icon: const Icon(Icons.replay),
             label: const Text('Neues Spiel'),
           ),
@@ -264,12 +289,14 @@ class _NextStep extends ConsumerWidget {
 
 class _RoundRow extends StatelessWidget {
   const _RoundRow({
+    required this.kind,
     required this.number,
     required this.round,
     required this.categories,
     required this.isCurrent,
   });
 
+  final QuizKind kind;
   final int number;
   final QuizRoundState? round;
   final Map<String, QuizCategory> categories;
@@ -284,12 +311,16 @@ class _RoundRow extends StatelessWidget {
 
     final mine = [
       for (var i = 0; i < quizQuestionsPerRound; i++)
-        QuizDot(correct: slot(i)?.mine?.correct),
+        QuizDot(
+          correct: slot(i)?.mine?.correct,
+          points: kind == QuizKind.estimate ? slot(i)?.mine?.points : null,
+        ),
     ];
     final theirs = [
       for (var i = 0; i < quizQuestionsPerRound; i++)
         QuizDot(
           correct: slot(i)?.opponent?.correct,
+          points: kind == QuizKind.estimate ? slot(i)?.opponent?.points : null,
           hidden: (r?.opponentDone ?? false) && slot(i)?.opponent == null,
         ),
     ];
@@ -310,8 +341,12 @@ class _RoundRow extends StatelessWidget {
                 context: context,
                 isScrollControlled: true,
                 showDragHandle: true,
-                builder: (_) =>
-                    _RoundReview(number: number, round: r, category: category),
+                builder: (_) => _RoundReview(
+                  kind: kind,
+                  number: number,
+                  round: r,
+                  category: category,
+                ),
               )
             : null,
         child: Padding(
@@ -347,11 +382,13 @@ class _RoundRow extends StatelessWidget {
 
 class _RoundReview extends StatelessWidget {
   const _RoundReview({
+    required this.kind,
     required this.number,
     required this.round,
     required this.category,
   });
 
+  final QuizKind kind;
   final int number;
   final QuizRoundState round;
   final QuizCategory? category;
@@ -376,16 +413,32 @@ class _RoundReview extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(review.question, style: theme.textTheme.titleMedium),
+                    Text(
+                      review.question,
+                      style: kind == QuizKind.emoji
+                          ? const TextStyle(fontSize: 32)
+                          : theme.textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 6),
-                    for (final (i, answer) in review.answers.indexed)
-                      _ReviewAnswer(
-                        text: answer,
-                        correct: i == review.correctIndex,
-                        ours: slot.mine?.finalChoice == i,
-                        proposed: slot.mine?.proposal == i,
-                        theirs: slot.opponent?.finalChoice == i,
-                      ),
+                    if (kind == QuizKind.estimate)
+                      _EstimateReview(review: review, slot: slot)
+                    else
+                      for (final (i, answer) in review.answers.indexed)
+                        _ReviewAnswer(
+                          text: answer,
+                          correct: kind.hasRightAnswer
+                              ? i == review.correctIndex
+                              // Seelenverwandt: „richtig“ = was die
+                              // Partnerin über sich gesagt hat.
+                              : i == slot.mine?.proposal,
+                          ours: slot.mine?.finalChoice == i,
+                          proposed:
+                              kind.hasRightAnswer && slot.mine?.proposal == i,
+                          theirs: slot.opponent?.finalChoice == i,
+                          oursLabel: kind == QuizKind.soulmate
+                              ? 'Tipp'
+                              : 'eure Antwort',
+                        ),
                   ],
                 ),
               ),
@@ -395,8 +448,40 @@ class _RoundReview extends StatelessWidget {
   }
 }
 
+class _EstimateReview extends StatelessWidget {
+  const _EstimateReview({required this.review, required this.slot});
+
+  final QuizReview review;
+  final QuizQuestionSlot slot;
+
+  @override
+  Widget build(BuildContext context) {
+    final unit = review.unit ?? '';
+    String pts(int? p) => p == null ? '' : ' · +$p';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Richtig: ${formatQuizNumber(review.numberAnswer)} $unit',
+          style: const TextStyle(color: quizGreen, fontWeight: FontWeight.w600),
+        ),
+        Text(
+          'Ihr: ${formatQuizNumber(slot.mine?.finalNumber)} $unit'
+          '${pts(slot.mine?.points)}',
+        ),
+        if (slot.opponent != null)
+          Text(
+            'Gegner: ${formatQuizNumber(slot.opponent?.finalNumber)} $unit'
+            '${pts(slot.opponent?.points)}',
+          ),
+      ],
+    );
+  }
+}
+
 class _ReviewAnswer extends StatelessWidget {
   const _ReviewAnswer({
+    this.oursLabel = 'eure Antwort',
     required this.text,
     required this.correct,
     required this.ours,
@@ -404,6 +489,7 @@ class _ReviewAnswer extends StatelessWidget {
     required this.theirs,
   });
 
+  final String oursLabel;
   final String text;
   final bool correct;
   final bool ours;
@@ -413,7 +499,7 @@ class _ReviewAnswer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tags = [
-      if (ours) 'eure Antwort',
+      if (ours) oursLabel,
       if (proposed && !ours) 'Vorschlag',
       if (theirs) 'Gegner',
     ];
