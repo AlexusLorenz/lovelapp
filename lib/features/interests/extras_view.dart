@@ -209,7 +209,7 @@ class ExtrasEditTiles extends ConsumerWidget {
           'Lieblingsmusik',
           summary([
             for (final a in e.artists) a.name,
-          ], 'Künstler:innen suchen oder per Spotify'),
+          ], 'Künstler:innen und Bands auswählen'),
           Routes.editMusic,
         ),
       ],

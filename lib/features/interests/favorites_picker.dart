@@ -32,7 +32,7 @@ class FavoritesPicker<T> extends StatefulWidget {
   final Widget Function(T item) thumbnail;
   final Future<void> Function(List<T> selected) onSave;
 
-  /// Z. B. „Mit Spotify verbinden“.
+  /// Optionaler Bereich über der Suche.
   final Widget? header;
 
   /// Quellenangabe unten (Pflicht bei RAWG und Spotify).

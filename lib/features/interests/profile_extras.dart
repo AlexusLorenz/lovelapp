@@ -39,29 +39,6 @@ class FavoriteArtist {
     imageUrl: (row['image_url'] ?? row['image']) as String?,
   );
 
-  /// Aus einem Spotify-Artist-Objekt (Web API). Nimmt das kleinste Bild,
-  /// das noch mindestens 160 px breit ist.
-  factory FavoriteArtist.fromSpotify(Map<String, Object?> json) {
-    final images =
-        [
-          for (final i in (json['images'] as List<Object?>? ?? const []))
-            i! as Map<String, Object?>,
-        ]..sort(
-          (a, b) =>
-              ((a['width'] as num?) ?? 0).compareTo((b['width'] as num?) ?? 0),
-        );
-    String? url;
-    for (final i in images) {
-      url = i['url'] as String?;
-      if (((i['width'] as num?) ?? 0) >= 160) break;
-    }
-    return FavoriteArtist(
-      id: json['id']! as String,
-      name: json['name']! as String,
-      imageUrl: url,
-    );
-  }
-
   final String id;
   final String name;
   final String? imageUrl;

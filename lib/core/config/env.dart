@@ -43,16 +43,4 @@ class Env {
   /// Muss in Supabase unter Authentication → URL Configuration →
   /// Redirect URLs eingetragen sein, ebenso in AndroidManifest/Info.plist.
   static const authRedirectUrl = 'de.lovelapp.lovelapp://login-callback';
-
-  /// Client-ID der Spotify-App (öffentlich, kein Geheimnis). Leer = die
-  /// Spotify-Verbindung wird nicht angeboten; die Suche läuft trotzdem.
-  static const spotifyClientId = String.fromEnvironment('SPOTIFY_CLIENT_ID');
-
-  /// Spotify-Login gibt es vorerst nur in der Web-App.
-  static bool get spotifyConnectEnabled => kIsWeb && spotifyClientId.isNotEmpty;
-
-  /// Rücksprungseite nach dem Spotify-Login (web/spotify-callback.html).
-  /// Muss so im Spotify-Developer-Dashboard als Redirect URI stehen.
-  static String get spotifyRedirectUrl =>
-      Uri.parse(authCallbackUrl).resolve('spotify-callback.html').toString();
 }

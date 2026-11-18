@@ -1,12 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 import 'package:lovelapp/features/interests/interest_catalog.dart';
 import 'package:lovelapp/features/interests/profile_extras.dart';
-import 'package:lovelapp/features/music/spotify_auth.dart';
 
 void main() {
   group('Interessen-Katalog', () {
@@ -100,97 +96,5 @@ void main() {
       grouped['b']!.artists.single.spotifyUrl,
       'https://open.spotify.com/artist/abc1234567',
     );
-  });
-
-  group('Spotify', () {
-    test('PKCE-Challenge: S256, base64url ohne Padding', () {
-      const p = SpotifyPending(
-        verifier: 'dBjftJeZ4CVP-mJ92IqLs6xzx2tKgK2PZ7xpOJpYmTI',
-        state: 's',
-      );
-      expect(p.challenge, 'iuoVfrUd4Twt3I6g6dE6m9Z1Lsk5yvav4yCAwbXJyPY');
-      final url = spotifyAuthorizeUrl(
-        clientId: 'cid',
-        redirectUri: 'https://x.test/spotify-callback.html',
-        pending: p,
-      );
-      expect(url.queryParameters['code_challenge_method'], 'S256');
-      expect(url.queryParameters['scope'], 'user-top-read');
-    });
-
-    test('Top-Künstler: Code tauschen, Bild ≥ 160 px wählen', () async {
-      final requests = <http.Request>[];
-      final client = MockClient((req) async {
-        requests.add(req);
-        if (req.url.path == '/api/token') {
-          return http.Response(jsonEncode({'access_token': 'tok'}), 200);
-        }
-        return http.Response(
-          jsonEncode({
-            'items': [
-              {
-                'id': '4Z8W4fKeB5YxbusRsdQVPb',
-                'name': 'Radiohead',
-                'images': [
-                  {'url': 'https://i.scdn.co/image/big', 'width': 640},
-                  {'url': 'https://i.scdn.co/image/small', 'width': 64},
-                  {'url': 'https://i.scdn.co/image/mid', 'width': 320},
-                ],
-              },
-            ],
-          }),
-          200,
-        );
-      });
-      final pending = SpotifyPending(verifier: 'v' * 64, state: 'st');
-      final artists = await fetchSpotifyTopArtists(
-        callback: const SpotifyCallback(code: 'c', state: 'st'),
-        pending: pending,
-        clientId: 'cid',
-        redirectUri: 'https://x.test/cb',
-        client: client,
-      );
-      expect(artists.single.name, 'Radiohead');
-      expect(artists.single.imageUrl, 'https://i.scdn.co/image/mid');
-      expect(requests.first.bodyFields['code_verifier'], 'v' * 64);
-      expect(requests.last.headers['Authorization'], 'Bearer tok');
-    });
-
-    test('Falscher state wird abgelehnt', () async {
-      expect(
-        fetchSpotifyTopArtists(
-          callback: const SpotifyCallback(code: 'c', state: 'fremd'),
-          pending: const SpotifyPending(verifier: 'v', state: 'st'),
-          clientId: 'cid',
-          redirectUri: 'https://x.test/cb',
-          client: MockClient((_) async => http.Response('', 500)),
-        ),
-        throwsA(isA<SpotifyFailure>()),
-      );
-    });
-
-    test('Nicht freigeschaltetes Konto (Development Mode)', () async {
-      final client = MockClient(
-        (req) async => req.url.path == '/api/token'
-            ? http.Response(jsonEncode({'access_token': 't'}), 200)
-            : http.Response('', 403),
-      );
-      await expectLater(
-        fetchSpotifyTopArtists(
-          callback: const SpotifyCallback(code: 'c', state: 'st'),
-          pending: const SpotifyPending(verifier: 'v', state: 'st'),
-          clientId: 'cid',
-          redirectUri: 'https://x.test/cb',
-          client: client,
-        ),
-        throwsA(
-          isA<SpotifyFailure>().having(
-            (e) => e.message,
-            'message',
-            contains('freigeschaltet'),
-          ),
-        ),
-      );
-    });
   });
 }

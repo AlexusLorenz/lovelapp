@@ -464,17 +464,12 @@ void main() {
     );
   });
 
-  testWidgets('Lieblingsmusik suchen (ohne Spotify-Verbindung)', (
-    tester,
-  ) async {
+  testWidgets('Lieblingsmusik suchen und speichern', (tester) async {
     await pumpLovelApp(tester);
     await tapAndSettle(tester, find.text('Profil'));
     await scrollTo(tester, find.text('Profil bearbeiten'));
     await tapAndSettle(tester, find.text('Profil bearbeiten'));
     await tapInEditor(tester, find.text('Lieblingsmusik'));
-
-    // Spotify-Login nur in der Web-App mit Client-ID
-    expect(find.text('Spotify verbinden'), findsNothing);
     await tester.enterText(find.byType(TextField), 'radio');
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
