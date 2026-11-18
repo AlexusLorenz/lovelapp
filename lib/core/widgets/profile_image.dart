@@ -26,7 +26,8 @@ class MemoryProfileImage extends ProfileImage {
   final Uint8List bytes;
 }
 
-/// Zeigt ein [ProfileImage] formatfüllend (BoxFit.cover).
+/// Zeigt ein [ProfileImage] formatfüllend (BoxFit.cover), oben ausgerichtet,
+/// damit bei Hochformat-Porträts der Kopf nicht abgeschnitten wird.
 class ProfileImageView extends StatelessWidget {
   const ProfileImageView({super.key, required this.image});
 
@@ -37,12 +38,18 @@ class ProfileImageView extends StatelessWidget {
     final img = image;
     if (img is PhotoArt) return PlaceholderPhoto(art: img);
     if (img is MemoryProfileImage) {
-      return Image.memory(img.bytes, fit: BoxFit.cover, gaplessPlayback: true);
+      return Image.memory(
+        img.bytes,
+        fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
+        gaplessPlayback: true,
+      );
     }
     if (img is NetworkProfileImage) {
       return Image.network(
         img.url,
         fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
         gaplessPlayback: true,
         loadingBuilder: (context, child, progress) => progress == null
             ? child

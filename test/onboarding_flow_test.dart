@@ -481,13 +481,32 @@ void main() {
     expect(find.textContaining('Radiohead'), findsOneWidget);
   });
 
-  testWidgets('Fremdes Profil zeigt Interessen, Spiele und Musik', (
-    tester,
-  ) async {
+  testWidgets('Profilseite: Interessen, Foto, Spiele, Musik, Foto, dann '
+      'abwechselnd Frage und Foto', (tester) async {
+    // Hoher Bildschirm, damit alles gleichzeitig gebaut ist.
+    tester.view.physicalSize = const Size(800, 9000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await pumpLovelApp(tester);
     await tapAndSettle(tester, find.byTooltip('Profil öffnen'));
-    await scrollTo(tester, find.text('Lieblingsmusik'));
+
+    double y(Finder f) => tester.getTopLeft(f.first).dy;
+    final photos = find.byWidgetPredicate(
+      (w) => w.runtimeType.toString() == '_PhotoTile',
+    );
+    expect(photos, findsNWidgets(2), reason: 'Mia hat 3 Fotos, eins oben');
+    final p2 = tester.getTopLeft(photos.at(0)).dy;
+    final p3 = tester.getTopLeft(photos.at(1)).dy;
+
     expect(find.text('🎷 Jazz'), findsOneWidget);
+    expect(y(find.text('Interessen')), lessThan(p2));
+    expect(p2, lessThan(y(find.text('Lieblingsspiele'))));
+    expect(
+      y(find.text('Lieblingsspiele')),
+      lessThan(y(find.text('Lieblingsmusik'))),
+    );
+    expect(y(find.text('Lieblingsmusik')), lessThan(p3));
+    expect(p3, lessThan(y(find.text('Mein perfekter Sonntag …'))));
     expect(find.text('Hollow Knight'), findsWidgets);
     expect(find.text('Radiohead'), findsWidgets);
   });

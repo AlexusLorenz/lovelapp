@@ -10,6 +10,7 @@ import 'photo_gallery.dart';
 import 'public_profile.dart';
 import 'swipe_card.dart';
 import '../../core/widgets/pinch_zoom.dart';
+import '../interests/extras_providers.dart';
 import '../interests/extras_view.dart';
 import '../../core/widgets/profile_image.dart';
 
@@ -74,7 +75,14 @@ class ProfileDetailScreen extends ConsumerWidget {
                   20,
                   showActions ? 120 : 32,
                 ),
-                sliver: SliverList.list(children: _content(context, profile)),
+                sliver: SliverList.list(
+                  children: _content(
+                    context,
+                    profile,
+                    ref.watch(profileExtrasProvider(profile.id)).value ??
+                        ProfileExtras.empty,
+                  ),
+                ),
               ),
             ],
           ),
@@ -112,19 +120,41 @@ class ProfileDetailScreen extends ConsumerWidget {
     );
   }
 
-  List<Widget> _content(BuildContext context, PublicProfile profile) {
+  List<Widget> _content(
+    BuildContext context,
+    PublicProfile profile,
+    ProfileExtras extras,
+  ) {
     final theme = Theme.of(context);
-    final extraPhotos = profile.photos.skip(1).toList();
-    final prompts = profile.prompts;
+    final photos = profile.photos.skip(1).iterator;
+    final prompts = profile.prompts.iterator;
 
-    // Fragen und weitere Bilder abwechselnd, damit es lebendig bleibt.
-    final mixed = <Widget>[];
-    final count = prompts.length > extraPhotos.length
-        ? prompts.length
-        : extraPhotos.length;
-    for (var i = 0; i < count; i++) {
-      if (i < prompts.length) mixed.add(_PromptCard(answer: prompts[i]));
-      if (i < extraPhotos.length) mixed.add(_PhotoTile(art: extraPhotos[i]));
+    // Reihenfolge: Interessen · Foto · Spiele · Musik · Foto, danach immer
+    // abwechselnd Frage und Foto. Leere Bereiche fallen weg.
+    final blocks = <Widget>[];
+    void photo() {
+      if (photos.moveNext()) blocks.add(_PhotoTile(art: photos.current));
+    }
+
+    if (extras.interests.isNotEmpty) {
+      blocks.add(InterestsBlock(keys: extras.interests));
+    }
+    photo();
+    final hasFavorites = extras.games.isNotEmpty || extras.artists.isNotEmpty;
+    if (extras.games.isNotEmpty) blocks.add(GamesBlock(games: extras.games));
+    if (extras.artists.isNotEmpty) {
+      blocks.add(MusicBlock(artists: extras.artists));
+    }
+    if (hasFavorites) photo();
+    var morePrompts = prompts.moveNext();
+    var morePhotos = true;
+    while (morePrompts || morePhotos) {
+      if (morePrompts) {
+        blocks.add(_PromptCard(answer: prompts.current));
+        morePrompts = prompts.moveNext();
+      }
+      morePhotos = photos.moveNext();
+      if (morePhotos) blocks.add(_PhotoTile(art: photos.current));
     }
 
     return [
@@ -162,9 +192,8 @@ class ProfileDetailScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         BasicsChips(basics: profile.basics),
       ],
-      ProfileExtrasSection(profileId: profile.id),
-      const SizedBox(height: 16),
-      for (final w in mixed) ...[w, const SizedBox(height: 16)],
+      const SizedBox(height: 24),
+      for (final w in blocks) ...[w, const SizedBox(height: 24)],
     ];
   }
 }
