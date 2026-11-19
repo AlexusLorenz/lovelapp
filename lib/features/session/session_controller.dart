@@ -84,3 +84,12 @@ class SessionController extends Notifier<SessionState> {
 final sessionProvider = NotifierProvider<SessionController, SessionState>(
   SessionController.new,
 );
+
+/// ID des angemeldeten Kontos (oder `null`).
+///
+/// Jeder Provider mit nutzerbezogenen Daten muss diese ID beobachten. Dann
+/// wird sein Cache beim Abmelden oder Kontowechsel verworfen und zeigt nie
+/// Daten des vorherigen Kontos.
+final currentUserIdProvider = Provider<String?>(
+  (ref) => ref.watch(sessionProvider.select((s) => s.user?.id)),
+);

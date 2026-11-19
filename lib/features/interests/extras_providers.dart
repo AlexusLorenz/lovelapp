@@ -10,13 +10,14 @@ final profileExtrasProvider = FutureProvider.family<ProfileExtras, String>((
   ref,
   profileId,
 ) async {
+  ref.watch(currentUserIdProvider);
   final all = await ref.read(extrasRepositoryProvider).fetchFor([profileId]);
   return all[profileId] ?? ProfileExtras.empty;
 });
 
 /// Eigene Extras; `null`, solange niemand angemeldet ist.
 final ownExtrasProvider = FutureProvider<ProfileExtras?>((ref) async {
-  final id = ref.watch(sessionProvider.select((s) => s.user?.id));
+  final id = ref.watch(currentUserIdProvider);
   if (id == null) return null;
   return ref.watch(profileExtrasProvider(id).future);
 });

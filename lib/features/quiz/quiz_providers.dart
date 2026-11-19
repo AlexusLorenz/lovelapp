@@ -8,13 +8,18 @@ import 'quiz_models.dart';
 export 'quiz_models.dart';
 export 'quiz_rules.dart';
 
-final quizGamesProvider = FutureProvider<List<QuizGameSummary>>(
-  (ref) => ref.watch(quizRepositoryProvider).myGames(),
-);
+final quizGamesProvider = FutureProvider<List<QuizGameSummary>>((ref) async {
+  if (ref.watch(currentUserIdProvider) == null) return const [];
+  return ref.watch(quizRepositoryProvider).myGames();
+});
 
-final quizGameProvider = FutureProvider.family<QuizGameState, String>(
-  (ref, id) => ref.watch(quizRepositoryProvider).state(id),
-);
+final quizGameProvider = FutureProvider.family<QuizGameState, String>((
+  ref,
+  id,
+) {
+  ref.watch(currentUserIdProvider);
+  return ref.watch(quizRepositoryProvider).state(id);
+});
 
 final quizCategoriesProvider = FutureProvider<Map<String, QuizCategory>>((
   ref,
@@ -36,7 +41,7 @@ final quizTurnCountProvider = Provider<int>(
 
 /// Hält die Live-Verbindung und lädt bei Änderungen neu (in der App-Shell).
 final quizLiveProvider = Provider<void>((ref) {
-  if (ref.watch(sessionProvider.select((s) => s.user?.id)) == null) return;
+  if (ref.watch(currentUserIdProvider) == null) return;
   Timer? debounce;
   final sub = ref.read(quizRepositoryProvider).changes().listen((_) {
     debounce?.cancel();

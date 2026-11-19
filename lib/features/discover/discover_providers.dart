@@ -7,8 +7,7 @@ import '../onboarding/profile_repository.dart';
 import '../session/session_controller.dart';
 import 'public_profile.dart';
 
-String? _userId(Ref ref) =>
-    ref.watch(sessionProvider.select((s) => s.user?.id));
+String? _userId(Ref ref) => ref.watch(currentUserIdProvider);
 
 /// Warteschlange im Entdecken-Feed. Die oberste Karte ist `state.first`.
 class DiscoverFeedController extends AsyncNotifier<List<PublicProfile>> {
@@ -53,6 +52,7 @@ final profileByIdProvider = FutureProvider.family<PublicProfile?, String>((
   ref,
   id,
 ) async {
+  if (_userId(ref) == null) return null;
   // Schon im Feed? Dann ohne Netz.
   final feed = ref.read(discoverFeedProvider).value ?? const [];
   final likes = ref.read(receivedLikesProvider).value ?? const [];
@@ -73,9 +73,13 @@ final matchesProvider = FutureProvider<List<MatchSummary>>((ref) async {
   return ref.read(matchesRepositoryProvider).fetchMatches();
 });
 
-final messagesProvider = StreamProvider.family<List<ChatMessage>, String>(
-  (ref, matchId) => ref.read(matchesRepositoryProvider).watchMessages(matchId),
-);
+final messagesProvider = StreamProvider.family<List<ChatMessage>, String>((
+  ref,
+  matchId,
+) {
+  if (_userId(ref) == null) return Stream.value(const []);
+  return ref.read(matchesRepositoryProvider).watchMessages(matchId);
+});
 
 /// Summe ungelesener Nachrichten – für das Badge am Chats-Tab.
 final unreadMessagesCountProvider = Provider<int>((ref) {
