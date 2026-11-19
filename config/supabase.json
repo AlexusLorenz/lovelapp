@@ -1,4 +1,5 @@
 {
   "SUPABASE_URL": "https://nexmrgibrhfkaxcwzoew.supabase.co",
-  "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_Gy8aVOU0KKw_OUAfnse-Mw_4PotzSjC"
+  "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_Gy8aVOU0KKw_OUAfnse-Mw_4PotzSjC",
+  "TEST_LOGIN_PASSWORD": "test-P6syl8hu4scGHFbZhoIKTtm-"
 }

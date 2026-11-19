@@ -7,6 +7,8 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../session/session_controller.dart';
 import 'auth_repository.dart';
+import 'test_account_picker.dart';
+import 'test_accounts.dart';
 
 /// Schriftzug „LOVEL“.
 class LovelLogo extends StatelessWidget {
@@ -69,7 +71,25 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   SocialProvider? _busy;
+  String? _busyTestEmail;
   String? _error;
+
+  Future<void> _testLogin(TestAccount account) async {
+    setState(() {
+      _busyTestEmail = account.email;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(authRepositoryProvider)
+          .signIn(email: account.email, password: Env.testLoginPassword);
+      // Weiter geht es über die Router-Weiterleitung.
+    } on AuthFailure catch (e) {
+      setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _busyTestEmail = null);
+    }
+  }
 
   Future<void> _social(SocialProvider provider) async {
     setState(() {
@@ -118,6 +138,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                           const Spacer(),
                           const SizedBox(height: 24),
                           const DemoModeBanner(),
+                          if (testAccountsEnabled) ...[
+                            TestAccountPicker(
+                              busyEmail: _busyTestEmail,
+                              onPick: _testLogin,
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                           const SizedBox(height: 16),
                           if (Env.appleLoginEnabled) ...[
                             // Apple-Vorgaben: schwarzer Button mit Apple-Symbol.
