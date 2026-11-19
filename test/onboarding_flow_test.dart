@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -22,12 +21,11 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) async {
   );
   // .first: die Liste selbst; mehrzeilige Textfelder sind auch Scrollables.
   await tester.scrollUntilVisible(finder, 150, scrollable: vertical.first);
-  // Nicht über den oberen Rand hinausschieben.
-  final top = tester.getTopLeft(finder.first).dy;
-  final shift = min(120.0, top - 100);
-  if (shift > 0) {
-    await tester.drag(vertical.first, Offset(0, -shift));
-  }
+  // Etwas Abstand zum oberen Rand (nicht unter die AppBar).
+  await tester.pumpAndSettle();
+  unawaited(
+    Scrollable.ensureVisible(tester.element(finder.first), alignment: 0.3),
+  );
   await tester.pumpAndSettle();
 }
 

@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
+import '../push/push_widgets.dart';
 import '../quiz/quiz_providers.dart';
 import '../quiz/quiz_start_sheet.dart';
 import '../quiz/quiz_widgets.dart';
@@ -57,7 +58,8 @@ class GamesScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
                     const Text(
                       'Spielt mit einem Match als Team gegen ein anderes Paar. '
-                      '6 Runden – und jede:r spielt, wann es passt.',
+                      '6 Runden – und jede:r spielt, wann es passt. '
+                      'Pro Zug habt ihr $quizTurnTimeoutHours Stunden Zeit.',
                       style: TextStyle(color: LovelColors.cream),
                     ),
                     const SizedBox(height: 12),
@@ -75,6 +77,7 @@ class GamesScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 8),
+            const PushPromptCard(),
             for (final kind in QuizKind.values)
               Card(
                 child: ListTile(

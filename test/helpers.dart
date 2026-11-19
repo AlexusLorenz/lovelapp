@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
@@ -31,6 +32,7 @@ Future<void> pumpLovelApp(
   bool hasProfile = true,
   PickImages? pickImages,
   DemoAuthRepository? auth,
+  List<Override> overrides = const [],
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -53,6 +55,7 @@ Future<void> pumpLovelApp(
         profileRepositoryProvider.overrideWithValue(
           DemoProfileRepository(existingUserIds: [if (hasProfile) testUser.id]),
         ),
+        ...overrides,
       ],
       child: const LovelApp(),
     ),

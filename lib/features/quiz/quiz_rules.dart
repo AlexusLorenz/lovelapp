@@ -147,3 +147,15 @@ bool isProposerInRound(int round, {required bool iAmUserA}) =>
 
 /// Team, das in Runde [round] die Kategorie wählt: ungerade Team A.
 bool teamAChooses(int round) => round.isOdd;
+
+// Inaktivität – synchron mit private.quiz_inactivity() und
+// private.quiz_quitter() (Migration beta_readiness).
+
+/// Nach so vielen Stunden ohne Zug kommt eine Erinnerung.
+const quizReminderHours = 48;
+
+/// Nach so vielen Stunden ohne Zug verliert das Team am Zug.
+const quizTurnTimeoutHours = 72;
+
+/// Ab so vielen Aufgaben in 30 Tagen keine Zufallsgegner mehr.
+const quizQuitterLimit = 3;

@@ -7,7 +7,10 @@ import '../account/delete_account.dart';
 import '../discover/discover_providers.dart';
 import '../location/location_prompt.dart';
 import '../../core/theme/app_theme.dart';
+import '../moderation/moderation_providers.dart';
 import '../photos/photos_repository.dart';
+import '../push/push_providers.dart';
+import '../push/push_widgets.dart';
 import '../progress/level.dart';
 import 'own_profile_providers.dart';
 import 'widgets/completion_avatar.dart';
@@ -138,6 +141,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const PushSettingTile(),
           const ListTile(
             leading: Icon(Icons.privacy_tip_outlined),
             title: Text('Privatsphäre & Einwilligungen'),
@@ -151,11 +155,18 @@ class ProfileScreen extends ConsumerWidget {
             ),
             onTap: () => context.push(Routes.changePassword),
           ),
+          if (ref.watch(isAdminProvider).value ?? false)
+            ListTile(
+              leading: const Icon(Icons.shield_outlined),
+              title: const Text('Moderation'),
+              subtitle: const Text('Meldungen und Kennzahlen'),
+              onTap: () => context.push(Routes.moderation),
+            ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Abmelden'),
-            onTap: () => ref.read(authRepositoryProvider).signOut(),
+            onTap: () => signOutWithPush(ref),
           ),
           ListTile(
             leading: const Icon(

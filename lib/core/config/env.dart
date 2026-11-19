@@ -26,6 +26,9 @@ class Env {
   /// eingeladene Personen (in Supabase „Allow new users to sign up“ aus).
   static const inviteOnly = bool.fromEnvironment('INVITE_ONLY');
 
+  /// Sentry-DSN für Absturzberichte. Leer = keine Berichte.
+  static const sentryDsn = String.fromEnvironment('SENTRY_DSN');
+
   /// Gemeinsames Passwort der Test-Konten (siehe `test_accounts.dart`).
   /// Ist es gesetzt, zeigt die Anmeldeseite die Test-Konten zur Auswahl.
   /// Nur für die Testphase – die Konten sind von echten Nutzern getrennt.
