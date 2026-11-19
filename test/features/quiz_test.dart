@@ -308,7 +308,13 @@ void main() {
     await settleShort(tester);
 
     for (var i = 0; i < 3; i++) {
-      await tester.enterText(find.byType(TextField), '1.000');
+      // Jede Frage beginnt mit leerem Feld (nicht der letzten Schätzung).
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        isEmpty,
+        reason: 'Frage ${i + 1}',
+      );
+      await tester.enterText(find.byType(TextField), '${i + 1}.000');
       await tester.tap(find.text('Schätzung abgeben'));
       await settleShort(tester);
     }

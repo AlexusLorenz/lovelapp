@@ -476,6 +476,9 @@ class _QuestionView extends StatelessWidget {
         const SizedBox(height: 16),
         if (view.kind == QuizKind.estimate)
           _EstimateInput(
+            // Neues Feld je Frage und Rolle, sonst bliebe die letzte
+            // Eingabe stehen.
+            key: ValueKey((view.index, view.role, view.question)),
             unit: view.unit,
             initial: deciding ? view.proposalNumber : null,
             onSubmit: onEstimate,
@@ -503,6 +506,7 @@ class _QuestionView extends StatelessWidget {
 /// Zahleneingabe fürs Schätzduell.
 class _EstimateInput extends StatefulWidget {
   const _EstimateInput({
+    super.key,
     required this.unit,
     required this.initial,
     required this.onSubmit,
