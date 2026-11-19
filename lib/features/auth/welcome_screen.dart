@@ -5,32 +5,11 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/config/env.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/lovel_logo.dart';
 import '../session/session_controller.dart';
 import 'auth_repository.dart';
 import 'test_account_picker.dart';
 import 'test_accounts.dart';
-
-/// Schriftzug „LOVEL“.
-class LovelLogo extends StatelessWidget {
-  const LovelLogo({super.key, this.size = 96});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      'LOVEL',
-      semanticsLabel: 'Lovel',
-      style: TextStyle(
-        fontFamily: AppTheme.displayFont,
-        fontSize: size,
-        height: 1,
-        letterSpacing: size * 0.06,
-        color: LovelColors.terracotta,
-      ),
-    );
-  }
-}
 
 /// Hinweis, dass im Demo-Modus nichts gespeichert wird.
 class DemoModeBanner extends StatelessWidget {
@@ -126,7 +105,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           const Spacer(),
-                          const Center(child: LovelLogo()),
+                          const Center(child: LovelLogo(size: 64)),
                           const SizedBox(height: 12),
                           Text(
                             'Erst spielen, dann daten.',

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../auth/welcome_screen.dart';
+import '../../core/widgets/lovel_logo.dart';
 import 'session_controller.dart';
 
 /// Wird gezeigt, während die Sitzung geprüft wird – oder wenn das scheitert.
@@ -19,7 +19,7 @@ class SplashScreen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const LovelLogo(size: 64),
+              const LovelLogo(size: 48),
               const SizedBox(height: 32),
               if (!failed)
                 const CircularProgressIndicator()
