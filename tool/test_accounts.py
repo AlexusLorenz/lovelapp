@@ -113,7 +113,7 @@ ACCOUNTS = [
                   ("first_date", "Ein Konzert, bei dem wir beide keine Band kennen.")],
          interests=["hobbies.schach", "music.jazz", "creative.klavier", "hobbies.vintage",
                     "food.specialty_coffee", "books.klassiker"],
-         games=["Chess", "Disco Elysium"], artists=["Miles Davis", "Radiohead"]),
+         games=["Chess Ultra", "Disco Elysium"], artists=["Miles Davis", "Radiohead"]),
     dict(n=8, name="Tim", age=26, gender="man",
          bio="Student, Fußball am Wochenende, Döner-Tester unter der Woche.",
          basics=dict(relationship_goal="unsure", children="not_sure", smoking="never",
@@ -123,7 +123,7 @@ ACCOUNTS = [
                   ("superpower", "Ich kenne jeden Song nach drei Sekunden.")],
          interests=["sports.fussball", "food.doener", "music.deutschrap", "hobbies.karaoke",
                     "going_out.festivals", "gaming.konsole"],
-         games=["EA Sports FC 24", "Rocket League"], artists=["Cro", "Apache 207"]),
+         games=["EA Sports FC 24", "Rocket League"], artists=["Kraftklub", "Apache 207"]),
 ]
 
 # Berlin, auf ~1 km gerundet (Leitplanke), leicht verteilt.
