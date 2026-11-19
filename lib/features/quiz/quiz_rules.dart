@@ -1,7 +1,7 @@
 // Regeln der 2-gegen-2-Spiele. Reine Logik ohne Flutter-Import.
 //
 // MÜSSEN zu supabase/migrations/20261118161147_quiz_duel.sql und
-// 20261118210000_party_games.sql passen.
+// 20261119002359_party_games.sql passen.
 
 const quizRounds = 6;
 const quizQuestionsPerRound = 3;

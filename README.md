@@ -73,7 +73,7 @@ Pro Runde schlägt ein Teammitglied vor, das andere entscheidet – die Rollen w
 Kein Echtzeit-Zwang: Jede Person spielt, wann sie Zeit hat; die App zeigt im Tab
 „Spiele“, wer dran ist. Gegner zufällig oder per Einladungscode.
 
-- Weitere Spielarten auf derselben Engine (`quiz_games.kind`): `20261118210000_party_games.sql`.
+- Weitere Spielarten auf derselben Engine (`quiz_games.kind`): `20261119002359_party_games.sql`.
   Schätzduell: 0–3 Punkte je nach Nähe; Seelenverwandt: Antwort der Partnerin bleibt beim Raten
   verborgen, Antworten über sich selbst sieht das andere Paar nie.
 - Spiellogik komplett serverseitig: `supabase/migrations/20261118161147_quiz_duel.sql`
